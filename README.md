@@ -94,7 +94,7 @@
 | RN-04 | O pedido registra armação e lentes; os preços são por armação e por par de lentes. | Formulário e entrevista |
 | RN-05 | O pedido pode ser pago em partes e ter parcelas acompanhadas em planilha. | Entrevista |
 | RN-06 | Um pedido pode não gerar compra (usa estoque); se gerar, cada compra atende um único pedido e um único fornecedor. | Entrevista |
-| RN-07 | A garantia de 1 ano começa na montagem/finalização, não na retirada. | Entrevista |
+| RN-07 | A garantia começa na montagem/finalização, não na retirada: 1 ano para a armação e 6 meses para a lente (cobertura na RN-19). | Entrevista; resposta do gerente (14/10/2026) |
 | RN-08 | Em troca ou devolução, peças intactas podem ser reaproveitadas e as demais são descartadas. | Entrevista |
 | RN-09 | Uma venda pode não ter receita (por exemplo, óculos de sol sem grau). | Resposta do gerente |
 | RN-10 | Cada receita tem no máximo 4 linhas de medida (OD/OE × longe/perto), garantido pela chave composta. | Laudo e pedido |
@@ -102,6 +102,15 @@
 | RN-12 | O motivo do movimento de estoque define a origem obrigatória (item de venda, item de compra ou troca). | Modelagem |
 | RN-13 | DNP e altura são registradas por olho. | Resposta do gerente |
 | RN-14 | Todo produto é exatamente uma armação ou exatamente uma lente. | Modelagem (generalização disjunta e total) |
+| RN-15 | O teste de vista e o laudo são realizados somente pelo optometrista; toda receita com origem LAUDO_OTICA pertence a um atendimento conduzido por funcionário com função OPTOMETRISTA. | Resposta do gerente (14/10/2026) |
+| RN-16 | Lentes de grau só são vendidas com prescrição: receita de oftalmologista trazida pelo cliente ou laudo feito na própria ótica. Venda sem receita só é possível sem lente de grau (RN-09). | Resposta do gerente (14/10/2026) |
+| RN-17 | O pagamento pode ser parcelado em até 10 parcelas, e cada parcela tem valor mínimo de R$ 50,00. | Resposta do gerente (14/10/2026) |
+| RN-18 | Para encomendar a fabricação dos óculos, o pedido exige entrada (sinal) de no mínimo 30% do valor total, e o cliente recebe a data prevista em que os óculos estarão prontos. | Resposta do gerente (14/10/2026) |
+| RN-19 | A garantia da armação (1 ano) cobre defeito de fabricação, mola da armação e parafuso. A garantia da lente (6 meses) cobre adaptação, erro de grau, tratamento sem a eficácia esperada e arranhões, conforme o regulamento da ótica. | Resposta do gerente (14/10/2026); regulamento não consultado pelo grupo † |
+| RN-20 | Após a entrega, o cliente tem suporte técnico vitalício e gratuito: troca de plaquetas, ajustes e parafusos não são cobrados. | Resposta do gerente (14/10/2026) |
+| RN-21 | Os óculos são entregues a qualquer pessoa que apresente o canhoto de compra e venda (comprovante) dado ao cliente no dia da aquisição. | Resposta do gerente (14/10/2026) |
+| RN-22 | A nota fiscal é emitida somente quando o cliente solicita. | Resposta do gerente (14/10/2026) |
+| RN-23 | Todo orçamento é anotado e entregue ao cliente antes do fechamento do pedido. | Resposta do gerente (14/10/2026) |
  
 - **Restrições organizacionais:**
   - **Prazo de 1 ano da receita trazida e garantia de 1 ano** contada da montagem: definem os atributos de data e o cálculo do fim da garantia.
