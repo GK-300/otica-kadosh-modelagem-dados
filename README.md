@@ -30,7 +30,7 @@
   - Endereço: Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP.
   - Contato da loja: (11) 99349-4371. Entrevistado: **Marcos Vinícius Silva Menezes**, gerente.
   - **Data da visita e entrevista:** 05/09/2026, presencial, com observação do formulário de pedido, do comprovante entregue ao cliente e do laudo produzido na ótica. Depois da visita, o gerente respondeu por mensagem a dúvidas pontuais (venda sem receita e medidas por olho).
-  - Fotografia feita no interior da ótica durante a visita: [`Otica kadoshi.jpeg`]([Otica%20kadoshi.jpeg](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Otica%20kadoshi.jpeg)).
+  - Fotografia feita no interior da ótica durante a visita: [`Otica kadoshi.jpeg`]([Otica%20kadoshi.jpeg](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Otica%20kadoshi.jpeg]).
   - As fotos do formulário e do laudo contêm dados pessoais e de saúde reais; por isso **não foram publicadas**.
 
 ---
