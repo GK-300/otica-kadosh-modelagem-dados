@@ -86,6 +86,7 @@
 ## 4. Regras de Negócio
  
 - **Regras operacionais:**
+
 | ID | Regra | Fundamento |
 | --- | --- | --- |
 | RN-01 | Não há venda sem atendimento. Um atendimento resulta em no máximo uma venda. | Entrevista |
