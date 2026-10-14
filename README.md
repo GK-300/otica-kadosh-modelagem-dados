@@ -47,6 +47,7 @@
 
 ## 3. Requisitos do Sistema
 
+
 ### 3.1 Requisitos Funcionais
 
 | ID | O sistema deve permitir... | Origem |
@@ -83,9 +84,8 @@
 ---
 
 ## 4. Regras de Negócio
-
+ 
 - **Regras operacionais:**
-
 | ID | Regra | Fundamento |
 | --- | --- | --- |
 | RN-01 | Não há venda sem atendimento. Um atendimento resulta em no máximo uma venda. | Entrevista |
@@ -102,13 +102,14 @@
 | RN-12 | O motivo do movimento de estoque define a origem obrigatória (item de venda, item de compra ou troca). | Modelagem |
 | RN-13 | DNP e altura são registradas por olho. | Resposta do gerente |
 | RN-14 | Todo produto é exatamente uma armação ou exatamente uma lente. | Modelagem (generalização disjunta e total) |
-
+ 
 - **Restrições organizacionais:**
   - **Prazo de 1 ano da receita trazida e garantia de 1 ano** contada da montagem: definem os atributos de data e o cálculo do fim da garantia.
   - **Dados de saúde (receitas e medidas):** exigem controle de acesso e trilha de auditoria por força da LGPD.
   - **Cobrança por dano:** a ótica cobra em alguns casos, inclusive por imprudência do cliente; por isso a troca guarda um valor cobrado opcional.
   - **Retirada efetiva** diferente de montagem: o sistema precisa guardar as duas datas.
 - **Cuidados de publicação:** exemplos de valores usados neste projeto são fictícios; fotos de documentos com dados reais não foram publicadas.
+
 
 ---
 
