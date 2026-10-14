@@ -45,33 +45,6 @@
   5. **Montagem, retirada e garantia:** com os produtos em mãos, a ótica monta e finaliza os óculos, avisa o cliente e registra a **retirada efetiva**. A **garantia é de 1 ano**, contada da montagem/finalização.
   6. **Trocas e devoluções:** o pedido em papel registra a data do ocorrido, a possível cobrança e a descrição do dano. A substituição sai do estoque ou de novo pedido ao fornecedor. Peças intactas são reaproveitadas e as demais, descartadas.
 
-- **Fluxograma ponta a ponta** (mostra como os processos se encadeiam):
-
-```mermaid
-flowchart TD
-    A["Cliente chega à loja"] --> B["Atendimento registrado"]
-    B --> C{"Óculos com grau?"}
-    C -- "Não, ex.: sol sem grau" --> F
-    C -- "Sim" --> D{"Receita trazida tem até 1 ano?"}
-    D -- "Sim" --> E["Registrar receita e medidas por olho e distância"]
-    D -- "Não" --> D2["Teste na ótica e laudo"] --> E
-    E --> F["Registrar pedido: itens de armação e lentes"]
-    F --> G["Cliente paga sinal; parcelas se houver"]
-    G --> H{"Produtos em estoque?"}
-    H -- "Sim" --> I["Saída de estoque"]
-    H -- "Não" --> J["Gerente compra do fornecedor"] --> K["Chegada e entrada no estoque"] --> I
-    I --> L["Montagem e finalização: início da garantia de 1 ano"]
-    L --> M["Aviso ao cliente"]
-    M --> N["Retirada efetiva e pagamento do saldo"]
-    N --> O{"Dano ou troca?"}
-    O -- "Não" --> T["Fim"]
-    O -- "Sim" --> P["Registrar troca ou devolução"] --> Q{"Peça intacta?"}
-    Q -- "Sim" --> R["Reaproveitar: entrada no estoque"]
-    Q -- "Não" --> S["Descartar"]
-```
-
----
-
 ## 3. Requisitos do Sistema
 
 ### 3.1 Requisitos Funcionais
