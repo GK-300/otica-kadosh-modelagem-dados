@@ -23,14 +23,16 @@
 ## 1. Caracterização da Organização
 
 - **Nome e natureza da organização:** **Ótica Kadosh**, estabelecimento comercial **com fins lucrativos** que vende produtos ópticos (armações e lentes). Fica na Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP, CEP 08191-000.
-- **Contexto e porte:** pequeno comércio com **três funcionários**: um optometrista, um gerente e um consultor óptico. O gerente informou cerca de **100 atendimentos e 80 vendas por semana**, o que indica que parte dos atendimentos não termina em venda. A ótica atende clientes presencialmente, vende armações e lentes, recebe pagamentos à vista, parcelados ou em partes, mantém estoque, compra de fornecedores quando falta produto e trata trocas e devoluções.
+- **Contexto e porte:** pequeno comércio com **três funcionários**: um optometrista (**Guilherme de Souza Silva**), um gerente (**Marcos Vinícius Silva Menezes**) e um consultor óptico (**Kaique Batista dos Santos**). O gerente informou cerca de **100 atendimentos e 80 vendas por semana**, o que indica que parte dos atendimentos não termina em venda. A ótica atende clientes presencialmente, vende armações e lentes, recebe pagamentos à vista, parcelados ou em partes, mantém estoque, compra de fornecedores quando falta produto e trata trocas e devoluções.
 - **Problemas e necessidades identificados:** pedidos, estoque e parcelas são controlados em **papel e planilhas separadas**, e um banco de dados usado antes apresentava falhas frequentes. Hoje não há vínculo seguro entre atendimento, receita, pedido, pagamentos, compras ao fornecedor, estoque e trocas, e cada consulta exige abrir vários registros. O sistema precisa relacionar tudo isso, saber o saldo de estoque e o saldo a pagar de cada pedido e proteger os dados de saúde dos clientes.
 - **Justificativa da escolha:** o grupo tem acesso presencial à ótica e ao gerente. O negócio é pequeno o bastante para o primeiro DER, mas tem processos encadeados e observáveis (atendimento, receita, venda, pagamento, compra, montagem, retirada, garantia e troca) que exigem relacionamentos variados: 1:1, 1:N, entidades fracas e generalização.
 - **Evidências da organização:**
   - Endereço: Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP.
   - Contato da loja: (11) 99349-4371. Entrevistado: **Marcos Vinícius Silva Menezes**, gerente.
   - **Data da visita e entrevista:** 05/09/2026, presencial, com observação do formulário de pedido, do comprovante entregue ao cliente e do laudo produzido na ótica. Depois da visita, o gerente respondeu por mensagem a dúvidas pontuais (venda sem receita e medidas por olho).
-  - Fotografia feita no interior da ótica durante a visita: [`Otica kadoshi.jpeg`]([Otica%20kadoshi.jpeg](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Otica%20kadoshi.jpeg]).
+  - Fotografia feita no interior da ótica durante a visita: `Otica kadoshi.jpeg`.
+  - As fotos do formulário e do laudo contêm dados pessoais e de saúde reais; por isso **não foram publicadas**.
+  - Fotografia feita no interior da ótica durante a visita: [`Otica kadoshi.jpeg`]([Otica%20kadoshi.jpeg]).
   - As fotos do formulário e do laudo contêm dados pessoais e de saúde reais; por isso **não foram publicadas**.
 
 ---
