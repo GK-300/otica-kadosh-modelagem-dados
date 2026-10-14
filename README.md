@@ -426,7 +426,7 @@ Lançamento de entrada ou saída de um produto no estoque. O saldo é sempre cal
 
 ## 7. Diagrama Entidade-Relacionamento (DER)
 
-<img width="4912" height="4377" alt="DER_Otica_Kadosh_Alta_Resolucao (1)" src="https://github.com/user-attachments/assets/4415726b-71a3-47b7-b950-1e47be0d1253" />
+  <img src="DER_Otica_Kadosh_Atualizado_Alta_Resolucao.jpeg" alt="DER da Ótica Kadosh" width="100%">
 
 
 O DER foi elaborado no **brModelo** e mostra as 17 entidades, seus atributos (identificadores com círculo preenchido), os relacionamentos nomeados e as cardinalidades (mínimo, máximo) junto de cada entidade. A tabela de cardinalidades está na Seção 6.
