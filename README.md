@@ -182,7 +182,7 @@ Prescrição oftalmológica usada no pedido: trazida pelo cliente ou produzida p
 | --- | --- | --- |
 | `ID_RECEITA` (`id_receita`) | Código interno da receita. Tipo: `integer`; obrigatório: Sim (PK). | Gerado pelo sistema. |
 | `ID_ATENDIMENTO` — vínculo ORIGINA | Atendimento em que a receita foi obtida ou apresentada. Tipo: `integer`; obrigatório: Sim (FK, único). | FK para ATENDIMENTO; único: um atendimento origina no máximo uma receita. |
-| `TP_ORIGEM` (`origem`) | De onde veio a prescrição. Tipo: `varchar(10)`; obrigatório: Sim. | Domínio: TRAZIDA (apresentada pelo cliente) ou LAUDO_OTICA (teste feito na ótica). |
+| `TP_ORIGEM` (`origem`) | De onde veio a prescrição. Tipo: `varchar(11)`; obrigatório: Sim. | Domínio: TRAZIDA (apresentada pelo cliente) ou LAUDO_OTICA (teste feito na ótica). |
 | `DT_RECEITA` (`data_receita`) | Data anotada na receita ou no laudo. Tipo: `date`; obrigatório: Sim. | RN-03: receita trazida é aceita se tiver até 1 ano; senão a ótica faz novo teste. É prática da ótica, não prazo legal geral. |
 | `DS_OBSERVACAO` (`observacao`) | Anotação complementar do laudo (espaço “Obs.”). Tipo: `varchar(255)`; obrigatório: Não. | Só quando houver anotação. |
 
