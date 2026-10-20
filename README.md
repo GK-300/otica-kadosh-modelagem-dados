@@ -564,11 +564,8 @@ As cardinalidades nas duas colunas correspondem à participação de cada entida
 
 ### DER da Ótica Kadosh
 
+<img width="4758" height="4100" alt="DER_Otica_Kadosh_recortado" src="https://github.com/user-attachments/assets/2d119e88-d26d-49eb-8f9d-f643e8f46ae3" />
 
-<img src="./DER_Otica_Kadosh.png" alt="DER da Ótica Kadosh" width="100%">
-
-
-[Abrir o DER em alta resolução](./DER_Otica_Kadosh.png) · [Abrir a versão PDF](./DER_Otica_Kadosh_FINAL.pdf)
 
 
 A imagem é a exportação do DER final elaborado no brModelo. As regras de exclusão mútua, especialização e linhas repetidas estão nas notas do diagrama e nas seções 4, 6 e 8. A evolução para o modelo relacional deve preservar essas regras; não basta aceitar automaticamente a conversão do editor.
