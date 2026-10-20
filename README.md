@@ -543,6 +543,8 @@ As cardinalidades nas duas colunas correspondem à participação de cada entida
 | COMPRA | GERA ENTRADA | MOVIMENTO_ESTOQUE | (0,n) | (0,1) | Movimento pode ter uma compra como origem. |
 | TROCA_DEVOLUCAO | ORIGINA | MOVIMENTO_ESTOQUE | (0,n) | (0,1) | Ocorrência pode originar vários movimentos de retorno, substituição ou descarte. |
 | MOVIMENTO_ESTOQUE | MOVIMENTADO EM | PRODUTO | (1,1) | (0,n) | Todo movimento refere-se a um produto; produto pode não ter movimentos. |
+| PRODUTO | ESPECIALIZA-SE EM | LENTE | (1,1) | (0,1) | Todo produto é especializado em um único subtipo (total e disjunta); a lente herda o identificador do produto. |
+| PRODUTO | ESPECIALIZA-SE EM | ARMACAO | (1,1) | (0,1) | Todo produto é especializado em um único subtipo (total e disjunta); a armação herda o identificador do produto. |
 
 
 ### 6.4 Restrições e políticas aplicadas
