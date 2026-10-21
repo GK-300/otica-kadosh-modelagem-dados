@@ -162,7 +162,10 @@ Os requisitos de qualidade são propostas técnicas para orientar a implementaç
 O DER final contém **16 entidades, 106 atributos desenhados nas entidades e 9 atributos nos três relacionamentos com atributos**. Essa contagem não inclui referências propostas para a transformação relacional nem repete o identificador herdado nos subtipos. Não corresponde a uma contagem de colunas físicas implementadas.
 
 
-O [Dicionário de Dados em HTML](./Dicionario_de_Dados_Otica_Kadosh.html) segue o exemplo do professor: notação formal, tipo físico proposto, obrigatoriedade, significado, índices, auditoria e acesso. A coluna abaixo apresenta o nome padronizado e, entre parênteses, o nome exibido no DER. Prefixos: ID_ identificador, NM_ nome, DT_ data, DH_ data e hora, HR_ horário, NR_ número textual/ordinal, QT_ quantidade, VL_ valor, TP_/CD_ categoria/domínio, IN_ indicador e DS_ descrição.
+. [Ver código do dicionário](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Dicionario_de_Dados_Otica_Kadosh.html)
+
+. [Visualizar no GitHub Pages](https://jfpiresoficial.github.io/otica-kadosh-modelagem-dados/)
+
 
 
 **Privacidade:** os documentos descrevem estruturas e regras; não publicam registros reais de clientes nem prescrições. OD/OE = olho direito/esquerdo; DNP = distância nasopupilar.
