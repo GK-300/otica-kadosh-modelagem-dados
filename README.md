@@ -11,13 +11,13 @@
 
 - **Nomes dos alunos e RGM**
 
-| Integrante | RGM |
-| --- | --- |
-| Victor Augusto Silva Marcilio | 47190175 |
-| João Felipe de Sousa Pires | 48165379 |
-| Cauã Batista Freire | 48355127 |
-| João Victor Gobi Romero | 48114642 |
-| Guilherme Araujo de Oliveira | 47116862 |
+| Integrante | RGM | Usuário no GitHub |
+| --- | --- | --- |
+| Victor Augusto Silva Marcilio | 47190175 | [Victordev14](https://github.com/Victordev14) |
+| João Felipe de Sousa Pires | 48165379 | [jfpiresoficial](https://github.com/jfpiresoficial) |
+| Cauã Batista Freire | 48355127 | [cauabf-prev](https://github.com/cauabf-prev) |
+| João Victor Gobi Romero | 48114642 | [joaovromero](https://github.com/joaovromero) |
+| Guilherme Araujo de Oliveira | 47116862 | [GK-300](https://github.com/GK-300) |
 
 ---
 
