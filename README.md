@@ -753,6 +753,21 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Reflexão crítica | A leitura de imagens pode confundir linhas e rótulos. Um atributo numero_linha não garante sozinho uma implementação correta das linhas repetidas; a próxima etapa precisa validar chaves e restrições. Tipos e políticas propostas não devem ser apresentados como práticas confirmadas da loja. |
 
 
+### Uso 9 — reorganização do DER, especialização de PRODUTO e revisão final
+
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | Claude (Anthropic), com acesso ao navegador: leitura do DER no brModelo, reorganização do layout, atualização do dicionário e do README e conferência final. |
+| Motivação | Deixar o DER mais legível sem mudar seu conteúdo, incluir a especialização de PRODUTO nos documentos e corrigir os erros encontrados na última conferência. |
+| Prompt(s) utilizados | “Quero que faça uma versão desse diagrama contendo as mesmas coisas só que preciso que fique mais organizado”; “agora quero que faça o dicionário desse diagrama utilizando o mesmo modelo do diagrama do Github adicione apenas o que não aparece nele”; “Agora coloque a foto do DER que vc fez mas antes compare os dois para ter a certeza de que estão iguais”; “Confira uma ultima vez o trabalho e veja se já está nos conformes”; “Quero que vc faça a correção dos erros de digitação do diagrama também”. |
+| Resposta recebida | Versão reorganizada do DER (apenas posições e alinhamento dos rótulos), linhas do relacionamento ESPECIALIZA-SE EM no README e no dicionário HTML, conferência final dos arquivos, aplicação do novo layout e das correções no modelo do grupo no brModelo e nova imagem do DER. |
+| Fontes consultadas e verificadas | DER público do grupo no brModelo, README e dicionário HTML do repositório. A IA comparou entidades, atributos, relacionamentos, cardinalidades e notas entre o diagrama reorganizado e o original, e entre a imagem e o README. Essa comparação não substitui a revisão acadêmica do grupo. |
+| Trechos rejeitados ou corrigidos | Corrigidos no diagrama os textos “TEM OCOREÊNCIA” (agora “TEM OCORRÊNCIA”) e “finalidadde” (agora “finalidade”). Restaurados a legenda dos prefixos e os links da Seção 5 do README. Imagem do README trocada pela versão sem os erros de digitação. |
+| Justificativa da escolha final | Manter o conteúdo do DER elaborado pelo grupo e mudar somente a organização visual, para que diagrama, dicionário e README continuem iguais. |
+| Reflexão crítica | O grupo não tinha a versão reorganizada salva, então o layout foi reaplicado no brModelo a partir da imagem. A IA pode errar ao ler imagens e o resultado precisa ser conferido pelo grupo. A decisão sobre o conteúdo do modelo continua sendo do grupo. |
+
+
 ## Critérios Atitudinais (20%)
 
 
