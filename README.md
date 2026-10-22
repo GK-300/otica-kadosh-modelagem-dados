@@ -570,7 +570,7 @@ As cardinalidades nas duas colunas correspondem à participação de cada entida
 
 ### DER da Ótica Kadosh
 
-<img width="3673" height="2898" alt="DER_Otica_Kadosh_reorganizado" src="https://github.com/user-attachments/assets/e0e62b21-6796-40bc-94d2-7c23a712746c" />
+<img width="3673" height="2898" alt="DER_Otica_Kadosh_reorganizado" src="./DER_Otica_Kadosh_reorganizado.png" />
 
 
 
