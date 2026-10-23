@@ -25,7 +25,7 @@
 
 - **Nome e natureza da organização:** **Ótica Kadosh**, estabelecimento comercial **com fins lucrativos** que vende produtos ópticos (armações e lentes). Fica na Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP, CEP 08191-000.
 - **Contexto e porte:** pequeno comércio com **três funcionários**: um optometrista (**Guilherme de Souza Silva**), um gerente (**Marcos Vinícius Silva Menezes**) e um consultor óptico (**Kaique Batista dos Santos**). O gerente informou cerca de **100 atendimentos e 80 vendas por semana**, o que indica que parte dos atendimentos não termina em venda. A ótica atende clientes presencialmente, vende armações e lentes, recebe pagamentos à vista, parcelados ou em partes, mantém estoque, compra de fornecedores quando falta produto e trata trocas e devoluções.
-- **Problemas e necessidades identificados:** pedidos, estoque e parcelas são controlados em **papel e planilhas separadas**, e um banco de dados usado antes apresentava falhas frequentes. Hoje não há vínculo seguro entre atendimento, receita, pedido, pagamentos, compras ao fornecedor, estoque e trocas, e cada consulta exige abrir vários registros. O sistema precisa relacionar tudo isso, saber o saldo de estoque e o saldo a pagar de cada pedido e proteger os dados de saúde dos clientes.
+- **Problemas e necessidades identificados:** pedidos, estoque e parcelas são controlados em **papel e planilhas separadas**, e um banco de dados usado antes apresentava falhas frequentes. Hoje não há vínculo seguro entre atendimento, receita, pedido, pagamentos, compras ao fornecedor, estoque e trocas, e cada consulta exige abrir vários registros. O sistema precisa relacionar tudo isso, saber o saldo de estoque e o saldo a pagar de cada pedido e proteger os dados de saúde dos clientes. Os problemas de gestão estão numerados de P1 a P5 na tabela ao final desta seção.
 - **Justificativa da escolha:** o grupo tem acesso presencial à ótica e ao gerente. O negócio é pequeno o bastante para o primeiro DER, mas tem processos encadeados e observáveis (atendimento, receita, venda, pagamento, compra, montagem, retirada, garantia e troca) que exigem relacionamentos variados: 1:1, 1:N, entidades fracas e generalização.
 - **Evidências da organização:**
   - Endereço: Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP.
@@ -33,6 +33,16 @@
   - **Data da visita e entrevista:** 05/09/2026, presencial, com observação do formulário de pedido, do comprovante entregue ao cliente e do laudo produzido na ótica. Depois da visita, o gerente respondeu por mensagem a dúvidas pontuais (venda sem receita e medidas por olho).
   - Fotografia feita no interior da ótica durante a visita: [Fotografia da visita](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Otica%20kadoshi.jpeg).
   - As fotos do formulário e do laudo contêm dados pessoais e de saúde reais; por isso **não foram publicadas**.
+
+**Problemas de gestão numerados.** Cada um aparece no DER e terá ao menos uma consulta gerencial no script SQL. Os processos de negócio da Seção 2 usam o prefixo PR para não se confundir com estes códigos.
+
+| Código | Problema | Onde aparece no DER |
+| --- | --- | --- |
+| P1 | Pedidos, receitas e pagamentos ficam em papel e planilhas separadas, sem vínculo seguro entre atendimento, orçamento, venda e pagamento; cada consulta exige abrir vários registros. | CLIENTE, ATENDIMENTO, RECEITA, ORCAMENTO, VENDA, PAGAMENTO |
+| P2 | O saldo de estoque de armações e lentes não é controlado de forma segura. | PRODUTO, MOVIMENTO_ESTOQUE, COMPRA |
+| P3 | A garantia não tem controle por produto vendido: um ano para a armação e seis meses para a lente, contados da montagem (RN-07). | VENDA, CONTÉM, PRODUTO, LENTE, ARMACAO |
+| P4 | A conversão de atendimentos em vendas não é medida; a loja faz cerca de 100 atendimentos e 80 vendas por semana. | ATENDIMENTO, VENDA |
+| P5 | Os dados de saúde das receitas precisam de proteção; lente de grau só é vendida com receita (RN-16). | RECEITA, RECEITA_MEDIDA, VENDA, LENTE |
 
 ---
 
@@ -48,18 +58,18 @@
 
 | ID | Processo | Entrada | Sequência e responsável | Saída e integração |
 | --- | --- | --- | --- | --- |
-| P01 | Cadastro e atendimento | Cliente procura a loja. | Funcionário consulta/cadastra CLIENTE e registra ATENDIMENTO. | Histórico do cliente, mesmo sem venda. |
-| P02 | Receita e medidas | Receita trazida ou avaliação interna. | Registrar RECEITA, origem, data, emissor interno quando houver e medidas OD/OE × LONGE/PERTO. | Prescrição acessível pelo atendimento, com acesso restrito. |
-| P03 | Orçamento | Seleção de produtos e quantidades. | Consultor registra ORCAMENTO e condições em OFERECE; informa validade e registra aprovação. | Oferta preservada mesmo sem conversão. |
-| P04 | Venda | Orçamento aprovado e válido. | Converter em VENDA do mesmo atendimento; registrar linhas de CONTÉM, preços, quantidades e total. | Pedido comercial rastreável, com receita quando exigida. |
-| P05 | Sinal e parcelas | Condição de pagamento acordada. | Registrar PAGAMENTO; sinal pode gerar parcelas futuras por GERA; recebimento posterior pode QUITA uma parcela. | Plano do saldo sem duplicação do sinal. |
-| P06 | Compras e fornecedores | Reposição ou necessidade de uma venda. | Gerente registra COMPRA, FORNECEDOR e produtos em ADQUIRE; registra chegada. | Compra pode existir sem venda; recebimento gera entrada. |
-| P07 | Estoque | Compra recebida, venda executada ou pós-venda aceito. | Registrar MOVIMENTO_ESTOQUE com produto, quantidade, condição, direção e uma origem. | Saldos disponível e segregado calculados sem dupla baixa. |
-| P08 | Encomenda e montagem | Sinal suficiente e previsão informada. | Registrar liberação, envio ao fornecedor e montagem/finalização. | Datas previstas e realizadas preservadas; início da garantia comercial. |
-| P09 | Retirada | Óculos prontos e canhoto apresentado. | Conferir canhoto e registrar retirada efetiva. | Entrega registrada; previsão não se confunde com realização. |
-| P10 | Manutenção | Solicitação de ajustes após a entrega. | Registrar atendimento de manutenção e serviço realizado. | Histórico do suporte gratuito relatado. |
-| P11 | Troca, devolução e garantia | Solicitação referente a produto vendido. | Registrar TROCA_DEVOLUCAO, linha afetada, avaliação e decisão; executar movimentos/acertos autorizados. | Retorno, substituição e descarte rastreados; recusas preservadas. |
-| P12 | Cancelamento e referência fiscal | Solicitação de desistência ou emissão fiscal externa. | Registrar instantes para análise comercial e referência do documento fiscal emitido. | Decisão auditável e referência fiscal; sem presumir integração externa. |
+| PR01 | Cadastro e atendimento | Cliente procura a loja. | Funcionário consulta/cadastra CLIENTE e registra ATENDIMENTO. | Histórico do cliente, mesmo sem venda. |
+| PR02 | Receita e medidas | Receita trazida ou avaliação interna. | Registrar RECEITA, origem, data, emissor interno quando houver e medidas OD/OE × LONGE/PERTO. | Prescrição acessível pelo atendimento, com acesso restrito. |
+| PR03 | Orçamento | Seleção de produtos e quantidades. | Consultor registra ORCAMENTO e condições em OFERECE; informa validade e registra aprovação. | Oferta preservada mesmo sem conversão. |
+| PR04 | Venda | Orçamento aprovado e válido. | Converter em VENDA do mesmo atendimento; registrar linhas de CONTÉM, preços, quantidades e total. | Pedido comercial rastreável, com receita quando exigida. |
+| PR05 | Sinal e parcelas | Condição de pagamento acordada. | Registrar PAGAMENTO; sinal pode gerar parcelas futuras por GERA; recebimento posterior pode QUITA uma parcela. | Plano do saldo sem duplicação do sinal. |
+| PR06 | Compras e fornecedores | Reposição ou necessidade de uma venda. | Gerente registra COMPRA, FORNECEDOR e produtos em ADQUIRE; registra chegada. | Compra pode existir sem venda; recebimento gera entrada. |
+| PR07 | Estoque | Compra recebida, venda executada ou pós-venda aceito. | Registrar MOVIMENTO_ESTOQUE com produto, quantidade, condição, direção e uma origem. | Saldos disponível e segregado calculados sem dupla baixa. |
+| PR08 | Encomenda e montagem | Sinal suficiente e previsão informada. | Registrar liberação, envio ao fornecedor e montagem/finalização. | Datas previstas e realizadas preservadas; início da garantia comercial. |
+| PR09 | Retirada | Óculos prontos e canhoto apresentado. | Conferir canhoto e registrar retirada efetiva. | Entrega registrada; previsão não se confunde com realização. |
+| PR10 | Manutenção | Solicitação de ajustes após a entrega. | Registrar atendimento de manutenção e serviço realizado. | Histórico do suporte gratuito relatado. |
+| PR11 | Troca, devolução e garantia | Solicitação referente a produto vendido. | Registrar TROCA_DEVOLUCAO, linha afetada, avaliação e decisão; executar movimentos/acertos autorizados. | Retorno, substituição e descarte rastreados; recusas preservadas. |
+| PR12 | Cancelamento e referência fiscal | Solicitação de desistência ou emissão fiscal externa. | Registrar instantes para análise comercial e referência do documento fiscal emitido. | Decisão auditável e referência fiscal; sem presumir integração externa. |
 
 
 **Fluxogramas:** a representação gráfica é opcional no esqueleto. O grupo documenta os processos em sequência textual na tabela acima, sem fluxograma. O levantamento não confirmou laboratório externo independente do fornecedor nem ordem de serviço; essas entidades não foram acrescentadas.
