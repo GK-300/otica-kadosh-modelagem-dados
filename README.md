@@ -645,7 +645,7 @@ Esta é a Entrega 1, de modelo conceitual. Tipos físicos, tamanhos, índices, c
 | Requisitos e regras | Seções 3 e 4 | 18 RF, 7 RNF e 34 regras com origem indicada. |
 | Dicionário conceitual por entidade | Seção 5 | 16 tabelas de entidades e três de atributos de relacionamentos. |
 | Entidades, atributos e relacionamentos | Seção 6 | Classificações, cardinalidades e restrições complementares. |
-| DER anexado em imagem | Seção 7 | Imagem local e PDF incluídos no pacote para publicação. |
+| DER anexado em imagem | Seção 7 | Imagem PNG do DER incluída no repositório e exibida diretamente no README. |
 | Justificativa técnica | Seção 8 | Decisões e limites da representação. |
 | Uso de IA | Seção 9 | Ferramentas, prompts, respostas, correções e reflexão. |
 | Dicionário HTML conforme exemplo | Arquivo HTML, seções 1 a 6 | Notação, tabelas, índices propostos, log e matriz de acesso. |
@@ -777,6 +777,21 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Trechos rejeitados ou corrigidos | Corrigidos no diagrama os textos “TEM OCOREÊNCIA” (agora “TEM OCORRÊNCIA”) e “finalidadde” (agora “finalidade”). Restaurados a legenda dos prefixos e os links da Seção 5 do README. Imagem do README trocada pela versão sem os erros de digitação. |
 | Justificativa da escolha final | Manter o conteúdo do DER elaborado pelo grupo e mudar somente a organização visual, para que diagrama, dicionário e README continuem iguais. |
 | Reflexão crítica | O grupo não tinha a versão reorganizada salva, então o layout foi reaplicado no brModelo a partir da imagem. A IA pode errar ao ler imagens e o resultado precisa ser conferido pelo grupo. A decisão sobre o conteúdo do modelo continua sendo do grupo. |
+
+
+
+### Uso 10 — revisão de consistência documental (24/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: revisão da Entrega 1 e correções documentais no README e no dicionário HTML. |
+| Motivação | Corrigir divergências confirmadas entre arquivos do mesmo projeto antes de avançar à Entrega 2. |
+| Prompt(s) utilizados | “Reanalise [...] baseado no esqueleto da entrega 1 e no que tá lá no GitHub [...] encontre os problemas”; “Pega essas três [...] e estrutura [...] como você vai fazer a mudança”; “Analisa de novo o GitHub e tenta achar um porquê esses problemas estão aí”; “Pode ir lá no meu github e fazer os commits”. |
+| Resposta recebida | Identificadas três inconsistências: RN-34 presente somente no README, links antigos de imagem/PDF no rodapé do HTML e afirmação no README sobre PDF não publicado. Proposta e execução de três commits documentais em branch separada no fork. |
+| Fontes consultadas e verificadas | Esqueleto da Entrega 1 fornecido ao grupo, README, HTML, árvore de arquivos, histórico de commits e imagem do DER no GitHub. A RN-34 foi reproduzida conforme o README, sem novo levantamento de campo. |
+| Trechos rejeitados ou corrigidos | Não foi criado um PDF apenas para manter um link antigo, nem foram alterados o DER, seus relacionamentos ou regras comerciais. Referências históricas a PDFs usados na elaboração foram preservadas. |
+| Justificativa da escolha final | Manter o modelo conceitual e corrigir somente divergências verificáveis na documentação publicada. |
+| Reflexão crítica | A IA não participou da entrevista com o gerente e não pode inferir a intenção dos autores dos commits. A conferência automatizada dos arquivos não substitui a revisão dos integrantes e do professor. |
 
 
 ## Critérios Atitudinais (20%)
