@@ -161,6 +161,7 @@ Os requisitos de qualidade são propostas técnicas para orientar a implementaç
 | RN-31 | O atendimento ligado diretamente à VENDA deve ser o mesmo que originou o ORCAMENTO dessa venda. | Nota final do DER |
 | RN-32 | O recebimento SINAL gera o plano do saldo: número e soma das parcelas são validados por venda, mesmo que haja mais de um recebimento de sinal. O sinal nunca é contado novamente como parcela quitada. | Decisão técnica de integridade |
 | RN-33 | Campos de reembolso e abatimento registram apenas acertos efetivamente autorizados; não comprovam que a loja oferece essas alternativas em todos os casos. | Limite do levantamento e campos do DER |
+| RN-34 | A loja mantém no mínimo 100 pares de lentes e 500 armações em estoque; abaixo disso, precisa repor. As lentes são contadas por par (RN-26). | Resposta do gerente |
 
 
 **Restrições organizacionais:** cumprir a unidade comercial por produto, preservar o histórico, separar previstos de realizados, exigir avaliação antes da decisão de pós-venda e aplicar acesso mínimo aos dados pessoais. As políticas comerciais relatadas não representam parecer jurídico. Regulamento de garantia, base legal de cada tratamento e prazos de retenção deverão ser formalizados pela organização antes do uso real.
@@ -641,7 +642,7 @@ Esta é a Entrega 1, de modelo conceitual. Tipos físicos, tamanhos, índices, c
 | --- | --- | --- |
 | Caracterização, acesso e evidências | Seção 1 | Organização, porte, problemas, contato, visita e referência à fotografia. |
 | Processos e integração | Seção 2 | Entradas, responsáveis, sequência e resultados; fluxograma opcional. |
-| Requisitos e regras | Seções 3 e 4 | 18 RF, 7 RNF e 33 regras com origem indicada. |
+| Requisitos e regras | Seções 3 e 4 | 18 RF, 7 RNF e 34 regras com origem indicada. |
 | Dicionário conceitual por entidade | Seção 5 | 16 tabelas de entidades e três de atributos de relacionamentos. |
 | Entidades, atributos e relacionamentos | Seção 6 | Classificações, cardinalidades e restrições complementares. |
 | DER anexado em imagem | Seção 7 | Imagem local e PDF incluídos no pacote para publicação. |
