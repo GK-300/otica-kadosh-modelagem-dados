@@ -78,6 +78,24 @@ Comparação com a versão que recebeu a correção do professor.
 - A primeira versão não trazia nome, endereço nem contato da loja. Agora estão registrados a organização, o endereço, o telefone, o responsável (Marcos Vinícius) e a visita de 05/09/2026.
 - Depois da visita, o gerente respondeu por mensagem a novas dúvidas (14 e 15/10/2026): o que a garantia cobre, a política de desistência, a venda de óculos sem grau sem receita e as medidas de DNP e altura por olho.
 - Confirmações de 15/10/2026 registradas no README: parcelamento do saldo no cartão em até dez parcelas de no mínimo R$ 50,00 (RN-17); toda venda precedida de orçamento, com validade usual de 24 horas (RN-23); lentes contadas por par e armações por unidade (RN-26).
+- Foram retiradas as ligações diretas VENDA–PARCELA e VENDA–RECEITA, conforme a orientação do professor. A receita passou a ser consultada pelo atendimento da venda, e as parcelas ficaram vinculadas ao pagamento de sinal que as gerou.
+- As entidades ITEM_VENDA e ITEM_COMPRA foram retiradas. Quantidade, preço de venda e custo de compra passaram a ser descritos nos relacionamentos entre venda, compra e produto.
+- TROCA_DEVOLUCAO passou a se relacionar diretamente com VENDA e PRODUTO, identificando a venda e o produto envolvidos na ocorrência.
+- A documentação passou a distinguir o pagamento já recebido da parcela que ainda será quitada.
+- As medidas da receita foram organizadas por olho (direito e esquerdo) e distância (longe e perto), incluindo DNP e altura por olho.
+- Foram diferenciados o funcionário responsável pelo atendimento comercial e o optometrista que emite o laudo.
+- Foram detalhados o orçamento, a previsão de conclusão, o horário previsto de retirada e as datas efetivas de montagem e entrega.
+Nas regras de negócio
+- Foram esclarecidas as condições para liberar uma encomenda: recebimento de sinal mínimo de 30% e registro da previsão de conclusão.
+- Foram detalhados os prazos e as coberturas da garantia relatados pelo gerente, além do suporte para ajustes, plaquetas e parafusos.
+- As regras de troca e devolução passaram a considerar avaliação, aprovação ou recusa, reaproveitamento e descarte dos produtos.
+- Foram registradas restrições para evitar pagamentos acima do saldo devido e movimentações duplicadas de estoque.
+Na documentação
+- Os processos passaram a ser apresentados com entradas, responsáveis, sequência de atividades e resultados.
+- O dicionário passou a detalhar o significado dos atributos, sua obrigatoriedade, os valores permitidos e as regras associadas.
+- Foram acrescentadas propostas de índices, registros de auditoria e permissões de acesso por função.
+- As informações confirmadas pela ótica foram diferenciadas das propostas técnicas que ainda precisam de validação.
+- O registro do uso de inteligência artificial foi ampliado, incluindo os pedidos feitos, as respostas recebidas e as sugestões corrigidas ou rejeitadas pelo grupo.
 
 ### No modelo e nos documentos
 
