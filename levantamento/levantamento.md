@@ -51,12 +51,12 @@ As fotos do formulário e do laudo mostram dados pessoais e de saúde de cliente
 | Quem faz o quê | O optometrista emite o laudo; o consultor conduz o atendimento comercial que fecha a venda | RN-15 |
 | Medidas por olho | DNP e altura são registradas por olho | RN-13 |
 | Encomenda | Só é liberada com sinal de pelo menos 30% do total e previsão de conclusão | RN-18 |
-| Garantia | Um ano para armação e seis meses para lente, contados da montagem. Armação: defeito de fabricação, mola e parafuso. Lente: adaptação, erro de grau, eficácia do tratamento e arranhões, conforme o regulamento da ótica (que o grupo não recebeu) | RN-07 e RN-19 |
+| Garantia | A garantia é contada a partir da montagem: um ano para armações e seis meses para lentes. Para armações, cobre defeitos de fabricação, mola e parafuso. Para lentes, cobre adaptação, erro de grau, eficácia do tratamento e riscos, conforme o regulamento da ótica | RN-07 e RN-19 |
 | Suporte após a entrega | Ajustes, plaquetas e parafusos, de graça e sem prazo | RN-20 |
 | Retirada | O cliente retira o óculos com o canhoto de compra e venda | RN-21 |
 | Nota fiscal | A loja emite quando solicitada. O grupo registra tipo, número e data do documento emitido | RN-22 |
 | Desistência | Relatada a política de considerar o pedido ainda não enviado ao fornecedor e o limite de 24 horas da compra | RN-24 |
-| Troca ou devolução | Depende de avaliação do produto e da causa do dano, e pode ser aprovada ou recusada. Peças intactas podem ser reaproveitadas e as demais são descartadas | RN-08 e RN-25 |
+| Troca e Devolução |  Depende de avaliação do produto e da causa do dano, e pode ser aprovada ou recusada. Peças intactas podem ser reaproveitadas e as demais são descartadas | RN-08 e RN-25 |
 | Formulário | O campo "A partir das" é o horário previsto de retirada | RN-27 |
 
 ## 5. O que não foi confirmado
