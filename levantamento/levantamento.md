@@ -57,7 +57,7 @@ As fotos do formulário e do laudo mostram dados pessoais e de saúde de cliente
 | Nota fiscal | A loja emite quando solicitada. O grupo registra tipo, número e data do documento emitido | RN-22 |
 | Desistência | Relatada a política de considerar o pedido ainda não enviado ao fornecedor e o limite de 24 horas da compra | RN-24 |
 | Troca e Devolução |  Depende de avaliação do produto e da causa do dano, e pode ser aprovada ou recusada. Peças intactas podem ser reaproveitadas e as demais são descartadas | RN-08 e RN-25 |
-| Formulário | O campo "A partir das" é o horário previsto de retirada | RN-27 |
+| Formulário | O campo “Retirada a partir das” indica o horário previsto para a retirada do produto. | RN-27 |
 
 ## 5. O que não foi confirmado
 
