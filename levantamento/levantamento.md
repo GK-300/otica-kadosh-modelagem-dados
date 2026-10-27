@@ -58,6 +58,7 @@ As fotos do formulário e do laudo mostram dados pessoais e de saúde de cliente
 | Desistência | Relatada a política de considerar o pedido ainda não enviado ao fornecedor e o limite de 24 horas da compra | RN-24 |
 | Troca e Devolução |  Depende de avaliação do produto e da causa do dano, e pode ser aprovada ou recusada. Peças intactas podem ser reaproveitadas e as demais são descartadas | RN-08 e RN-25 |
 | Formulário | O campo “Retirada a partir das” indica o horário previsto para a retirada do produto. | RN-27 |
+| Estoque mínimo | Conforme a RN-34 do README (origem indicada: resposta do gerente), a loja mantém no mínimo 100 pares de lentes e 500 armações em estoque; abaixo disso, precisa repor. Lentes são contadas por par (RN-26). | RN-34 |
 
 ## 5. O que não foi confirmado
 
@@ -100,7 +101,7 @@ Na documentação
 ### No modelo e nos documentos
 
 - Os processos deixaram de ser listas de atributos e viraram 12 processos, cada um com entrada, responsável, sequência e saída.
-- Os requisitos passaram de 9 funcionais e 6 não funcionais para 18 funcionais e 7 não funcionais. As regras de negócio chegaram a 33 (RN-01 a RN-33).
+- Os requisitos passaram de 9 funcionais e 6 não funcionais para 18 funcionais e 7 não funcionais. As regras de negócio chegaram inicialmente a 33 (RN-01 a RN-33); posteriormente, a RN-34 sobre estoque mínimo foi acrescentada, totalizando 34 na versão atual do README.
 - Por orientação do professor, foram retiradas as ligações diretas VENDA–PARCELA e VENDA–RECEITA. A parcela agora vem do pagamento de sinal, e a receita vem do atendimento.
 - Venda e compra passaram a ligar direto ao PRODUTO (CONTÉM e ADQUIRE), sem entidades de item. TROCA_DEVOLUCAO liga à venda e ao produto.
 - PRODUTO ganhou especialização total e disjunta em LENTE e ARMACAO.
