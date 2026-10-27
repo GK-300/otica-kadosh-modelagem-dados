@@ -794,6 +794,20 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Reflexão crítica | A IA não participou da entrevista com o gerente e não pode inferir a intenção dos autores dos commits. A conferência automatizada dos arquivos não substitui a revisão dos integrantes e do professor. |
 
 
+### Uso 11 — revisão do dicionário e sincronização da RN-34 (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: revisão da apresentação do dicionário HTML, do domínio TP_ORIGEM e da atualização do levantamento. |
+| Motivação | Verificar divergências documentais e resolver problemas pontuais sem modificar o DER ou substituir informações de outros integrantes. |
+| Prompt(s) utilizados | “Procura esses dois probleminhas, identifica eles, vê se realmente são problemas, procura uma solução, vê se a solução vai resolver isso sem ter consequências no GitHub”; “Feito isso adiciona os outros dois. Estrutura se eles realmente são problemas a serem resolvidos [...]”. |
+| Resposta recebida | Revisadas as regras de apresentação das tabelas; corrigido TP_ORIGEM de varchar(10) para varchar(11), pois LAUDO_OTICA tem 11 caracteres; acrescentada a RN-34 ao levantamento, com registro da evolução de 33 para 34 regras. Alterações reunidas em três commits do PR #3. |
+| Fontes consultadas e verificadas | README, dicionário HTML, levantamento e histórico do repositório GitHub; comparação do domínio de TP_ORIGEM, da redação da RN-34 e das alterações da equipe. |
+| Trechos rejeitados ou corrigidos | Não se alterou a regra comercial do estoque mínimo nem o desenho do DER; evitou-se substituir o levantamento por uma versão antiga da branch. |
+| Justificativa da escolha final | Corrigir incompatibilidade de tamanho de campo e divergência entre documentos, preservando a estrutura conceitual e o trabalho existente dos colegas. |
+| Reflexão crítica | A conferência textual e as verificações de formatação não substituem testes em todos os navegadores nem validação presencial da regra pelo gerente. |
+
+
 ## Critérios Atitudinais (20%)
 
 
