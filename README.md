@@ -808,6 +808,20 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Reflexão crítica | A conferência textual e as verificações de formatação não substituem testes em todos os navegadores nem validação presencial da regra pelo gerente. |
 
 
+### Uso 12 — correções de referências e padronização documental (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: conferência de caminhos do DER, nomenclatura dos processos e metadados de versão do dicionário HTML. |
+| Motivação | Resolver links desatualizados após a substituição da imagem do DER e eliminar diferenças de identificação e revisão entre README e HTML. |
+| Prompt(s) utilizados | “Se vamos mexer nos links do DER seria ideal trabalhar em outros dois”; “Aproveita então, analisa o Github de novo. Analisa o que mudamos e se estão bem integrados, se os links do DER ainda precisam ser mexidos”; “Erfeito manda bala”. |
+| Resposta recebida | Atualizados os caminhos do PNG para DER_Otica_Kadosh.png no README e no HTML; padronizados os doze processos do HTML de P01–P12 para PR01–PR12; atualizados versão e data de revisão do HTML para 1.1 e 27/10/2026. Alterações reunidas em três commits do PR #4. |
+| Fontes consultadas e verificadas | Árvore de arquivos, README, dicionário HTML, histórico do GitHub e lista de processos; conferidos os destinos dos links e os nomes dos processos nos dois documentos. |
+| Trechos rejeitados ou corrigidos | Mantidos o conteúdo do diagrama, os nomes das entidades, os relacionamentos e as regras de negócio; a mudança no link não foi tratada como validação visual do novo PNG. |
+| Justificativa da escolha final | Corrigir referências quebradas e manter identificadores consistentes, com alterações documentais restritas e separadas por commit. |
+| Reflexão crítica | A existência do arquivo PNG e a correção dos caminhos não comprovam que seu conteúdo visual coincide com o modelo textual; essa comparação exige revisão específica. |
+
+
 ## Critérios Atitudinais (20%)
 
 
