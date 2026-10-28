@@ -5,6 +5,8 @@
 
 **Organização estudada: Ótica Kadosh** · Projeto acadêmico de Modelagem de Dados
 
+**Navegação rápida:** [Metadados](#metadados) · [1. Organização](#1-caracterização-da-organização) · [2. Processos](#2-processos-de-negócio) · [3. Requisitos](#3-requisitos-do-sistema) · [4. Regras](#4-regras-de-negócio) · [5. Dicionário](#5-dicionário-de-dados-conceitual-preliminar) · [6. Modelagem](#6-modelagem-conceitual-entidades-atributos-relacionamentos) · [7. DER](#7-diagrama-entidade-relacionamento-der) · [8. Justificativa](#8-justificativa-técnica) · [9. Uso de IA](#9-uso-de-inteligência-artificial)
+
 ---
 
 ## Metadados
@@ -24,15 +26,16 @@
 ## 1. Caracterização da Organização
 
 - **Nome e natureza da organização:** **Ótica Kadosh**, estabelecimento comercial **com fins lucrativos** que vende produtos ópticos (armações e lentes). Fica na Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP, CEP 08191-000.
-- **Contexto e porte:** pequeno comércio com **três funcionários**: um optometrista (**Guilherme de Souza Silva**), um gerente (**Marcos Vinícius Silva Menezes**) e um consultor óptico (**Kaique Batista dos Santos**). O gerente informou cerca de **100 atendimentos e 80 vendas por semana**, o que indica que parte dos atendimentos não termina em venda. A ótica atende clientes presencialmente, vende armações e lentes, recebe pagamentos à vista, parcelados ou em partes, mantém estoque, compra de fornecedores quando falta produto e trata trocas e devoluções.
-- **Problemas e necessidades identificados:** pedidos, estoque e parcelas são controlados em **papel e planilhas separadas**, e um banco de dados usado antes apresentava falhas frequentes. Hoje não há vínculo seguro entre atendimento, receita, pedido, pagamentos, compras ao fornecedor, estoque e trocas, e cada consulta exige abrir vários registros. O sistema precisa relacionar tudo isso, saber o saldo de estoque e o saldo a pagar de cada pedido e proteger os dados de saúde dos clientes. Os problemas de gestão estão numerados de P1 a P5 na tabela ao final desta seção.
-- **Justificativa da escolha:** o grupo tem acesso presencial à ótica e ao gerente. O negócio é pequeno o bastante para o primeiro DER, mas tem processos encadeados e observáveis (atendimento, receita, venda, pagamento, compra, montagem, retirada, garantia e troca) que exigem relacionamentos variados: 1:1, 1:N, entidades fracas e generalização.
+- **Contexto e porte:** a equipe tem **três funcionários**: o optometrista (**Guilherme de Souza Silva**), o gerente (**Marcos Vinícius Silva Menezes**) e o consultor óptico (**Kaique Batista dos Santos**). Segundo o gerente, são cerca de **100 atendimentos e 80 vendas por semana**; nem todo atendimento termina em compra. Além de vender armações e lentes, a ótica recebe pagamentos à vista, parcelados ou em partes, compra de fornecedores quando falta produto e atende pedidos de troca e devolução.
+- **Problemas e necessidades identificados:** pedidos, estoque e parcelas ficam registrados em **papel e planilhas separadas**. O gerente também relatou falhas frequentes em um banco de dados usado anteriormente. Para acompanhar uma venda, conferir o que já foi pago ou saber o que precisa ser reposto, a equipe precisa consultar registros diferentes. A proposta é reunir essas informações, ligando atendimento, receita, orçamento, venda, pagamentos, compras e estoque, sem deixar de restringir o acesso aos dados de saúde. Os problemas estão detalhados de P1 a P5 na tabela abaixo.
+- **Justificativa da escolha:** a visita e o contato com o gerente permitiram conhecer as etapas que vão do atendimento à entrega e ao pós-venda. Embora tenha apenas três funcionários, a ótica reúne situações suficientes para estudar relações 1:1 e 1:N, entidades fracas e a especialização de produtos em lentes e armações, sem precisar modelar uma operação maior.
 - **Evidências da organização:**
   - Endereço: Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP.
   - Contato da loja: (11) 99349-4371. Entrevistado: **Marcos Vinícius Silva Menezes**, gerente.
   - **Data da visita e entrevista:** 05/09/2026, presencial, com observação do formulário de pedido, do comprovante entregue ao cliente e do laudo produzido na ótica. Depois da visita, o gerente respondeu por mensagem a dúvidas pontuais (venda sem receita e medidas por olho).
   - Fotografia feita no interior da ótica durante a visita: [Fotografia da visita](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Otica%20kadoshi.jpeg).
   - As fotos do formulário e do laudo contêm dados pessoais e de saúde reais; por isso **não foram publicadas**.
+  - O registro da visita, da entrevista e dos esclarecimentos posteriores está no [levantamento de campo](./levantamento/levantamento.md).
 
 **Problemas de gestão numerados.** Cada um aparece no DER e terá ao menos uma consulta gerencial no script SQL. Os processos de negócio da Seção 2 usam o prefixo PR para não se confundir com estes códigos.
 
@@ -596,7 +599,7 @@ A imagem é a exportação do DER final elaborado no brModelo. As regras de excl
 ### 8.1 Separação dos eventos
 
 
-CLIENTE e FUNCIONARIO são cadastros reutilizados. ATENDIMENTO preserva o contato com a ótica mesmo sem compra; ORCAMENTO conserva a oferta e sua validade; VENDA registra a contratação. Essa separação explica as participações opcionais antes do fechamento e a obrigatoriedade de atendimento e orçamento em toda venda.
+CLIENTE e FUNCIONARIO permanecem cadastrados mesmo quando não há uma nova venda. O ATENDIMENTO registra a passagem do cliente pela ótica; o ORCAMENTO guarda a proposta e seu prazo; a VENDA representa o negócio fechado. Assim, um atendimento sem compra continua no histórico, e um orçamento que não foi convertido em venda não é perdido.
 
 
 ### 8.2 Produtos e relacionamentos com atributos
@@ -632,7 +635,7 @@ COMPRA pode repor estoque sem venda de origem, por isso DEMANDA é opcional do l
 ### 8.7 Escopo, integridade e evolução
 
 
-Esta é a Entrega 1, de modelo conceitual. Tipos físicos, tamanhos, índices, chaves estrangeiras e controles administrativos do HTML são uma proposta documentada para a próxima etapa, não um banco implementado. As associações N:N precisarão de estruturas associativas na transformação relacional; isso não recoloca ITEM_VENDA e ITEM_COMPRA como entidades no DER conceitual. Laboratório, adquirente de cartão e regras comerciais de crédito/reembolso não foram inventados. A política de acesso e a auditoria são requisitos a implementar.
+O DER desta entrega descreve o modelo conceitual, não um banco em operação. Os tipos físicos, tamanhos, índices, chaves estrangeiras e controles de acesso do dicionário HTML são propostas para as próximas etapas. Ao transformar o modelo em tabelas, os relacionamentos N:N precisarão de estruturas associativas, sem transformar ITEM_VENDA e ITEM_COMPRA em novas entidades conceituais. Como o levantamento não confirmou um laboratório independente, uma adquirente de cartão ou políticas detalhadas de crédito e reembolso, esses elementos ficaram fora do modelo. A auditoria e o controle de acesso ainda terão de ser implementados.
 
 
 ### 8.8 Conferência com o esqueleto
@@ -798,28 +801,28 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 
 | Item | Registro |
 | --- | --- |
-| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: revisão da apresentação do dicionário HTML, do domínio TP_ORIGEM e da atualização do levantamento. |
-| Motivação | Verificar divergências documentais e resolver problemas pontuais sem modificar o DER ou substituir informações de outros integrantes. |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para comparar o README, o dicionário HTML e o levantamento e revisar a leitura das tabelas. |
+| Motivação | No dicionário, TP_ORIGEM estava limitado a dez caracteres, embora um de seus valores fosse LAUDO_OTICA (11 caracteres). O levantamento também ainda não mencionava a RN-34, e algumas células do HTML quebravam nomes e cardinalidades. |
 | Prompt(s) utilizados | “Procura esses dois probleminhas, identifica eles, vê se realmente são problemas, procura uma solução, vê se a solução vai resolver isso sem ter consequências no GitHub”; “Feito isso adiciona os outros dois. Estrutura se eles realmente são problemas a serem resolvidos [...]”. |
-| Resposta recebida | Revisadas as regras de apresentação das tabelas; corrigido TP_ORIGEM de varchar(10) para varchar(11), pois LAUDO_OTICA tem 11 caracteres; acrescentada a RN-34 ao levantamento, com registro da evolução de 33 para 34 regras. Alterações reunidas em três commits do PR #3. |
+| Resposta recebida | O PR #3 reuniu três ajustes: impedir que nomes técnicos e cardinalidades se partissem nas tabelas do HTML; mudar TP_ORIGEM de varchar(10) para varchar(11); e registrar no levantamento a RN-34, que prevê reposição abaixo de 100 pares de lentes ou 500 armações. |
 | Fontes consultadas e verificadas | README, dicionário HTML, levantamento e histórico do repositório GitHub; comparação do domínio de TP_ORIGEM, da redação da RN-34 e das alterações da equipe. |
 | Trechos rejeitados ou corrigidos | Não se alterou a regra comercial do estoque mínimo nem o desenho do DER; evitou-se substituir o levantamento por uma versão antiga da branch. |
-| Justificativa da escolha final | Corrigir incompatibilidade de tamanho de campo e divergência entre documentos, preservando a estrutura conceitual e o trabalho existente dos colegas. |
-| Reflexão crítica | A conferência textual e as verificações de formatação não substituem testes em todos os navegadores nem validação presencial da regra pelo gerente. |
+| Justificativa da escolha final | Aumentar o campo para 11 caracteres acomodava LAUDO_OTICA sem alterar os valores permitidos. A RN-34 já estava no README e no HTML, então bastava acrescentá-la ao levantamento existente. |
+| Reflexão crítica | A comparação dos arquivos confirmou os textos e o tamanho do campo, mas não testa todas as formas de exibição do HTML. A RN-34 foi transcrita do relato registrado pelo grupo; não houve nova entrevista com o gerente. |
 
 
 ### Uso 12 — correções de referências e padronização documental (27/10/2026)
 
 | Item | Registro |
 | --- | --- |
-| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: conferência de caminhos do DER, nomenclatura dos processos e metadados de versão do dicionário HTML. |
-| Motivação | Resolver links desatualizados após a substituição da imagem do DER e eliminar diferenças de identificação e revisão entre README e HTML. |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para conferir os arquivos referenciados no README e no HTML, os códigos dos processos e a data do dicionário. |
+| Motivação | Depois que a imagem do DER foi substituída no repositório, README e HTML continuaram apontando para o PNG removido. Além disso, o README usava PR01–PR12, enquanto o HTML mostrava P01–P12 e ainda trazia a versão 1.0, de 19/10/2026. |
 | Prompt(s) utilizados | “Se vamos mexer nos links do DER seria ideal trabalhar em outros dois”; “Aproveita então, analisa o Github de novo. Analisa o que mudamos e se estão bem integrados, se os links do DER ainda precisam ser mexidos”; “Erfeito manda bala”. |
-| Resposta recebida | Atualizados os caminhos do PNG para DER_Otica_Kadosh.png no README e no HTML; padronizados os doze processos do HTML de P01–P12 para PR01–PR12; atualizados versão e data de revisão do HTML para 1.1 e 27/10/2026. Alterações reunidas em três commits do PR #4. |
+| Resposta recebida | No PR #4, os dois links passaram a apontar para DER_Otica_Kadosh.png; os 12 processos do HTML receberam o prefixo PR, como no README; e a versão do dicionário passou a 1.1, com revisão em 27/10/2026. Cada ajuste ficou em um commit. |
 | Fontes consultadas e verificadas | Árvore de arquivos, README, dicionário HTML, histórico do GitHub e lista de processos; conferidos os destinos dos links e os nomes dos processos nos dois documentos. |
 | Trechos rejeitados ou corrigidos | Mantidos o conteúdo do diagrama, os nomes das entidades, os relacionamentos e as regras de negócio; a mudança no link não foi tratada como validação visual do novo PNG. |
-| Justificativa da escolha final | Corrigir referências quebradas e manter identificadores consistentes, com alterações documentais restritas e separadas por commit. |
-| Reflexão crítica | A existência do arquivo PNG e a correção dos caminhos não comprovam que seu conteúdo visual coincide com o modelo textual; essa comparação exige revisão específica. |
+| Justificativa da escolha final | A imagem com o novo nome já estava no repositório, portanto não era preciso criar outro arquivo. Para os processos, mantivemos os nomes e alteramos somente os códigos do HTML, seguindo o README. |
+| Reflexão crítica | Conferir o caminho do PNG prova que o arquivo existe, não que o desenho corresponde às 16 entidades e aos relacionamentos documentados. Essa comparação visual ficou fora do escopo dos três commits. |
 
 
 ## Critérios Atitudinais (20%)
