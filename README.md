@@ -843,6 +843,20 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Reflexão crítica | Uma redação mais fluida não comprova, por si só, a correção das regras. Os números e as práticas relatadas continuam dependendo do registro de campo, e a revisão documental não substitui a conferência visual das cardinalidades do DER. |
 
 
+### Uso 15 — revisão final da apresentação documental (28/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para conferir o README, o levantamento de campo e as notas do dicionário HTML antes de finalizar pequenos ajustes da Entrega 1. |
+| Motivação | O grupo decidiu retirar a navegação rápida do início do README: as seções já têm títulos próprios e o esqueleto do professor não exige esse índice. Na seção histórica do levantamento, “Nas regras de negócio” e “Na documentação” apareciam como linhas comuns entre listas, sem a hierarquia usada nos demais subtítulos. |
+| Prompt(s) utilizados | “adiciona ai também pra tirar aquele **Navegação rápida**”; “vocÊ já olhou em volta desses 0,1 e 1,1 pra ver se realmente são um problema ou só uma questão de contexto que você ignorou?”; “Então analisa os três, vê se eles realmente são problemas a serem resolvidos”. |
+| Resposta recebida | Foram organizadas três alterações: retirar o índice e diminuir espaços vazios próximos à Seção 2 e à imagem do DER; marcar os dois subtítulos do levantamento em Markdown; e registrar esta revisão na Seção 9. A análise da especialização de PRODUTO foi revista após consultar a RN-14 e a nota da Seção 6.4. |
+| Fontes consultadas e verificadas | Esqueleto da Entrega 1 fornecido pelo professor; README, levantamento/levantamento.md e dicionário HTML do repositório; histórico dos PRs anteriores; RN-14 e Seções 6.3, 6.4 e 8.5. As mudanças de formatação foram comparadas com os textos anteriores, preservando os dados da visita, as regras e os relacionamentos. |
+| Trechos rejeitados ou corrigidos | Não se inverteram automaticamente as cardinalidades `(1,1)` e `(0,1)` das duas linhas de especialização: o próprio documento descreve uma adaptação gráfica do brModelo e define a participação total e disjunta por nota complementar. Também não foram retirados os links para o levantamento e para o DER. |
+| Justificativa da escolha final | Remover o índice atende à preferência do grupo sem alterar os títulos exigidos pelo professor. Corrigir a hierarquia do levantamento ajuda a separar o que mudou nas regras daquilo que mudou na documentação, sem reescrever os relatos do gerente ou acrescentar requisitos. |
+| Reflexão crítica | A navegação rápida não era um erro técnico, apenas um recurso opcional de leitura. Conferir textos e caminhos não equivale a validar visualmente o PNG do DER; por isso a revisão não tratou as cardinalidades como um defeito comprovado nem modificou o diagrama. |
+
+
 ## Critérios Atitudinais (20%)
 
 
