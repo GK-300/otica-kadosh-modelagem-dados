@@ -5,8 +5,6 @@
 
 **Organização estudada: Ótica Kadosh** · Projeto acadêmico de Modelagem de Dados
 
-**Navegação rápida:** [Metadados](#metadados) · [1. Organização](#1-caracterização-da-organização) · [2. Processos](#2-processos-de-negócio) · [3. Requisitos](#3-requisitos-do-sistema) · [4. Regras](#4-regras-de-negócio) · [5. Dicionário](#5-dicionário-de-dados-conceitual-preliminar) · [6. Modelagem](#6-modelagem-conceitual-entidades-atributos-relacionamentos) · [7. DER](#7-diagrama-entidade-relacionamento-der) · [8. Justificativa](#8-justificativa-técnica) · [9. Uso de IA](#9-uso-de-inteligência-artificial)
-
 ---
 
 ## Metadados
@@ -48,10 +46,6 @@
 | P5 | Os dados de saúde das receitas precisam de proteção; lente de grau só é vendida com receita (RN-16). | RECEITA, RECEITA_MEDIDA, VENDA, LENTE |
 
 ---
-
-
-
-
 
 ## 2. Processos de Negócio
 
@@ -585,10 +579,6 @@ As cardinalidades nas duas colunas correspondem à participação de cada entida
 ### DER da Ótica Kadosh
 
 <img width="3673" height="2898" alt="Diagrama entidade-relacionamento da Ótica Kadosh" src="./DER_Otica_Kadosh.png" />
-
-
-
-
 
 A imagem é a exportação do DER final elaborado no brModelo. As regras de exclusão mútua, especialização e linhas repetidas estão nas notas do diagrama e nas seções 4, 6 e 8. A evolução para o modelo relacional deve preservar essas regras; não basta aceitar automaticamente a conversão do editor.
 
