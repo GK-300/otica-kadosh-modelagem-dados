@@ -801,28 +801,28 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 
 | Item | Registro |
 | --- | --- |
-| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: revisão da apresentação do dicionário HTML, do domínio TP_ORIGEM e da atualização do levantamento. |
-| Motivação | Verificar divergências documentais e resolver problemas pontuais sem modificar o DER ou substituir informações de outros integrantes. |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para comparar o README, o dicionário HTML e o levantamento e revisar a leitura das tabelas. |
+| Motivação | No dicionário, TP_ORIGEM estava limitado a dez caracteres, embora um de seus valores fosse LAUDO_OTICA (11 caracteres). O levantamento também ainda não mencionava a RN-34, e algumas células do HTML quebravam nomes e cardinalidades. |
 | Prompt(s) utilizados | “Procura esses dois probleminhas, identifica eles, vê se realmente são problemas, procura uma solução, vê se a solução vai resolver isso sem ter consequências no GitHub”; “Feito isso adiciona os outros dois. Estrutura se eles realmente são problemas a serem resolvidos [...]”. |
-| Resposta recebida | Revisadas as regras de apresentação das tabelas; corrigido TP_ORIGEM de varchar(10) para varchar(11), pois LAUDO_OTICA tem 11 caracteres; acrescentada a RN-34 ao levantamento, com registro da evolução de 33 para 34 regras. Alterações reunidas em três commits do PR #3. |
+| Resposta recebida | O PR #3 reuniu três ajustes: impedir que nomes técnicos e cardinalidades se partissem nas tabelas do HTML; mudar TP_ORIGEM de varchar(10) para varchar(11); e registrar no levantamento a RN-34, que prevê reposição abaixo de 100 pares de lentes ou 500 armações. |
 | Fontes consultadas e verificadas | README, dicionário HTML, levantamento e histórico do repositório GitHub; comparação do domínio de TP_ORIGEM, da redação da RN-34 e das alterações da equipe. |
 | Trechos rejeitados ou corrigidos | Não se alterou a regra comercial do estoque mínimo nem o desenho do DER; evitou-se substituir o levantamento por uma versão antiga da branch. |
-| Justificativa da escolha final | Corrigir incompatibilidade de tamanho de campo e divergência entre documentos, preservando a estrutura conceitual e o trabalho existente dos colegas. |
-| Reflexão crítica | A conferência textual e as verificações de formatação não substituem testes em todos os navegadores nem validação presencial da regra pelo gerente. |
+| Justificativa da escolha final | Aumentar o campo para 11 caracteres acomodava LAUDO_OTICA sem alterar os valores permitidos. A RN-34 já estava no README e no HTML, então bastava acrescentá-la ao levantamento existente. |
+| Reflexão crítica | A comparação dos arquivos confirmou os textos e o tamanho do campo, mas não testa todas as formas de exibição do HTML. A RN-34 foi transcrita do relato registrado pelo grupo; não houve nova entrevista com o gerente. |
 
 
 ### Uso 12 — correções de referências e padronização documental (27/10/2026)
 
 | Item | Registro |
 | --- | --- |
-| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: conferência de caminhos do DER, nomenclatura dos processos e metadados de versão do dicionário HTML. |
-| Motivação | Resolver links desatualizados após a substituição da imagem do DER e eliminar diferenças de identificação e revisão entre README e HTML. |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para conferir os arquivos referenciados no README e no HTML, os códigos dos processos e a data do dicionário. |
+| Motivação | Depois que a imagem do DER foi substituída no repositório, README e HTML continuaram apontando para o PNG removido. Além disso, o README usava PR01–PR12, enquanto o HTML mostrava P01–P12 e ainda trazia a versão 1.0, de 19/10/2026. |
 | Prompt(s) utilizados | “Se vamos mexer nos links do DER seria ideal trabalhar em outros dois”; “Aproveita então, analisa o Github de novo. Analisa o que mudamos e se estão bem integrados, se os links do DER ainda precisam ser mexidos”; “Erfeito manda bala”. |
-| Resposta recebida | Atualizados os caminhos do PNG para DER_Otica_Kadosh.png no README e no HTML; padronizados os doze processos do HTML de P01–P12 para PR01–PR12; atualizados versão e data de revisão do HTML para 1.1 e 27/10/2026. Alterações reunidas em três commits do PR #4. |
+| Resposta recebida | No PR #4, os dois links passaram a apontar para DER_Otica_Kadosh.png; os 12 processos do HTML receberam o prefixo PR, como no README; e a versão do dicionário passou a 1.1, com revisão em 27/10/2026. Cada ajuste ficou em um commit. |
 | Fontes consultadas e verificadas | Árvore de arquivos, README, dicionário HTML, histórico do GitHub e lista de processos; conferidos os destinos dos links e os nomes dos processos nos dois documentos. |
 | Trechos rejeitados ou corrigidos | Mantidos o conteúdo do diagrama, os nomes das entidades, os relacionamentos e as regras de negócio; a mudança no link não foi tratada como validação visual do novo PNG. |
-| Justificativa da escolha final | Corrigir referências quebradas e manter identificadores consistentes, com alterações documentais restritas e separadas por commit. |
-| Reflexão crítica | A existência do arquivo PNG e a correção dos caminhos não comprovam que seu conteúdo visual coincide com o modelo textual; essa comparação exige revisão específica. |
+| Justificativa da escolha final | A imagem com o novo nome já estava no repositório, portanto não era preciso criar outro arquivo. Para os processos, mantivemos os nomes e alteramos somente os códigos do HTML, seguindo o README. |
+| Reflexão crítica | Conferir o caminho do PNG prova que o arquivo existe, não que o desenho corresponde aos 16 cadastros e às relações documentadas. Essa comparação visual ficou fora do escopo dos três commits. |
 
 
 ## Critérios Atitudinais (20%)
