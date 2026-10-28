@@ -788,13 +788,13 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Item | Registro |
 | --- | --- |
 | Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: revisão da Entrega 1 e correções documentais no README e no dicionário HTML. |
-| Motivação | Corrigir divergências confirmadas entre arquivos do mesmo projeto antes de avançar à Entrega 2. |
+| Motivação | A RN-34 sobre estoque mínimo já aparecia no README, mas faltava no dicionário HTML. O HTML também mantinha links para arquivos antigos do DER, enquanto o README mencionava um PDF que não estava publicado no repositório. |
 | Prompt(s) utilizados | “Reanalise [...] baseado no esqueleto da entrega 1 e no que tá lá no GitHub [...] encontre os problemas”; “Pega essas três [...] e estrutura [...] como você vai fazer a mudança”; “Analisa de novo o GitHub e tenta achar um porquê esses problemas estão aí”; “Pode ir lá no meu github e fazer os commits”. |
 | Resposta recebida | Identificadas três inconsistências: RN-34 presente somente no README, links antigos de imagem/PDF no rodapé do HTML e afirmação no README sobre PDF não publicado. Proposta e execução de três commits documentais em branch separada no fork. |
 | Fontes consultadas e verificadas | Esqueleto da Entrega 1 fornecido ao grupo, README, HTML, árvore de arquivos, histórico de commits e imagem do DER no GitHub. A RN-34 foi reproduzida conforme o README, sem novo levantamento de campo. |
 | Trechos rejeitados ou corrigidos | Não foi criado um PDF apenas para manter um link antigo, nem foram alterados o DER, seus relacionamentos ou regras comerciais. Referências históricas a PDFs usados na elaboração foram preservadas. |
-| Justificativa da escolha final | Manter o modelo conceitual e corrigir somente divergências verificáveis na documentação publicada. |
-| Reflexão crítica | A IA não participou da entrevista com o gerente e não pode inferir a intenção dos autores dos commits. A conferência automatizada dos arquivos não substitui a revisão dos integrantes e do professor. |
+| Justificativa da escolha final | Como o estoque mínimo já estava documentado no README, a RN-34 podia ser reproduzida no HTML sem criar uma nova regra. Quanto aos anexos, optou-se por corrigir ou retirar referências desatualizadas, sem inventar um PDF nem redesenhar o DER. |
+| Reflexão crítica | Conferir a RN-34 em dois arquivos não comprova o estoque físico da ótica: essa informação veio do relato registrado pelo grupo. Da mesma forma, o histórico do GitHub mostra os links alterados, mas não permite deduzir a intenção de quem criou cada versão. |
 
 
 ### Uso 11 — revisão do dicionário e sincronização da RN-34 (27/10/2026)
@@ -823,6 +823,34 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Trechos rejeitados ou corrigidos | Mantidos o conteúdo do diagrama, os nomes das entidades, os relacionamentos e as regras de negócio; a mudança no link não foi tratada como validação visual do novo PNG. |
 | Justificativa da escolha final | A imagem com o novo nome já estava no repositório, portanto não era preciso criar outro arquivo. Para os processos, mantivemos os nomes e alteramos somente os códigos do HTML, seguindo o README. |
 | Reflexão crítica | Conferir o caminho do PNG prova que o arquivo existe, não que o desenho corresponde às 16 entidades e aos relacionamentos documentados. Essa comparação visual ficou fora do escopo dos três commits. |
+
+
+### Uso 13 — documentação das revisões e texto alternativo do DER (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para completar o histórico de uso de IA da Entrega 1 e revisar a descrição textual da imagem no README. |
+| Motivação | Os PRs #3 e #4 já estavam integrados, mas suas revisões ainda não constavam na Seção 9. Além disso, o texto alternativo da imagem mencionava DER_Otica_Kadosh_reorganizado, nome de um PNG que já havia sido retirado do repositório. |
+| Prompt(s) utilizados | “Então vamos evitar mexer no que diz respeito pra imagem, entendi certo? Beleza. Por enquanto trabalha naqueles dois primeiros que você sugeriu.” |
+| Resposta recebida | O PR #5 acrescentou os usos 11 e 12, com as correções realizadas nos PRs #3 e #4, e trocou o texto alternativo do DER por “Diagrama entidade-relacionamento da Ótica Kadosh”. Foram três commits, sem substituir o PNG nem alterar seu caminho. |
+| Fontes consultadas e verificadas | Esqueleto da Entrega 1; Seção 9 do README; dicionário HTML; arquivos existentes e histórico dos PRs #3 e #4 no GitHub. A alteração do texto alternativo foi conferida no diff do PR #5. |
+| Trechos rejeitados ou corrigidos | Não se renomeou nem redesenhou o DER para acompanhar o texto antigo. A mudança ficou restrita à descrição acessível da imagem e ao registro das atividades já realizadas. |
+| Justificativa da escolha final | O esqueleto pede que o grupo relate os usos relevantes de IA. Registrar as duas revisões deixava esse histórico completo até o PR #4; corrigir o texto alternativo evitava manter, na descrição da figura, o nome de um arquivo excluído. |
+| Reflexão crítica | A conferência do nome e do caminho da imagem não permite afirmar que o desenho corresponde ao modelo descrito no README. O conteúdo visual do DER não foi validado nesse PR; a IA também não substitui a conferência do grupo sobre o histórico registrado. |
+
+
+### Uso 14 — revisão de linguagem e acesso ao levantamento (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para revisar a redação do README e do levantamento, conferir as mudanças e organizá-las em commits. |
+| Motivação | O README descrevia corretamente a ótica, mas algumas justificativas usavam expressões genéricas, como “preservar a estrutura conceitual”, sem mostrar o problema concreto. O documento também era longo e não tinha um atalho direto para o registro da visita de 05/09/2026. |
+| Prompt(s) utilizados | “Eu não quero que você adicione coisas pra deixar o arquivo mais pomposo. [...] eu quero focar mais em otimizações escritas”; “Coisas que estejam muito padrão [...] deixar elas mais atreladas ao projeto, mais naturais, mais fluidas, mais originais e menos genéricas”; “Ok, checa de novo esses três commits novos que você fez, e me diz se acha que eles estão bons mesmo”. |
+| Resposta recebida | O PR #6 incluiu dez links de navegação e uma referência ao levantamento na Seção 1. Reescreveu justificativas dos usos 11 e 12 com exemplos das correções de TP_ORIGEM, RN-34 e dos códigos dos processos. Também tornou mais direta a descrição dos três funcionários, dos cerca de 100 atendimentos e 80 vendas semanais e da separação entre atendimento, orçamento e venda; ajustou a redação do estoque mínimo no levantamento. |
+| Fontes consultadas e verificadas | README, levantamento/levantamento.md, dicionário HTML, esqueleto da Entrega 1 e diff do PR #6 no GitHub. Foram conferidos os destinos dos dez atalhos, o link da pesquisa e a preservação dos requisitos, regras e atributos. |
+| Trechos rejeitados ou corrigidos | Foi descartada a proposta de apontar o link do GitHub Pages diretamente para o HTML, porque o grupo preferiu não depender dessa verificação naquele momento. Não se mudaram os prompts históricos nem se acrescentaram fatos não registrados na visita. |
+| Justificativa da escolha final | O texto passou a explicar o que foi observado na Ótica Kadosh — registros separados em papel e planilhas, acompanhamento de pagamentos e reposição do estoque — em vez de justificar o modelo só com termos abstratos. O link do levantamento permite consultar a origem dessas informações sem duplicá-las no README. |
+| Reflexão crítica | Uma redação mais fluida não comprova, por si só, a correção das regras. Os números e as práticas relatadas continuam dependendo do registro de campo, e a revisão documental não substitui a conferência visual das cardinalidades do DER. |
 
 
 ## Critérios Atitudinais (20%)
