@@ -1,17 +1,12 @@
+# Entrega 2 — Modelo Lógico, Implementação SQL e Apresentação Final
 
-
-# Entrega 1 — Modelo Conceitual (DER)
 ### Modelagem de um sistema de gestão de informações para uma organização de pequeno porte
 
 **Organização estudada: Ótica Kadosh** · Projeto acadêmico de Modelagem de Dados
 
----
+## Integrantes
 
-## Metadados
-
-- **Nomes dos alunos e RGM**
-
-| Integrante | RGM | Usuário no GitHub |
+| Nome completo do aluno | RGM | Usuário do GitHub |
 | --- | --- | --- |
 | Victor Augusto Silva Marcilio | 47190175 | [Victordev14](https://github.com/Victordev14) |
 | João Felipe de Sousa Pires | 48165379 | [jfpiresoficial](https://github.com/jfpiresoficial) |
@@ -19,109 +14,167 @@
 | João Victor Gobi Romero | 48114642 | [joaovromero](https://github.com/joaovromero) |
 | Guilherme Araujo de Oliveira | 47116862 | [GK-300](https://github.com/GK-300) |
 
+**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_OticaKadosh.png) · modelo lógico, script SQL e massa de dados (nas próximas partes).
+
 ---
 
-## 1. Caracterização da Organização
+## 1.1 Revisão do Modelo Conceitual (Caso A — mesma organização da Entrega 1)
 
-- **Nome e natureza da organização:** **Ótica Kadosh**, estabelecimento comercial **com fins lucrativos** que vende produtos ópticos (armações e lentes). Fica na Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP, CEP 08191-000.
-- **Contexto e porte:** a equipe tem **três funcionários**: o optometrista (**Guilherme de Souza Silva**), o gerente (**Marcos Vinícius Silva Menezes**) e o consultor óptico (**Kaique Batista dos Santos**). Segundo o gerente, são cerca de **100 atendimentos e 80 vendas por semana**; nem todo atendimento termina em compra. Além de vender armações e lentes, a ótica recebe pagamentos à vista, parcelados ou em partes, compra de fornecedores quando falta produto e atende pedidos de troca e devolução.
-- **Problemas e necessidades identificados:** pedidos, estoque e parcelas ficam registrados em **papel e planilhas separadas**. O gerente também relatou falhas frequentes em um banco de dados usado anteriormente. Para acompanhar uma venda, conferir o que já foi pago ou saber o que precisa ser reposto, a equipe precisa consultar registros diferentes. A proposta é reunir essas informações, ligando atendimento, receita, orçamento, venda, pagamentos, compras e estoque, sem deixar de restringir o acesso aos dados de saúde. Os problemas estão detalhados de P1 a P5 na tabela abaixo.
-- **Justificativa da escolha:** a visita e o contato com o gerente permitiram conhecer as etapas que vão do atendimento à entrega e ao pós-venda. Embora tenha apenas três funcionários, a ótica reúne situações suficientes para estudar relações 1:1 e 1:N, entidades fracas e a especialização de produtos em lentes e armações, sem precisar modelar uma operação maior.
-- **Evidências da organização:**
-  - Endereço: Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP.
-  - Contato da loja: (11) 99349-4371. Entrevistado: **Marcos Vinícius Silva Menezes**, gerente.
-  - **Data da visita e entrevista:** 05/09/2026, presencial, com observação do formulário de pedido, do comprovante entregue ao cliente e do laudo produzido na ótica. Depois da visita, o gerente respondeu por mensagem a dúvidas pontuais (venda sem receita e medidas por olho).
-  - Fotografia feita no interior da ótica durante a visita: [Fotografia da visita](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Otica%20kadoshi.jpeg).
-  - As fotos do formulário e do laudo contêm dados pessoais e de saúde reais; por isso **não foram publicadas**.
-  - O registro da visita, da entrevista e dos esclarecimentos posteriores está no [levantamento de campo](./levantamento/levantamento.md).
+### Caracterização da organização
 
-**Problemas de gestão numerados.** Cada um aparece no DER e terá ao menos uma consulta gerencial no script SQL. Os processos de negócio da Seção 2 usam o prefixo PR para não se confundir com estes códigos.
+**Nome e natureza.** **Ótica Kadosh**, comércio **com fins lucrativos** que vende armações e lentes, no endereço Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP, CEP 08191-000. É a mesma organização da Entrega 1; o grupo mantém acesso a ela, inclusive para voltar a campo e validar regras e volumes.
 
-| Código | Problema | Onde aparece no DER |
+**Contexto e porte.** Pequeno comércio com **3 funcionários**: um optometrista, um gerente e um consultor óptico. O gerente informou cerca de **100 atendimentos e 80 vendas por semana**. A ótica atende presencialmente, recebe pagamentos à vista, parcelados ou em partes, mantém estoque, compra de fornecedores quando falta produto e trata trocas e devoluções.
+
+Os números abaixo dimensionam a massa de dados (seção 4). A coluna **Origem** separa o que o gerente informou do que o grupo estimou. As estimativas são valores fictícios definidos pelo grupo, por orientação do professor, e **não foram confirmadas pela ótica**.
+
+| Indicador | Valor | Origem |
 | --- | --- | --- |
-| P1 | Pedidos, receitas e pagamentos ficam em papel e planilhas separadas, sem vínculo seguro entre atendimento, orçamento, venda e pagamento; cada consulta exige abrir vários registros. | CLIENTE, ATENDIMENTO, RECEITA, ORCAMENTO, VENDA, PAGAMENTO |
-| P2 | O saldo de estoque de armações e lentes não é controlado de forma segura. | PRODUTO, MOVIMENTO_ESTOQUE, COMPRA |
-| P3 | A garantia não tem controle por produto vendido: um ano para a armação e seis meses para a lente, contados da montagem (RN-07). | VENDA, CONTÉM, PRODUTO, LENTE, ARMACAO |
-| P4 | A conversão de atendimentos em vendas não é medida; a loja faz cerca de 100 atendimentos e 80 vendas por semana. | ATENDIMENTO, VENDA |
-| P5 | Os dados de saúde das receitas precisam de proteção; lente de grau só é vendida com receita (RN-16). | RECEITA, RECEITA_MEDIDA, VENDA, LENTE |
+| Funcionários | 3 (optometrista, gerente, consultor óptico) | Informado pelo gerente |
+| Atendimentos por semana | ≈ 100 (≈ 430 por mês) | Informado pelo gerente |
+| Vendas por semana | ≈ 80 (≈ 345 por mês) | Informado pelo gerente |
+| Conversão de atendimento em venda | ≈ 80% | Calculado: 80 ÷ 100 |
+| Estoque mínimo | 100 pares de lentes e 500 armações (RN-34) | Informado pelo gerente |
+| Clientes ativos (com atendimento nos últimos 12 meses) | ≈ 1.800 | Estimativa fictícia do grupo |
+| Orçamentos por semana | ≈ 90 (toda venda tem orçamento, RN-23, e alguns não viram venda) | Estimativa fictícia do grupo |
+| Vendas parceladas | ≈ 35% das vendas (≈ 120 por mês) | Estimativa fictícia do grupo |
+| Pagamentos por mês | ≈ 800 (345 sinais ou pagamentos integrais + ≈ 4 parcelas por venda parcelada) | Calculado a partir das estimativas |
+| Itens em estoque | ≈ 900 armações e ≈ 250 pares de lentes, em ≈ 350 produtos cadastrados | Estimativa fictícia do grupo (acima do mínimo da RN-34) |
+| Fornecedores ativos | ≈ 6 | Estimativa fictícia do grupo |
+| Compras a fornecedores | ≈ 12 por mês | Estimativa fictícia do grupo |
+| Trocas e devoluções | ≈ 15 por mês (≈ 4% das vendas) | Estimativa fictícia do grupo |
 
----
+**Problemas e necessidades.** Hoje pedidos, estoque e parcelas ficam em **papel e planilhas separadas**, e um banco de dados usado antes na loja falhava com frequência. Cada problema abaixo é de gestão de informações, aparece no DER e terá ao menos uma consulta gerencial no script SQL (rastreabilidade na seção 1.6).
 
-## 2. Processos de Negócio
+| Código | Problema | Onde aparece no DER | Requisitos que o resolvem |
+| --- | --- | --- | --- |
+| P1 | Pedidos, receitas e pagamentos ficam em papel e planilhas separadas, sem vínculo seguro entre atendimento, orçamento, venda e pagamento; cada consulta exige abrir vários registros. | CLIENTE, ATENDIMENTO, RECEITA, ORCAMENTO, VENDA, PAGAMENTO, PARCELA | RF-01, RF-02, RF-05, RF-06, RF-07, RF-08, RF-17 |
+| P2 | O saldo de estoque de armações e lentes não é controlado com segurança, e a loja não sabe quando está abaixo do mínimo (RN-34). | PRODUTO, ESTOQUE, COMPRA, FORNECEDOR | RF-10, RF-11, RF-12 |
+| P3 | A garantia não é controlada por produto vendido: um ano para armação e seis meses para lente, contados da montagem (RN-07). | VENDA, CONTÉM, PRODUTO, LENTE, ARMACAO | RF-13, RF-14 |
+| P4 | A conversão de atendimentos em vendas não é medida (≈ 100 atendimentos e ≈ 80 vendas por semana). | ATENDIMENTO, VENDA | RF-02, RF-06, RF-18 |
+| P5 | Os dados de saúde das receitas precisam de proteção, e lente de grau só é vendida com receita (RN-16). | RECEITA, RECEITA_MEDIDA, ATENDIMENTO, LENTE | RF-03, RF-04, RF-19 |
 
+**Escopo do sistema.** O banco reúne todos os dados da ótica, e não só os dos problemas acima: clientes, equipe, atendimentos (inclusive manutenção sem venda), receitas e medidas, orçamentos, vendas e suas linhas, pagamentos, parcelas, notas fiscais de saída e de entrada, fornecedores, compras, produtos (lentes e armações), estoque e pós-venda.
 
-**Principais processos mapeados:**
+**Justificativa da escolha.** A ótica tem processos encadeados e observáveis (atendimento, receita, orçamento, venda, pagamento, compra, montagem, retirada, garantia e troca), que pedem relacionamentos variados: 1:1, 1:N, N:N com atributos e generalização/especialização. O grupo tem acesso presencial à loja e ao gerente. **Vínculo com a organização:** nenhum integrante do grupo trabalha na ótica nem tem vínculo familiar com seus responsáveis.
 
+**Evidências da organização.**
+
+- Endereço completo: Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP, CEP 08191-000.
+- Forma de contato: telefone da loja, (11) 99349-4371.
+- Perfil no Google Meu Negócio (Google Maps, "Óticas kadosh"): [abrir o perfil](https://www.google.com/maps/place/%C3%93ticas+kadosh/@-23.4853128,-46.3896531,17z/data=!3m1!4b1!4m6!3m5!1s0x94ce63a88cc3646f:0x458e7b7ae1e2b7bb!8m2!3d-23.4853177!4d-46.3870782!16s%2Fg%2F11qwsc5n75).
+- Foto da visita, dentro da loja, com o letreiro "Ótica Kadosh" na parede: [`Otica kadoshi.jpeg`](./Otica%20kadoshi.jpeg). Da esquerda para a direita: Kaique Batista dos Santos (consultor óptico), Guilherme de Souza Silva (optometrista), **Marcos Vinícius Silva Menezes (gerente, o entrevistado)**, Victor Augusto Silva Marcilio, João Felipe de Sousa Pires e Cauã Batista Freire (integrantes do grupo).
+- As fotos do formulário de pedido e do laudo mostram dados pessoais e de saúde de clientes reais e **não foram publicadas**.
+
+**Responsável pela organização.** Marcos Vinícius Silva Menezes, **gerente**, que atendeu o grupo. Contato pelo telefone da loja: (11) 99349-4371.
+
+### Relato da entrevista
+
+- **Quem:** o entrevistado foi Marcos Vinícius Silva Menezes, gerente. Participaram os integrantes Cauã Batista Freire, João Felipe de Sousa Pires e Victor Augusto Silva Marcilio.
+- **Quando e onde:** 05/09/2026, presencialmente, dentro da Ótica Kadosh.
+- **Comprovação:** a foto [`Otica kadoshi.jpeg`](./Otica%20kadoshi.jpeg), tirada no interior da loja durante a visita.
+- **Depois da visita:** o gerente respondeu por mensagem a dúvidas pontuais do grupo em 14/10/2026 e 15/10/2026 (garantia, desistência, venda sem receita, medidas por olho, parcelamento, validade do orçamento, unidade de lentes e armações) e informou depois que a ótica emite nota fiscal a cada pagamento recebido. Foram confirmações por mensagem, e não uma nova visita.
+- **O que mudou desde a Entrega 1:** nome, endereço, contato e responsável passaram a constar no relatório; os processos viraram sequências com entrada, responsável e saída; entraram as notas fiscais de saída e de entrada; o DER foi revisado (tabela do Caso A, abaixo).
+
+**O que o grupo observou na loja** (separado do que foi dito):
+
+| Observado no local | Efeito no modelo |
+| --- | --- |
+| O formulário de pedido preenchido na venda, com os campos do cliente, da compra, da receita e do pagamento | Atributos de CLIENTE, VENDA, CONTÉM, PAGAMENTO |
+| O comprovante (canhoto de compra e venda) entregue ao cliente | VENDA.canhoto_conferido; RN-21 |
+| O laudo produzido na ótica pelo optometrista | RECEITA e RECEITA_MEDIDA |
+| Pedidos, estoque e parcelas anotados em papel e em planilhas separadas | Problemas P1 e P2 |
+
+**O que o gerente informou:** porte e rotina (3 funcionários, ≈ 100 atendimentos e ≈ 80 vendas por semana, banco de dados anterior com falhas), regras de receita (RN-03, RN-09, RN-16), garantia (RN-07, RN-19), suporte gratuito (RN-20), retirada com canhoto (RN-21), nota fiscal (RN-22), desistência (RN-24), troca e devolução (RN-08, RN-25), parcelamento (RN-17), encomenda (RN-18), orçamento (RN-23), unidade de lentes e armações (RN-26) e estoque mínimo (RN-34).
+
+**Não confirmado:** o regulamento de garantia não foi apresentado; as regras de nota fiscal e reembolso são relatos do gerente, e não parecer jurídico; tipos de dados, tamanhos, índices e prazos de retenção do dicionário são propostas do grupo.
+
+O levantamento completo está em [`levantamento/levantamento.md`](./levantamento/levantamento.md).
+
+### Processos de negócio
+
+Os 12 processos foram mapeados na ótica e conferidos com o gerente. Cada um cita os dados envolvidos.
 
 | ID | Processo | Entrada | Sequência e responsável | Saída e integração |
 | --- | --- | --- | --- | --- |
-| PR01 | Cadastro e atendimento | Cliente procura a loja. | Funcionário consulta/cadastra CLIENTE e registra ATENDIMENTO. | Histórico do cliente, mesmo sem venda. |
-| PR02 | Receita e medidas | Receita trazida ou avaliação interna. | Registrar RECEITA, origem, data, emissor interno quando houver e medidas OD/OE × LONGE/PERTO. | Prescrição acessível pelo atendimento, com acesso restrito. |
-| PR03 | Orçamento | Seleção de produtos e quantidades. | Consultor registra ORCAMENTO e condições em OFERECE; informa validade e registra aprovação. | Oferta preservada mesmo sem conversão. |
-| PR04 | Venda | Orçamento aprovado e válido. | Converter em VENDA do mesmo atendimento; registrar linhas de CONTÉM, preços, quantidades e total. | Pedido comercial rastreável, com receita quando exigida. |
-| PR05 | Sinal e parcelas | Condição de pagamento acordada. | Registrar PAGAMENTO; sinal pode gerar parcelas futuras por GERA; recebimento posterior pode QUITA uma parcela. | Plano do saldo sem duplicação do sinal. |
-| PR06 | Compras e fornecedores | Reposição ou necessidade de uma venda. | Gerente registra COMPRA, FORNECEDOR e produtos em ADQUIRE; registra chegada. | Compra pode existir sem venda; recebimento gera entrada. |
-| PR07 | Estoque | Compra recebida, venda executada ou pós-venda aceito. | Registrar MOVIMENTO_ESTOQUE com produto, quantidade, condição, direção e uma origem. | Saldos disponível e segregado calculados sem dupla baixa. |
-| PR08 | Encomenda e montagem | Sinal suficiente e previsão informada. | Registrar liberação, envio ao fornecedor e montagem/finalização. | Datas previstas e realizadas preservadas; início da garantia comercial. |
-| PR09 | Retirada | Óculos prontos e canhoto apresentado. | Conferir canhoto e registrar retirada efetiva. | Entrega registrada; previsão não se confunde com realização. |
-| PR10 | Manutenção | Solicitação de ajustes após a entrega. | Registrar atendimento de manutenção e serviço realizado. | Histórico do suporte gratuito relatado. |
-| PR11 | Troca, devolução e garantia | Solicitação referente a produto vendido. | Registrar TROCA_DEVOLUCAO, linha afetada, avaliação e decisão; executar movimentos/acertos autorizados. | Retorno, substituição e descarte rastreados; recusas preservadas. |
-| PR12 | Cancelamento e referência fiscal | Solicitação de desistência ou emissão fiscal externa. | Registrar instantes para análise comercial e referência do documento fiscal emitido. | Decisão auditável e referência fiscal; sem presumir integração externa. |
+| PR01 | Cadastro e atendimento | Cliente procura a loja. | Funcionário consulta ou cadastra o CLIENTE (nome, data de nascimento, CPF, e-mail, telefones, endereço) e registra o ATENDIMENTO (data e hora, meio de contato, tipo COMERCIAL, AVALIACAO ou MANUTENCAO). | Histórico do cliente, mesmo sem venda. |
+| PR02 | Receita e medidas | Receita trazida ou avaliação interna. | Optometrista (laudo) ou consultor (receita trazida) registra a RECEITA (data, origem TRAZIDA ou LAUDO_OTICA, observação) no atendimento e as medidas por olho (OD/OE) e distância (LONGE/PERTO): esférico, cilíndrico, eixo, acuidade visual, DNP e altura. | Prescrição acessível pelo atendimento, com acesso restrito. |
+| PR03 | Orçamento | Cliente escolhe armação e lente. | Consultor registra o ORCAMENTO (emissão, validade de 24 horas, status, observação) e a aprovação do cliente. | Oferta preservada mesmo sem venda. |
+| PR04 | Venda | Orçamento aprovado e válido. | Consultor registra a VENDA no mesmo atendimento (data e hora, total, status, observação) com as linhas de CONTÉM (número da linha, produto, quantidade, preço unitário, observação). | Pedido comercial rastreável, com receita quando exigida. |
+| PR05 | Sinal e parcelas | Condição de pagamento acordada. | Consultor registra o PAGAMENTO (valor, data, forma, finalidade) e as PARCELAS do saldo (número, valor, vencimento). Pagamento posterior quita uma parcela. | Plano do saldo sem duplicação do sinal. |
+| PR06 | Compras e fornecedores | Reposição ou necessidade de uma venda. | Gerente registra a COMPRA ao FORNECEDOR (data do pedido, chegada, status), com venda de origem opcional, e a NOTA_FISCAL_ENTRADA recebida. | Compra pode existir sem venda; o recebimento gera entrada no estoque. |
+| PR07 | Estoque | Compra recebida, venda executada ou pós-venda aceito. | Registrar o movimento em ESTOQUE (data, quantidade, direção, motivo, condição) para um PRODUTO. | Saldos disponível e segregado calculados sem dupla baixa. |
+| PR08 | Encomenda e montagem | Sinal de pelo menos 30% e previsão informada. | Registrar previsão de conclusão, liberação, envio ao fornecedor e montagem/finalização. | Datas previstas e realizadas preservadas; início da garantia. |
+| PR09 | Retirada | Óculos prontos e canhoto apresentado. | Conferir o canhoto e registrar a retirada efetiva (data e conferência). | Entrega registrada; previsão não se confunde com realização. |
+| PR10 | Manutenção | Pedido de ajuste após a entrega. | Registrar ATENDIMENTO de manutenção e a descrição do serviço (gratuito, RN-20). | Histórico do suporte gratuito. |
+| PR11 | Troca, devolução e garantia | Solicitação sobre produto vendido. | Registrar a TROCA_DEVOLUCAO (tipo, data do ocorrido, quantidade afetada, dano, parecer, data de avaliação, decisão, valores cobrado, abatido e reembolsado), com a nota fiscal de saída de origem, e os movimentos de ESTOQUE. | Retorno, substituição e descarte rastreados; recusas preservadas. |
+| PR12 | Cancelamento e nota fiscal | Desistência do cliente ou pagamento recebido. | Registrar na VENDA o envio ao fornecedor e a solicitação de cancelamento; registrar a NOTA_FISCAL_SAIDA (número, data, valor total, tributos) de **cada** PAGAMENTO recebido. | Decisão auditável e nota fiscal registrada; sem integração com o Fisco. |
 
+**Processos comuns em óticas que ficaram de fora.** Foram levantados com apoio de IA, a partir do que óticas costumam fazer (registrado na seção 6). A coluna de justificativa é uma **proposta do grupo, a confirmar com o gerente** na próxima visita.
 
-**Fluxogramas:** a representação gráfica é opcional no esqueleto. O grupo documenta os processos em sequência textual na tabela acima, sem fluxograma. O levantamento não confirmou laboratório externo independente do fornecedor nem ordem de serviço; essas entidades não foram acrescentadas.
+| Processo comum | Por que não foi incluído |
+| --- | --- |
+| Agendamento de consultas | Não foi relatado. O atendimento é presencial e o DER registra só o atendimento realizado. |
+| Laboratório externo e ordem de serviço | Não confirmado; o levantamento indicou envio do pedido ao fornecedor, registrado em VENDA. |
+| Fidelidade, campanhas e CRM | Não relatado e não ligado aos problemas P1 a P5. |
+| Caixa diário e conciliação com a operadora do cartão | Não relatado; o sistema registra o pagamento recebido, e não o repasse da operadora. |
+| Emissão fiscal integrada (NF-e/NFC-e) | A nota é emitida em sistema externo; o banco só registra os dados da nota. |
+| Folha, ponto, escala e comissões | Equipe de 3 pessoas; não relatado. |
+| Convênios e planos de saúde | Não relatado. |
 
+### Requisitos
 
-## 3. Requisitos do Sistema
+Os requisitos abaixo foram reescritos com os dados envolvidos e correspondem aos processos acima. A cobertura dos problemas está na coluna **Problema**.
 
+**Requisitos funcionais**
 
-### 3.1 Requisitos Funcionais
+| ID | O sistema deve permitir | Processo | Problema |
+| --- | --- | --- | --- |
+| RF-01 | Cadastrar e consultar clientes com nome completo, data de nascimento, CPF, e-mail, telefone fixo, celular e endereço (logradouro, número, bairro, cidade, CEP), exigindo ao menos um meio de contato. | PR01 | P1 |
+| RF-02 | Registrar atendimentos com data e hora, meio de contato, tipo (COMERCIAL, AVALIACAO ou MANUTENCAO), descrição do serviço (na manutenção), cliente e funcionário responsável, inclusive atendimentos sem venda. | PR01, PR10 | P1, P4 |
+| RF-03 | Registrar receita (data, origem, observação) e, por olho e distância, esférico, cilíndrico, eixo, acuidade visual, DNP e altura, com de uma a quatro medidas por receita. | PR02 | P5 |
+| RF-04 | Conferir se a venda de lente com grau (possui grau) tem receita no mesmo atendimento. | PR02, PR04 | P5 |
+| RF-05 | Emitir e guardar orçamentos com data e hora de emissão, validade (24 horas), aprovação, status e observação, preservando os não aprovados. | PR03 | P1 |
+| RF-06 | Registrar venda com data e hora, total, status, observação e, por linha, número da linha, produto, quantidade, preço unitário e observação. | PR04 | P1, P4 |
+| RF-07 | Registrar pagamentos com valor, data, forma (PIX, DINHEIRO, DEBITO, CREDITO) e finalidade (SINAL, INTEGRAL, PARCIAL, QUITACAO_PARCELA), sem exceder o saldo devido, e emitir/registrar a nota fiscal de saída de cada pagamento com número, data de emissão, valor total e tributos. | PR05, PR12 | P1 |
+| RF-08 | Registrar as parcelas do saldo (número de 1 a 10, valor mínimo de R$ 50,00, vencimento, status) e a quitação por pagamento. | PR05 | P1 |
+| RF-09 | Cadastrar fornecedores (nome, CNPJ, endereço, contato) e compras (data do pedido, chegada, status, venda de origem opcional), e registrar a nota fiscal de entrada (número, data de emissão, valor total, tributos). | PR06 | P2 |
+| RF-10 | Cadastrar produtos (tipo, referência, marca, unidade) com as características de lente (índice, tratamento, possui grau) ou de armação (tipo, material). | PR04, PR07 | P2, P3 |
+| RF-11 | Registrar movimentos de estoque (data, quantidade, direção, motivo, condição, produto, compra de origem) e consultar o saldo por produto e condição. | PR07 | P2 |
+| RF-12 | Indicar produtos cujo saldo disponível está abaixo do mínimo de 100 pares de lentes ou 500 armações (RN-34). | PR07 | P2 |
+| RF-13 | Registrar previsão de conclusão, liberação da encomenda, envio ao fornecedor, montagem/finalização, horário previsto, retirada efetiva e conferência do canhoto. | PR08, PR09 | P1 |
+| RF-14 | Calcular a garantia por produto vendido a partir da montagem: um ano para armação e seis meses para lente. | PR08, PR11 | P3 |
+| RF-15 | Registrar troca ou devolução com tipo, data do ocorrido, status, quantidade afetada, dano, parecer, data de avaliação, valores cobrado, de abatimento e reembolsado, e a nota fiscal de saída de origem, com os movimentos de estoque correspondentes. | PR11 | P3 |
+| RF-16 | Registrar o envio do pedido ao fornecedor e a solicitação de cancelamento por desistência, preservando a decisão. | PR12 | P4 |
+| RF-17 | Consultar o histórico integrado de um cliente: atendimentos, receitas, orçamentos, vendas, pagamentos e parcelas. | PR01 a PR05 | P1 |
+| RF-18 | Consultar a conversão de atendimentos em vendas por período e por funcionário. | PR01, PR04 | P4 |
+| RF-19 | Controlar o acesso por função (gerente, consultor óptico, optometrista) e auditar leituras de receitas e alterações. | Todos | P5 |
 
-
-| ID | O sistema deve permitir | Cobertura no modelo |
-| --- | --- | --- |
-| RF-01 | Cadastrar e consultar clientes e seus contatos. | CLIENTE |
-| RF-02 | Registrar atendimentos vinculados a cliente e funcionário, inclusive manutenção sem venda. | ATENDIMENTO, SOLICITA e CONDUZ |
-| RF-03 | Registrar receita, origem, data, emissor interno e medidas por olho/distância. | RECEITA, RECEITA_MEDIDA, ORIGINA, EMISSOR DE e POSSUI |
-| RF-04 | Conferir receita exigida para lente de grau pelo atendimento da venda. | LENTE.possui_grau; RN-02, RN-03 e RN-16 |
-| RF-05 | Emitir e guardar orçamentos com produtos, quantidades, preços, aprovação e validade. | ORCAMENTO e OFERECE |
-| RF-06 | Registrar venda originada de orçamento e atendimento, com linhas de produto e total. | VENDA, CONTÉM e RN-31 |
-| RF-07 | Registrar sinal e demais recebimentos sem exceder o saldo devido. | PAGAMENTO e RECEBE |
-| RF-08 | Gerar parcelas futuras a partir do sinal e registrar sua quitação posterior. | PARCELA, GERA e QUITA |
-| RF-09 | Cadastrar fornecedores e compras de reposição ou por demanda de venda. | FORNECEDOR, COMPRA, ADQUIRE e DEMANDA |
-| RF-10 | Registrar movimentos e consultar saldo por produto e condição. | MOVIMENTO_ESTOQUE; RN-12 e RN-30 |
-| RF-11 | Registrar previsão, liberação da encomenda, envio, montagem e retirada. | Datas e horários de VENDA; chegada de COMPRA |
-| RF-12 | Registrar conferência do canhoto e gerar comprovante resumido do pedido. | VENDA.canhoto_conferido e dados da venda |
-| RF-13 | Calcular garantia comercial por produto vendido, a partir da montagem. | PRODUTO, CONTÉM e VENDA.data_montagem_finalizacao |
-| RF-14 | Registrar avaliação, aprovação ou recusa de troca/devolução e respectivos movimentos. | TROCA_DEVOLUCAO e ORIGINA |
-| RF-15 | Registrar acertos financeiros autorizados e conciliar o saldo sem apagar pagamentos. | Campos financeiros da ocorrência; RN-11 e RN-33 |
-| RF-16 | Consultar histórico integrado de atendimento, orçamento, receita, venda e recebimentos. | Relacionamentos do DER |
-| RF-17 | Registrar solicitação de cancelamento e referência de documento fiscal emitido externamente. | Campos específicos de VENDA |
-| RF-18 | Controlar acesso por perfil e auditar leituras sensíveis e alterações. | Política proposta do dicionário HTML, seções 5 e 6 |
-
-
-### 3.2 Requisitos Não Funcionais
-
-
-Os requisitos de qualidade são propostas técnicas para orientar a implementação futura; não descrevem recursos já instalados na loja.
-
+**Requisitos não funcionais**
 
 | ID | Característica | Critério proposto |
 | --- | --- | --- |
-| RNF-01 | Segurança e privacidade | Acesso individual e por perfil, com mínimo necessário e proteção de dados de saúde. |
-| RNF-02 | Integridade | Validar identificadores, vínculos, totalização, XOR de origens e compatibilidade dos caminhos. |
-| RNF-03 | Recuperação | Proposta técnica: cópia de segurança diária e teste periódico de restauração; retenção e infraestrutura a definir com a loja. |
-| RNF-04 | Usabilidade | Permitir localizar cliente, histórico e situação do pedido em uma consulta integrada; validar a interface com a equipe. |
-| RNF-05 | Rastreabilidade | Registrar autor, instante, operação, objeto e resultado; proteger registros de auditoria. |
-| RNF-06 | Desempenho | Projetar índices para consultas por cliente, período e produto; medir desempenho na implementação, sem afirmar meta não validada. |
-| RNF-07 | Disponibilidade | Planejar operação durante o horário de atendimento e recuperação de falhas; níveis de serviço ainda não contratados. |
+| RNF-01 | Segurança e privacidade | Acesso individual e por função, com o mínimo necessário; proteção dos dados de saúde (LGPD). |
+| RNF-02 | Integridade | Validar identificadores, vínculos, totais (soma das linhas igual ao total da venda) e saldos. |
+| RNF-03 | Recuperação | Cópia de segurança diária e teste periódico de restauração; infraestrutura a definir com a loja. |
+| RNF-04 | Usabilidade | Localizar cliente, histórico e situação do pedido em uma única consulta; validar com a equipe. |
+| RNF-05 | Rastreabilidade | Registrar autor, instante, operação, objeto e resultado; proteger os registros de auditoria. |
+| RNF-06 | Desempenho | Índices para consultas por cliente, período e produto; medir na implementação, sem meta não validada. |
+| RNF-07 | Disponibilidade | Operar no horário de atendimento da loja; níveis de serviço ainda não contratados. |
 
+**Requisitos comuns que ficaram de fora** (justificativas propostas pelo grupo, a confirmar com o gerente):
 
-## 4. Regras de Negócio
+| Requisito comum | Por que não foi incluído |
+| --- | --- |
+| Agendamento online e lembretes por mensagem | A ótica não faz agendamento; o aviso de que o óculos ficou pronto é feito pelo celular do cliente (campo cadastrado), fora do sistema. |
+| Emissão de NF-e/NFC-e dentro do sistema | A nota é emitida em sistema externo; o banco registra apenas os dados dela (RN-22). |
+| Controle de custo e itens da compra | O DER final do grupo não tem entidade ou relacionamento de itens da compra; é uma **limitação declarada** do modelo, a avaliar com o gerente. |
+| Folha, escala e comissão | Equipe de 3 pessoas; não relatado. |
+| Aplicativo ou site para o cliente | Não é problema de gestão de informações e não foi relatado. |
 
+### Regras de negócio
 
-**Regras operacionais:**
-
+Os códigos da Entrega 1 foram mantidos. **RN-31 e RN-32** foram retiradas porque dependiam de relacionamentos que não constam do DER final; os códigos não foram reutilizados. **RN-22 foi alterada** (a ótica emite nota fiscal a cada pagamento recebido) e **RN-35** foi criada.
 
 | ID | Regra | Origem |
 | --- | --- | --- |
@@ -139,514 +192,114 @@ Os requisitos de qualidade são propostas técnicas para orientar a implementaç
 | RN-12 | Movimentos têm quantidade positiva, direção, condição e motivo compatíveis. Saída não pode exceder o saldo da condição movimentada; retorno, substituição e descarte não repetem a baixa original. | Modelagem do estoque |
 | RN-13 | DNP e altura são registradas por olho. Se repetidas entre longe e perto para o mesmo olho, manter coerência, salvo diferenciação validada pelo responsável. | Resposta do gerente e decisão técnica |
 | RN-14 | PRODUTO tem especialização total e disjunta: todo produto é LENTE ou ARMACAO, nunca os dois. Os subtipos herdam id_produto. | Nota do DER |
-| RN-15 | O optometrista emite o laudo interno; o consultor conduz o atendimento comercial que fecha a venda. O emissor da receita pode ser diferente do funcionário do atendimento comercial. | Respostas do gerente; adaptação ao DER |
+| RN-15 | O optometrista emite o laudo interno; o consultor conduz o atendimento comercial que fecha a venda. O DER não registra o emissor do laudo; o responsável pelo atendimento é obtido por CONDUZ. | Respostas do gerente; DER final |
 | RN-16 | Lente com possui_grau verdadeiro exige receita no atendimento da venda, trazida pelo cliente ou emitida internamente. | Resposta do gerente |
 | RN-17 | Depois do sinal, o saldo pode ser parcelado no cartão em até dez parcelas de no mínimo R$ 50,00; o sinal não integra essas parcelas. | Confirmação de 15/10/2026 |
 | RN-18 | Encomenda só é liberada após recebimento de sinal de pelo menos 30% do total e registro da previsão de conclusão. Uma venda aberta pode existir antes desse recebimento. | Resposta do gerente |
 | RN-19 | Segundo o gerente, a garantia da armação cobre defeito de fabricação, mola e parafuso; a da lente cobre adaptação, erro de grau, eficácia do tratamento e arranhões, conforme regulamento da ótica. O regulamento não foi apresentado ao grupo. | Relato de 14/10/2026 |
 | RN-20 | O suporte relatado após a entrega é gratuito e vitalício para ajustes, plaquetas e parafusos; registrar como atendimento de manutenção. | Resposta do gerente |
 | RN-21 | A entrega é feita ao portador do canhoto de compra e venda; registrar a conferência ao preencher a retirada efetiva. | Resposta do gerente |
-| RN-22 | Registrar tipo, número e data do documento fiscal efetivamente emitido. O relato de emissão quando solicitada não constitui dispensa fiscal nem validação jurídica. | Relato do gerente; limite do levantamento |
-| RN-23 | Toda venda, inclusive pronta entrega, é precedida de orçamento. Orçamentos são guardados mesmo sem venda, com emissão e validade usual de 24 horas. Conversão exige aprovação dentro da validade e ocorre no máximo uma vez. | Confirmações do grupo |
+| RN-22 | A ótica emite uma nota fiscal a cada pagamento recebido (sinal, parcela ou pagamento integral). Registrar em NOTA_FISCAL_SAIDA o número, a data de emissão, o valor total e os tributos, vinculada ao PAGAMENTO que a originou (GERA): todo pagamento tem exatamente uma nota e cada nota pertence a um único pagamento. Toda TROCA_DEVOLUCAO referencia a nota fiscal de saída da venda original (REFERE-SE A), e uma nota pode ser referenciada por várias ocorrências. O relato do gerente sobre a emissão a cada pagamento não constitui validação fiscal ou jurídica. | Relato do gerente; DER final (27/10/2026) |
+| RN-23 | Toda venda, inclusive pronta entrega, é precedida de orçamento. Orçamentos são guardados mesmo sem venda, com emissão e validade usual de 24 horas. A venda só é feita com aprovação dentro da validade. O DER não liga ORCAMENTO diretamente a VENDA. | Confirmações do grupo; DER final |
 | RN-24 | Na desistência sem defeito, a política comercial relatada considera o pedido ainda não enviado ao fornecedor e o limite de 24 horas da compra. Solicitação não significa cancelamento automático; preservar a decisão. | Relato de 15/10/2026 |
 | RN-25 | Troca depende de avaliação do produto e causa do dano, podendo ser aprovada ou recusada. Parecer e data são exigidos na decisão; não presumir política de reembolso ou crédito. | Resposta do gerente |
-| RN-26 | Lentes são compradas, vendidas e contadas por par; armações por unidade. O custo_unitario de lente corresponde ao custo por par. | Confirmação de 15/10/2026 |
+| RN-26 | Lentes são compradas, vendidas e contadas por par; armações por unidade. | Confirmação de 15/10/2026 |
 | RN-27 | O campo “A partir das” é horário previsto de retirada. O índice de refração registra o valor numérico; observações da linha descrevem características adicionais da lente. | Formulário e resposta do gerente |
-| RN-28 | PARCELA possui id_parcela próprio. Somente pagamento com finalidade SINAL participa de GERA; cada parcela tem um gerador e pode existir sem QUITA. QUITA é opcional e 1:1: um pagamento quita no máximo uma parcela e cada parcela é quitada por no máximo um pagamento. Gerador e quitador devem pertencer à mesma venda. | DER final e restrição técnica |
-| RN-29 | CONTÉM distingue linhas por numero_linha único dentro da venda. O mesmo produto pode ocorrer em duas linhas com preços diferentes. A ocorrência aponta numero_linha_venda e seu produto deve coincidir com o dessa linha; quantidade afetada deve respeitar a quantidade vendida. | Confirmação do usuário e nota do DER |
-| RN-30 | Cada MOVIMENTO_ESTOQUE possui exatamente uma origem: VENDA, COMPRA ou TROCA_DEVOLUCAO (exclusão mútua/XOR). O produto da origem deve ser compatível; em substituição, o movimento identifica o produto efetivamente entregue. | Nota do DER e modelagem |
-| RN-31 | O atendimento ligado diretamente à VENDA deve ser o mesmo que originou o ORCAMENTO dessa venda. | Nota final do DER |
-| RN-32 | O recebimento SINAL gera o plano do saldo: número e soma das parcelas são validados por venda, mesmo que haja mais de um recebimento de sinal. O sinal nunca é contado novamente como parcela quitada. | Decisão técnica de integridade |
+| RN-28 | PARCELA possui id_parcela próprio. QUITA é opcional e 1:1: um pagamento quita no máximo uma parcela e cada parcela é quitada por no máximo um pagamento. | DER final |
+| RN-29 | CONTÉM distingue linhas por numero_linha único dentro da venda. O mesmo produto pode ocorrer em duas linhas com preços diferentes. | Confirmação do usuário e nota do DER |
+| RN-30 | Todo movimento de ESTOQUE refere-se a um produto (É MOVIMENTADO EM); a entrada por compra liga-se à COMPRA de origem (GERA ENTRADA). Os demais motivos (venda, retorno, substituição, descarte) são registrados no atributo motivo. | DER final |
 | RN-33 | Campos de reembolso e abatimento registram apenas acertos efetivamente autorizados; não comprovam que a loja oferece essas alternativas em todos os casos. | Limite do levantamento e campos do DER |
 | RN-34 | A loja mantém no mínimo 100 pares de lentes e 500 armações em estoque; abaixo disso, precisa repor. As lentes são contadas por par (RN-26). | Resposta do gerente |
+| RN-35 | A nota fiscal de entrada, emitida pelo fornecedor, é registrada em NOTA_FISCAL_ENTRADA e vinculada à COMPRA (POSSUI): toda compra tem exatamente uma nota e cada nota pertence a uma compra. | DER final (27/10/2026); a confirmar com a ótica |
 
+**Regras comuns em óticas que ficaram de fora** (justificativas propostas, a confirmar com o gerente):
 
-**Restrições organizacionais:** cumprir a unidade comercial por produto, preservar o histórico, separar previstos de realizados, exigir avaliação antes da decisão de pós-venda e aplicar acesso mínimo aos dados pessoais. As políticas comerciais relatadas não representam parecer jurídico. Regulamento de garantia, base legal de cada tratamento e prazos de retenção deverão ser formalizados pela organização antes do uso real.
-
-
-## 5. Dicionário de Dados Conceitual (Preliminar)
-
-
-O DER final contém **16 entidades, 106 atributos desenhados nas entidades e 9 atributos nos três relacionamentos com atributos**. Essa contagem não inclui referências propostas para a transformação relacional nem repete o identificador herdado nos subtipos. Não corresponde a uma contagem de colunas físicas implementadas.
-
-
-- [Ver código do dicionário](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Dicionario_de_Dados_Otica_Kadosh.html)
-- [Visualizar no GitHub Pages](https://jfpiresoficial.github.io/otica-kadosh-modelagem-dados/)
-
-O [Dicionário de Dados em HTML](./Dicionario_de_Dados_Otica_Kadosh.html) segue o exemplo do professor: notação formal, tipo físico proposto, obrigatoriedade, significado, índices, auditoria e acesso. A coluna abaixo apresenta o nome padronizado e, entre parênteses, o nome exibido no DER. Prefixos: ID_ identificador, NM_ nome, DT_ data, DH_ data e hora, HR_ horário, NR_ número textual/ordinal, QT_ quantidade, VL_ valor, TP_/CD_ categoria/domínio, IN_ indicador e DS_ descrição.
-
-
-
-**Privacidade:** os documentos descrevem estruturas e regras; não publicam registros reais de clientes nem prescrições. OD/OE = olho direito/esquerdo; DNP = distância nasopupilar.
-
-
-### CLIENTE
-
-
-Pessoa física que solicita os atendimentos e é titular dos pedidos.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_CLIENTE` (`id_cliente`) | Código interno do cadastro; não sofre operação matemática. | Obrigatório: Sim (PK). Gerado pelo sistema; nunca reutilizado. |
-| `NM_CLIENTE` (`nome`) | Nome completo do cliente, como escrito no pedido. Identifica o cliente nos atendimentos e no comprovante. | Obrigatório: Sim. É o nome do cliente, nunca o do funcionário do campo “Consultor”. |
-| `DT_NASCIMENTO` (`data_nasc`) | Data de nascimento (campo “Data Nasc.” do pedido). Ajuda a confirmar identidade e faixa etária. | Obrigatório: Não. Preenchimento obrigatório não confirmado com a ótica. |
-| `NR_CPF` (`cpf`) | CPF, somente dígitos. Dado pessoal protegido pela LGPD. | Obrigatório: Não. Se informado: 11 dígitos válidos e único no cadastro. |
-| `DS_EMAIL` (`email`) | Endereço de e-mail para contato. | Obrigatório: Não. Se informado, deve ter formato válido. |
-| `NR_TELEFONE_FIXO` (`telefone_fixo`) | Telefone fixo com DDD, somente dígitos (campo “Tel. Fixo”). | Obrigatório: Não. Sem regra específica. |
-| `NR_TELEFONE_CELULAR` (`telefone_celular`) | Celular com DDD (campo “Tel. Celular”). Canal usado para avisar que os óculos ficaram prontos. | Obrigatório: Não. Ao menos um meio de contato (celular, fixo ou e-mail) deve existir no cadastro. |
-| `DS_LOGRADOURO` (`logradouro`) | Rua, avenida ou similar do endereço. | Obrigatório: Não. Sem regra específica. |
-| `NR_ENDERECO` (`numero_endereco`) | Número do imóvel (campo “Nº” ao lado do CEP). Texto, pois pode ter complemento como “12-A”. | Obrigatório: Não. Sem regra específica. |
-| `NM_BAIRRO` (`bairro`) | Bairro do endereço. | Obrigatório: Não. Sem regra específica. |
-| `NM_CIDADE` (`cidade`) | Cidade do endereço. | Obrigatório: Não. Sem regra específica. |
-| `NR_CEP` (`cep`) | CEP, somente dígitos. | Obrigatório: Não. Se informado: 8 dígitos. |
-
-
-### FUNCIONARIO
-
-
-Integrante da equipe: gerente, consultor óptico ou optometrista.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_FUNCIONARIO` (`id_funcionario`) | Código interno do funcionário. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `NM_FUNCIONARIO` (`nome`) | Nome do integrante da equipe; aparece como “Consultor” no pedido. | Obrigatório: Sim. Sem regra específica. |
-| `TP_FUNCAO` (`funcao`) | Papel exercido na ótica. Define o que a pessoa pode fazer no sistema (Seção 6). | Obrigatório: Sim. Domínio: OPTOMETRISTA, GERENTE, CONSULTOR_OPTICO (relatado na entrevista de 05/09/2026). |
-| `NR_TELEFONE` (`telefone`) | Telefone de contato do funcionário. | Obrigatório: Não. Guarda de telefone individual não confirmada. |
-| `IN_ATIVO` (`ativo`) | Indica se o funcionário pode receber novas atribuições. | Obrigatório: Sim. Padrão TRUE. No desligamento, inativar; conservar o vínculo com atendimentos, laudos e vendas históricos. |
-
-
-### ATENDIMENTO
-
-
-Evento que relaciona um cliente a um funcionário e preserva a atividade realizada.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_ATENDIMENTO` (`id_atendimento`) | Código interno do atendimento. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `DH_ATENDIMENTO` (`data_hora`) | Data e hora em que o atendimento ocorreu. É diferente da “Data da Compra” da venda. | Obrigatório: Sim. Sem regra específica. |
-| `TP_MEIO_CONTATO` (`meio_contato`) | Como o cliente chegou à ótica (campo “Meio de contato” do pedido). | Obrigatório: Não. Lista de valores não confirmada; texto livre por enquanto. |
-| `TP_ATENDIMENTO` (`tipo_atendimento`) | Distingue atendimento comercial, avaliação e manutenção. | Obrigatório: Sim. Domínio proposto: COMERCIAL, AVALIACAO, MANUTENCAO. Não presume uma venda em todo atendimento. |
-| `DS_SERVICO` (`descricao_servico`) | Descrição do ajuste ou manutenção realizada. | Obrigatório: Não. Obrigatória em manutenção. RN-20: plaquetas, ajustes e parafusos do suporte relatado são gratuitos; registrar sem gerar cobrança por esses serviços. |
-
-
-### RECEITA
-
-
-Prescrição trazida pelo cliente ou laudo interno registrado no atendimento.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_RECEITA` (`id_receita`) | Código interno da receita. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `DT_RECEITA` (`data_receita`) | Data anotada na receita ou no laudo. | Obrigatório: Sim. RN-03: receita trazida é aceita se tiver até 1 ano; senão a ótica faz novo teste. É prática da ótica, não prazo legal geral. |
-| `TP_ORIGEM` (`origem`) | De onde veio a prescrição. | Obrigatório: Sim. Domínio: TRAZIDA (apresentada pelo cliente) ou LAUDO_OTICA (teste feito na ótica). |
-| `DS_OBSERVACAO` (`observacao`) | Anotação complementar do laudo (espaço “Obs.”). | Obrigatório: Não. Só quando houver anotação. |
-
-
-### RECEITA_MEDIDA
-
-
-Linha de medidas para um olho e uma distância dentro de uma receita.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_RECEITA` (`id_receita`) | Receita a que a medida pertence. | Obrigatório: Sim (PK, FK). FK para RECEITA; parte da chave. |
-| `CD_OLHO` (`olho`) | Olho a que a linha se refere. | Obrigatório: Sim (PK). Domínio: OD (direito) ou OE (esquerdo). Medida de um olho nunca é atribuída ao outro. |
-| `CD_DISTANCIA` (`distancia`) | Finalidade visual da linha. | Obrigatório: Sim (PK). Domínio: LONGE ou PERTO. Nem sempre as duas são preenchidas. |
-| `VL_ESFERICO` (`esferico`) | Grau esférico em dioptrias (DE no laudo; coluna “Esférico” no pedido). | Obrigatório: Não. Faixa de validação clínica ainda não confirmada. Não bloquear prescrições por uma faixa genérica; eventual passo e limites dependem de validação pelo responsável técnico. |
-| `VL_CILINDRICO` (`cilindro`) | Grau cilíndrico em dioptrias (DC no laudo; coluna “Cilíndrico” no pedido). | Obrigatório: Não. Convenção de sinal e limites ainda não confirmados. Quando houver componente cilíndrico que exija orientação, informar o eixo. Não assumir apenas valores negativos sem validação. |
-| `VL_EIXO` (`eixo`) | Eixo do cilindro em graus. | Obrigatório: Não. Entre 0 e 180. |
-| `VL_ACUIDADE_VISUAL` (`acuidade_visual`) | Acuidade visual (AV) registrada no laudo. | Obrigatório: Não. Texto, pois pode ser fração (20/20) ou decimal (0,8). |
-| `VL_DNP` (`dnp`) | Distância nasopupilar, em mm, usada na montagem das lentes. | Obrigatório: Não. Registrada por olho (confirmado pelo gerente). |
-| `VL_ALTURA` (`altura`) | Altura da lente na armação, em mm. | Obrigatório: Não. Registrada por olho (confirmado pelo gerente). |
-
-
-### ORCAMENTO
-
-
-Oferta comercial preservada mesmo quando não é convertida em venda.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_ORCAMENTO` (`id_orcamento`) | Identificador do orçamento. | Obrigatório: Sim (PK). Gerado pelo sistema; não reutilizado. |
-| `DH_EMISSAO` (`data_hora_emissao`) | Data e hora em que o orçamento foi emitido. | Obrigatório: Sim. RN-23: data e hora da emissão; início da validade usual de 24 horas. |
-| `DH_VALIDADE` (`data_hora_validade`) | Data e hora limite da oferta. | Obrigatório: Sim. RN-23: padrão DH_EMISSAO + 24 horas. Registrar prazo efetivamente concedido; eventual exceção precisa de justificativa e autorização auditadas, sem inventar outro prazo padrão. |
-| `DH_APROVACAO` (`data_hora_aprovacao`) | Data e hora da aceitação pelo cliente. | Obrigatório: Não (condicional). Obrigatória para conversão: DH_EMISSAO ≤ DH_APROVACAO ≤ DH_VALIDADE. Oferta vencida exige nova proposta; preservar a anterior. |
-| `CD_STATUS` (`status`) | Etapa do orçamento. | Obrigatório: Sim. Domínio proposto: EM_ELABORACAO, EMITIDO, APROVADO, RECUSADO, CANCELADO. A conversão é identificada pelo vínculo com VENDA, sem status duplicado. |
-| `DS_OBSERVACAO` (`observacao`) | Observação da proposta comercial. | Obrigatório: Não. Não registrar dados de saúde em texto comercial; usar RECEITA quando necessário. |
-
-
-### VENDA
-
-
-Pedido comercial com valor, datas de execução, retirada e referência fiscal.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_VENDA` (`id_venda`) | Número do pedido. Chave técnica única, pois a unicidade do número impresso no bloco não foi confirmada. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `DH_COMPRA` (`data_hora_compra`) | Data e hora do fechamento da compra, para aferir o intervalo de 24 horas. | Obrigatório: Sim. Obrigatória; usada na análise comercial de cancelamento (RN-24). |
-| `VL_TOTAL` (`valor_total`) | Total cobrado pelo pedido (campo “Total: R$”), antes de considerar o que já foi pago. | Obrigatório: Sim. Soma de quantidade × preço_unitario de CONTÉM. Preservar o valor original; ajustes autorizados ficam na ocorrência. RN-04 e RN-29. |
-| `CD_STATUS` (`status`) | Etapa do pedido no acompanhamento. | Obrigatório: Sim. Proposta: ABERTO, AGUARDANDO_PRODUTO, EM_MONTAGEM, PRONTO, RETIRADO, CANCELADO. Estados a validar com a ótica. |
-| `DS_OBSERVACAO` (`observacao`) | Anotação livre do pedido (“Obs.”). | Obrigatório: Não. Sem regra específica. |
-| `DT_MONTAGEM_FINALIZACAO` (`data_montagem_finalizacao`) | Data em que lente e armação foram montadas e os óculos finalizados. | Obrigatório: Não. RN-07 e RN-19: inicia a garantia comercial por linha de CONTÉM: 1 ano para ARMACAO e 6 meses para LENTE. Não calcular término enquanto esta data for nula. |
-| `DT_RETIRADA` (`data_retirada`) | Data em que o cliente retirou os óculos. | Obrigatório: Não. Retirada efetiva (confirmado). Nula até a retirada. Não é anterior à montagem. |
-| `HR_PREVISTA_RETIRADA` (`horario_previsto_retirada`) | Horário prometido para retirada, transcrito do campo A partir das. | Obrigatório: Não. RN-27: horário previsto, não efetivo. Combinar com DT_PREVISTA_CONCLUSAO para comunicar a disponibilidade prevista. |
-| `DT_PREVISTA_CONCLUSAO` (`data_prevista_conclusao`) | Data prometida para os óculos estarem prontos. | Obrigatório: Não (condicional). Obrigatória antes de liberar uma encomenda (RN-18). É distinta da montagem e da retirada efetivas. Não há prazo fixo em dias confirmado. |
-| `DT_LIBERACAO_ENCOMENDA` (`data_liberacao_encomenda`) | Data em que a fabricação foi autorizada após conferir a entrada. | Obrigatório: Não (condicional). Só registrar quando os pagamentos identificados como SINAL atingirem pelo menos 30% de VL_TOTAL e existir previsão de conclusão. Validar no ato da liberação e auditar a transição. |
-| `IN_CANHOTO_CONFERIDO` (`canhoto_conferido`) | Registra a apresentação do comprovante no momento da entrega. | Obrigatório: Não (condicional). TRUE obrigatório quando DT_RETIRADA for preenchida (RN-21). O relato aceita o portador do canhoto; não criar exigência de titularidade ou documento pessoal não confirmada. |
-| `TP_DOCUMENTO_FISCAL` (`tipo_documento_fiscal`) | Tipo do documento fiscal efetivamente emitido em sistema externo. | Obrigatório: Não. Preencher somente quando houver documento. A espécie fiscal e as condições de emissão dependem de validação contábil; o comprovante de pedido não é classificado automaticamente como documento fiscal. |
-| `NR_DOCUMENTO_FISCAL` (`numero_documento_fiscal`) | Referência ao documento fiscal da operação. | Obrigatório: Não. Exigir junto com o tipo e a data quando a emissão for registrada. Não pressupõe autorização ou integração automática com o Fisco. |
-| `DT_EMISSAO_FISCAL` (`data_emissao_fiscal`) | Data da emissão do documento fiscal referenciado. | Obrigatório: Não. A RN-22 descreve prática relatada, não uma dispensa legal. A implementação deve respeitar as obrigações fiscais aplicáveis. |
-| `DH_ENVIO_FORNECEDOR` (`data_hora_envio_fornecedor`) | Instante do primeiro envio do pedido ao fornecedor para execução. | Obrigatório: Não. Registro técnico para RN-24; distinto da liberação interna e da chegada. Deve ser preenchido no envio efetivo e preservado no histórico. |
-| `DH_SOLICITACAO_CANCELAMENTO` (`data_hora_solicitacao_cancelamento`) | Instante da solicitação de cancelamento por desistência. | Obrigatório: Não. Proposta para registrar pedido e avaliar RN-24. Uma solicitação não cancela automaticamente a venda; motivo, decisão e responsável ficam na auditoria. |
-
-
-### PAGAMENTO
-
-
-Recebimento efetivo de uma venda; pode ser sinal, pagamento integral ou quitação de parcela.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_PAGAMENTO` (`id_pagamento`) | Código interno do recebimento. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `VL_PAGAMENTO` (`valor`) | Quantia recebida nesta operação (campo “Sinal/Pago” é o primeiro pagamento). | Obrigatório: Sim. Maior que zero. Ao registrar recebimento, não exceder o saldo devedor vigente nem o saldo da parcela vinculada. Reembolsos são registrados em TROCA_DEVOLUCAO, não como pagamento negativo. |
-| `DT_PAGAMENTO` (`data_pagamento`) | Data em que o recebimento ocorreu. | Obrigatório: Sim. Registro proposto para acompanhar pagamentos parciais. |
-| `TP_FORMA` (`forma`) | Meio pelo qual o cliente pagou. | Obrigatório: Sim. Domínio PIX, DINHEIRO, DEBITO, CREDITO. O plano parcelado da RN-17 usa CREDITO. A estrutura não presume calendário de repasses nem taxas da operadora. |
-| `TP_FINALIDADE` (`finalidade`) | Finalidade do recebimento, distinguindo o sinal dos demais pagamentos. | Obrigatório: Sim. Domínio técnico proposto: SINAL, INTEGRAL, PARCIAL ou QUITACAO_PARCELA. Somente SINAL participa de GERA. RN-17, RN-18 e RN-28. |
-
-
-### PARCELA
-
-
-Compromisso futuro gerado por um pagamento de sinal; existe antes da quitação.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_PARCELA` (`id_parcela`) | Identificador próprio da parcela, independente do identificador da venda. | Obrigatório: Sim (PK). Identificador único e não nulo. A parcela liga-se ao sinal por GERA; não possui id_venda no DER. RN-28. |
-| `NR_PARCELA` (`numero_parcela`) | Número da parcela dentro da venda. | Obrigatório: Sim. Inteiro de 1 a 10, único dentro do plano da venda obtida pelo pagamento gerador; não integra a PK. RN-17 e RN-28. |
-| `VL_PARCELA` (`valor`) | Valor combinado da parcela. | Obrigatório: Sim. Mínimo de R$ 50,00; soma do plano igual ao saldo após o sinal; até 10 parcelas por venda. RN-17. |
-| `DT_VENCIMENTO` (`data_vencimento`) | Data em que a parcela vence. | Obrigatório: Sim. Sem regra específica. |
-| `DT_QUITACAO` (`data_quitacao`) | Data da quitação efetivamente registrada para a parcela. | Obrigatório: Não (condicional). Permanece nula enquanto não houver QUITA. Quando quitada, deve ser compatível com a data do pagamento vinculado. RN-28. |
-| `CD_STATUS` (`status`) | Situação operacional da parcela, coerente com vencimento e quitação. | Obrigatório: Sim. Domínio proposto: ABERTA, PAGA ou ATRASADA. Recalcular/validar para não manter status contraditório; PAGA exige QUITA e data_quitacao. RN-28. |
-
-
-### FORNECEDOR
-
-
-Organização que fornece produtos à ótica.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_FORNECEDOR` (`id_fornecedor`) | Código interno do fornecedor. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `NM_FORNECEDOR` (`nome`) | Nome pelo qual a ótica identifica o fornecedor. | Obrigatório: Sim. Confirmado na entrevista. |
-| `NR_CNPJ` (`cnpj`) | CNPJ somente dígitos. | Obrigatório: Não. Identificador cadastral externo, sem cálculo matemático; normalizar formato e validar quando informado. Unicidade proposta, não obrigatoriedade de coleta. |
-| `DS_ENDERECO` (`endereco`) | Endereço do fornecedor em texto. | Obrigatório: Não. Registro pela ótica não confirmado. |
-| `DS_CONTATO` (`contato`) | Telefone ou canal de mensagem usado para pedir produtos. | Obrigatório: Não. Confirmado: o contato é registrado e usado nas solicitações. |
-
-
-### COMPRA
-
-
-Solicitação a um fornecedor, para reposição de estoque ou para atender uma venda.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_COMPRA` (`id_compra`) | Código interno da solicitação. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `DT_PEDIDO` (`data_pedido`) | Data em que a ótica pediu os produtos ao fornecedor. | Obrigatório: Sim. Diferente da “Data da Compra” da venda. |
-| `DT_CHEGADA` (`data_chegada`) | Data em que os produtos chegaram à ótica. | Obrigatório: Não. Nula até a chegada. Não é anterior a DT_PEDIDO. |
-| `CD_STATUS` (`status`) | Situação da solicitação. | Obrigatório: Sim. Proposta: SOLICITADA, RECEBIDA, CANCELADA. |
-
-
-### PRODUTO
-
-
-Generalização dos produtos comprados, vendidos e movimentados no estoque.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_PRODUTO` (`id_produto`) | Código interno do produto. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `CD_TIPO` (`tipo`) | Categoria do produto. | Obrigatório: Sim. LENTE ou ARMACAO; exatamente um subtipo compatível. RN-14. |
-| `DS_REFERENCIA` (`referencia`) | Código ou modelo comercial (“Ref. Armação” no pedido). | Obrigatório: Sim. Formato e unicidade não confirmados. |
-| `NM_MARCA` (`marca`) | Marca do produto. | Obrigatório: Não. Existência de cadastro geral de marcas não confirmada. |
-| `CD_UNIDADE_ESTOQUE` (`unidade_estoque`) | Unidade usada consistentemente em entradas, saídas e saldos do produto. | Obrigatório: Sim. PAR para lentes e UNIDADE para armações; mesma unidade em compra, venda e movimento. RN-26. |
-
-
-### LENTE
-
-
-Especialização de PRODUTO com características próprias de uma lente.
-
-
-**Identificação herdada:** `ID_PRODUTO` de PRODUTO; não acrescentar outro identificador no DER conceitual.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `VL_INDICE` (`indice`) | Índice de refração da lente escolhida, associado ao afinamento relatado pelo gerente. | Obrigatório: Não. Registrar o índice informado, por exemplo 1,56 ou 1,74; exemplos não são lista fechada. RN-27. |
-| `DS_TRATAMENTO` (`tratamento`) | Tratamento aplicado (antirreflexo, filtro etc.). | Obrigatório: Não. O formulário oferece opções; forma de registro no estoque a validar. |
-| `IN_POSSUI_GRAU` (`possui_grau`) | Indica se o produto de lente exige prescrição no pedido. | Obrigatório: Sim. TRUE exige receita vinculada ao atendimento da venda; FALSE não exige prescrição por esse motivo. RN-16. A classificação não confirma oferta de todos os tipos de lente. |
-
-
-### ARMACAO
-
-
-Especialização de PRODUTO com características próprias de uma armação.
-
-
-**Identificação herdada:** `ID_PRODUTO` de PRODUTO; não acrescentar outro identificador no DER conceitual.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `TP_ARMACAO` (`tipo_armacao`) | Tipo da armação escolhido pelo cliente (“Tipo de Armação”). | Obrigatório: Não. Aplica-se só à armação. |
-| `DS_MATERIAL` (`material`) | Material da armação. | Obrigatório: Não. Uso pela ótica não confirmado. |
-
-
-### TROCA_DEVOLUCAO
-
-
-Ocorrência de pós-venda referente a uma linha e ao produto nela vendido.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_OCORRENCIA` (`id_ocorrencia`) | Código interno da ocorrência. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `TP_OCORRENCIA` (`tipo`) | Classificação da ocorrência. | Obrigatório: Sim. Domínio: TROCA ou DEVOLUCAO. |
-| `DT_OCORRIDO` (`data_ocorrido`) | Data do fato que levou à troca ou devolução, anotada no pedido. | Obrigatório: Sim. Diferente da data do registro no sistema. |
-| `CD_STATUS` (`status`) | Situação da ocorrência. | Obrigatório: Sim. Proposta: ABERTA, EM_AVALIACAO, APROVADA, RECUSADA, CONCLUIDA. Aprovação/recusa exige parecer e data de avaliação. CONCLUIDA exige execução dos movimentos/acertos autorizados. |
-| `NR_LINHA_VENDA` (`numero_linha_venda`) | Número da linha de CONTÉM afetada por esta ocorrência. | Obrigatório: Sim. Deve existir na venda da ocorrência; o produto de OBJETO DE deve coincidir com o produto dessa linha. RN-29. |
-| `QT_AFETADA` (`quantidade_afetada`) | Quantidade do item envolvida nesta ocorrência. | Obrigatório: Sim. Maior que zero e não superior à quantidade da linha referenciada; controlar ocorrências anteriores para evitar retorno duplicado. RN-25 e RN-29. |
-| `DS_DANO` (`descricao_dano`) | Descrição do que quebrou ou foi danificado. | Obrigatório: Não. Obrigatória quando houver dano; ajuda a decidir se a peça é reaproveitável. |
-| `DS_PARECER_AVALIACAO` (`parecer_avaliacao`) | Estado observado, causa avaliada e justificativa da decisão. | Obrigatório: Não (condicional). RN-25: obrigatório ao aprovar ou recusar; não concluir automaticamente culpa do cliente. Identidade de quem decide registrada na auditoria. |
-| `DT_AVALIACAO` (`data_avaliacao`) | Data da avaliação do produto. | Obrigatório: Não (condicional). RN-25: obrigatória na decisão; não anterior a DT_OCORRIDO. |
-| `VL_COBRADO` (`valor_cobrado`) | Quantia cobrada do cliente, quando houver. | Obrigatório: Não. Critérios comerciais não confirmados. Valor adicional autorizado para a ocorrência, não negativo; informar zero quando explicitamente sem cobrança. Não confundir nulo (a decidir) com zero. RN-20: não cobrar os serviços de suporte gratuito relatados. |
-| `VL_ABATIMENTO` (`valor_abatimento`) | Redução autorizada do valor devido pelo pedido em decorrência da ocorrência. | Obrigatório: Não (condicional). não negativo; os abatimentos autorizados não podem tornar negativo o total vigente da venda nem exceder o valor do item devolvido. Informar zero quando explicitamente sem redução. A política comercial não foi confirmada. |
-| `VL_REEMBOLSADO` (`valor_reembolso`) | Valor efetivamente restituído ao cliente, se houver restituição autorizada. | Obrigatório: Não (condicional). Não negativo, limitado ao crédito do cliente apurado para a venda; exige DT_REEMBOLSO quando positivo. Campo de contingência proposto: a existência de reembolso na prática da ótica não foi confirmada. |
-| `DT_REEMBOLSO` (`data_reembolso`) | Data do reembolso efetivamente realizado, se houver. | Obrigatório: Não. obrigatória se VL_REEMBOLSADO > 0, não anterior à ocorrência; nula se não houve reembolso. Não preencher com data presumida. |
-
-
-### MOVIMENTO_ESTOQUE
-
-
-Lançamento de entrada ou saída de um produto, com origem e condição identificadas.
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `ID_MOVIMENTO` (`id_movimento`) | Código interno do lançamento. | Obrigatório: Sim (PK). Gerado pelo sistema. |
-| `DT_MOVIMENTO` (`data`) | Data do lançamento no controle de estoque. | Obrigatório: Sim. Sem regra específica. |
-| `QT_MOVIMENTO` (`quantidade`) | Unidades movimentadas. | Obrigatório: Sim. Sempre positiva; o sinal vem da direção. |
-| `CD_DIRECAO` (`direcao`) | Efeito no saldo. | Obrigatório: Sim. Domínio: ENTRADA ou SAIDA. |
-| `CD_MOTIVO` (`motivo`) | Por que o movimento aconteceu. | Obrigatório: Sim. Domínios técnicos propostos: COMPRA, VENDA, REAPROVEITAMENTO, DEVOLUCAO_AVARIA, DESCARTE e SUBSTITUICAO. Cada motivo deve ser compatível com uma origem. RN-12 e RN-30. |
-| `CD_CONDICAO` (`condicao`) | Condição do estoque movimentado, distinguindo peças aptas de segregadas. | Obrigatório: Sim. Domínio proposto DISPONIVEL, SEGREGADO. Descarte de peça devolvida sai de SEGREGADO, não do saldo disponível. |
-
-
-### Atributos dos relacionamentos
-
-
-CONTÉM, OFERECE e ADQUIRE são relacionamentos do DER, e não entidades ITEM_VENDA, ITEM_ORCAMENTO ou ITEM_COMPRA.
-
-
-#### CONTÉM — VENDA / PRODUTO
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `NR_LINHA` (`numero_linha`) | Número que distingue a linha dentro da venda. | Obrigatório: Sim. Único por venda; distingue o mesmo produto com preços diferentes. RN-29. |
-| `QT_PRODUTO` (`quantidade`) | Quantidade vendida nesta linha. | Obrigatório: Sim. Maior que zero; lentes por par e armações por unidade. RN-26. |
-| `VL_PRECO_UNITARIO` (`preco_unitario`) | Preço aplicado na venda, por unidade comercial. | Obrigatório: Sim. Não negativo; preservar o preço histórico da linha. RN-04. |
-| `DS_OBSERVACAO` (`observacao`) | Observação da linha, incluindo características da lente escolhida. | Obrigatório: Não. Não substitui medidas da receita. RN-27. |
-
-
-#### OFERECE — ORCAMENTO / PRODUTO
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `QT_PRODUTO` (`quantidade`) | Quantidade proposta do produto. | Obrigatório: Sim. Maior que zero e compatível com a unidade comercial. RN-23 e RN-26. |
-| `VL_PRECO_UNITARIO` (`preco_unitario`) | Preço proposto por unidade comercial. | Obrigatório: Sim. Não negativo; preservar oferta emitida. RN-23. |
-| `DS_OBSERVACAO` (`observacao`) | Observação específica do produto oferecido. | Obrigatório: Não. Sem dados de saúde em texto comercial. |
-
-
-#### ADQUIRE — COMPRA / PRODUTO
-
-
-| Atributo | Descrição | Regra de negócio associada |
-| --- | --- | --- |
-| `QT_PRODUTO` (`quantidade`) | Quantidade solicitada na compra. | Obrigatório: Sim. Maior que zero; lentes contadas por par. RN-26. |
-| `VL_CUSTO_UNITARIO` (`custo_unitario`) | Custo por unidade de armação ou por par de lentes. | Obrigatório: Sim. Não negativo; total da associação = quantidade × custo_unitario. RN-26. |
-
-
-## 6. Modelagem Conceitual (Entidades, Atributos, Relacionamentos)
-
-
-### 6.1 Entidades reconhecidas
-
-
-| Entidade | Justificativa |
+| Regra comum | Por que não foi incluída |
 | --- | --- |
-| `CLIENTE` | Pessoa física que solicita os atendimentos e é titular dos pedidos. |
-| `FUNCIONARIO` | Integrante da equipe: gerente, consultor óptico ou optometrista. |
-| `ATENDIMENTO` | Evento que relaciona um cliente a um funcionário e preserva a atividade realizada. |
-| `RECEITA` | Prescrição trazida pelo cliente ou laudo interno registrado no atendimento. |
-| `RECEITA_MEDIDA` | Linha de medidas para um olho e uma distância dentro de uma receita. |
-| `ORCAMENTO` | Oferta comercial preservada mesmo quando não é convertida em venda. |
-| `VENDA` | Pedido comercial com valor, datas de execução, retirada e referência fiscal. |
-| `PAGAMENTO` | Recebimento efetivo de uma venda; pode ser sinal, pagamento integral ou quitação de parcela. |
-| `PARCELA` | Compromisso futuro gerado por um pagamento de sinal; existe antes da quitação. |
-| `FORNECEDOR` | Organização que fornece produtos à ótica. |
-| `COMPRA` | Solicitação a um fornecedor, para reposição de estoque ou para atender uma venda. |
-| `PRODUTO` | Generalização dos produtos comprados, vendidos e movimentados no estoque. |
-| `LENTE` | Especialização de PRODUTO com características próprias de uma lente. |
-| `ARMACAO` | Especialização de PRODUTO com características próprias de uma armação. |
-| `TROCA_DEVOLUCAO` | Ocorrência de pós-venda referente a uma linha e ao produto nela vendido. |
-| `MOVIMENTO_ESTOQUE` | Lançamento de entrada ou saída de um produto, com origem e condição identificadas. |
+| Registro profissional do optometrista e responsabilidade técnica pelo laudo | Não confirmado com a ótica; o DER não guarda o emissor do laudo. |
+| Prazo legal de guarda de receitas e dados | Não confirmado; os prazos de retenção estão marcados como pendência da ótica (LGPD). |
+| Idade mínima ou autorização de responsável | Não relatada. |
+| Normas sanitárias | Não se aplicam à venda de armações e lentes; o grupo não identificou exigência. |
+| Política de comissão sobre venda | Não relatada. |
 
+### Notação do DER conceitual
 
-### 6.2 Atributos e classificações
+O DER foi criado no **brModelo Web** ([modelo "Ótica"](https://app.brmodeloweb.com/conceptual/6ada7333db66b4314c898dba)) e segue a notação do esqueleto: entidades em retângulo, relacionamentos em losango, cardinalidade (mín, máx) dos dois lados, atributos como círculos ligados à entidade e identificadores como círculos preenchidos, generalização/especialização com triângulo (PRODUTO → LENTE e ARMACAO) e atributos de relacionamento ligados ao losango (CONTÉM). Não há chaves estrangeiras no DER.
 
+**18 entidades:** CLIENTE, FUNCIONARIO, ATENDIMENTO, RECEITA, RECEITA_MEDIDA, ORCAMENTO, VENDA, PAGAMENTO, PARCELA, NOTA_FISCAL_SAIDA, FORNECEDOR, COMPRA, NOTA_FISCAL_ENTRADA, PRODUTO, LENTE, ARMACAO, TROCA_DEVOLUCAO e ESTOQUE.
 
-- Identificadores simples: atributos `id_*` das entidades, exceto RECEITA_MEDIDA, que usa `id_receita + olho + distancia`.
-- LENTE e ARMACAO herdam a identificação de PRODUTO, conforme especialização total e disjunta.
-- Dados de cadastro e eventos são atributos simples no desenho. O endereço do cliente foi decomposto em logradouro, número, bairro, cidade e CEP.
-- Quantidade, preço e observação da venda pertencem ao relacionamento CONTÉM; os demais atributos de relacionamentos estão na Seção 5.
-- Saldo de estoque, saldo devedor, total de orçamento/compra e término da garantia são cálculos; não foram adicionados como novos atributos ao DER.
-- A presença de atributo comum no desenho não determina, por si só, NOT NULL: a obrigatoriedade detalhada é proposta técnica do dicionário, condicionada ao evento.
+![DER conceitual revisado da Ótica Kadosh](./DER_OticaKadosh.png)
 
+| Entidade A | Relacionamento | Entidade B | Em A | Em B |
+| --- | --- | --- | --- | --- |
+| CLIENTE | SOLICITA | ATENDIMENTO | (0,n) | (1,1) |
+| FUNCIONARIO | CONDUZ | ATENDIMENTO | (0,n) | (1,1) |
+| ATENDIMENTO | ORIGINA | RECEITA | (0,1) | (1,1) |
+| RECEITA | POSSUI | RECEITA_MEDIDA | (1,n) | (1,1) |
+| ATENDIMENTO | ORIGINA ORÇAMENTO | ORCAMENTO | (0,n) | (1,1) |
+| ATENDIMENTO | RESULTA EM | VENDA | (0,1) | (1,1) |
+| VENDA | CONTÉM | PRODUTO | (1,n) | (0,n) |
+| VENDA | RECEBE | PAGAMENTO | (0,n) | (1,1) |
+| PAGAMENTO | QUITA | PARCELA | (0,1) | (0,1) |
+| PAGAMENTO | GERA | NOTA_FISCAL_SAIDA | (1,1) | (1,1) |
+| NOTA_FISCAL_SAIDA | REFERE-SE A | TROCA_DEVOLUCAO | (0,n) | (1,1) |
+| FORNECEDOR | FORNECE | COMPRA | (0,n) | (1,1) |
+| VENDA | DEMANDA | COMPRA | (0,n) | (0,1) |
+| COMPRA | POSSUI | NOTA_FISCAL_ENTRADA | (1,1) | (1,1) |
+| COMPRA | GERA ENTRADA | ESTOQUE | (0,n) | (0,1) |
+| ESTOQUE | É MOVIMENTADO EM | PRODUTO | (1,1) | (0,n) |
+| PRODUTO | ESPECIALIZA-SE EM | LENTE | (1,1) | (0,1) |
+| PRODUTO | ESPECIALIZA-SE EM | ARMACAO | (1,1) | (0,1) |
 
-### 6.3 Relacionamentos pertinentes
+CONTÉM é o único relacionamento com atributos próprios (número da linha, quantidade, preço unitário e observação). O dicionário de dados em HTML descreve cada atributo.
 
+### Caso A — apontamentos da correção da Entrega 1 e o que mudou
 
-As cardinalidades nas duas colunas correspondem à participação de cada entidade nomeada na mesma linha.
-
-
-| Entidade A | Relacionamento | Entidade B | Cardinalidade em A | Cardinalidade em B | Significado |
-| --- | --- | --- | --- | --- | --- |
-| CLIENTE | SOLICITA | ATENDIMENTO | (0,n) | (1,1) | Um cliente pode solicitar vários atendimentos; cada atendimento tem um cliente. |
-| FUNCIONARIO | CONDUZ | ATENDIMENTO | (0,n) | (1,1) | Cada atendimento é conduzido por um funcionário. |
-| ATENDIMENTO | ORIGINA | RECEITA | (0,1) | (1,1) | O atendimento pode registrar uma receita; a receita pertence a um atendimento. |
-| FUNCIONARIO | EMISSOR DE | RECEITA | (0,n) | (0,1) | Emissor interno opcional para receita trazida; obrigatório para laudo interno. |
-| RECEITA | POSSUI | RECEITA_MEDIDA | (1,n) | (1,1) | Cada medida pertence a uma receita; limite complementar de quatro combinações. |
-| ATENDIMENTO | ORIGINA ORCAMENTO | ORCAMENTO | (0,n) | (1,1) | Um atendimento pode gerar vários orçamentos; cada orçamento tem um atendimento. |
-| ATENDIMENTO | RESULTA EM | VENDA | (0,1) | (1,1) | Atendimento pode terminar sem venda; toda venda possui atendimento. |
-| ORCAMENTO | ORIGINA VENDA | VENDA | (0,1) | (1,1) | Um orçamento converte no máximo uma vez; toda venda vem de um orçamento. |
-| VENDA | CONTÉM | PRODUTO | (1,n) | (0,n) | Venda possui produtos; produto pode existir sem venda. A linha tem número, quantidade, preço e observação. |
-| ORCAMENTO | OFERECE | PRODUTO | (1,n) | (0,n) | Orçamento oferece produtos com quantidade, preço e observação. |
-| VENDA | RECEBE | PAGAMENTO | (0,n) | (1,1) | Venda pode estar aberta sem recebimento; cada pagamento pertence a uma venda. |
-| PAGAMENTO | GERA | PARCELA | (0,n) | (1,1) | Somente um sinal gera o plano de parcelas futuras; cada parcela tem um gerador. |
-| PAGAMENTO | QUITA | PARCELA | (0,1) | (0,1) | Recebimento pode quitar uma parcela; parcela futura pode ainda não estar quitada. |
-| FORNECEDOR | FORNECE | COMPRA | (0,n) | (1,1) | Cada compra tem exatamente um fornecedor. |
-| VENDA | DEMANDA | COMPRA | (0,n) | (0,1) | Compra pode repor estoque sem venda; quando vinculada, atende uma venda. |
-| COMPRA | ADQUIRE | PRODUTO | (1,n) | (0,n) | Compra solicita produtos com quantidade e custo. |
-| VENDA | TEM OCORRÊNCIA | TROCA_DEVOLUCAO | (0,n) | (1,1) | Ocorrência pertence a uma única venda. |
-| TROCA_DEVOLUCAO | OBJETO DE | PRODUTO | (1,1) | (0,n) | Ocorrência afeta um produto da linha referenciada. |
-| VENDA | GERA SAÍDA | MOVIMENTO_ESTOQUE | (0,n) | (0,1) | Movimento pode ter uma venda como origem. |
-| COMPRA | GERA ENTRADA | MOVIMENTO_ESTOQUE | (0,n) | (0,1) | Movimento pode ter uma compra como origem. |
-| TROCA_DEVOLUCAO | ORIGINA | MOVIMENTO_ESTOQUE | (0,n) | (0,1) | Ocorrência pode originar vários movimentos de retorno, substituição ou descarte. |
-| MOVIMENTO_ESTOQUE | MOVIMENTADO EM | PRODUTO | (1,1) | (0,n) | Todo movimento refere-se a um produto; produto pode não ter movimentos. |
-| PRODUTO | ESPECIALIZA-SE EM | LENTE | (1,1) | (0,1) | Todo produto é especializado em um único subtipo (total e disjunta); a lente herda o identificador do produto. |
-| PRODUTO | ESPECIALIZA-SE EM | ARMACAO | (1,1) | (0,1) | Todo produto é especializado em um único subtipo (total e disjunta); a armação herda o identificador do produto. |
-
-
-### 6.4 Restrições e políticas aplicadas
-
-
-1. O atendimento da venda deve ser o mesmo que originou seu orçamento (RN-31). A receita necessária é encontrada nesse atendimento, sem vínculo direto RECEITA–VENDA.
-2. O funcionário comercial é obtido por VENDA → ATENDIMENTO → CONDUZ → FUNCIONARIO; não há relacionamento próprio de vendedor em VENDA no DER final. Para fechamento comercial, validar a função CONSULTOR_OPTICO. A autoria do laudo é obtida por EMISSOR DE.
-3. Um sinal pode gerar várias parcelas; a parcela futura não precisa ter pagamento quitador. QUITA modela quitação integral em uma única operação por parcela. Pagamento parcial de parcela ou liquidação de várias parcelas em um único recebimento exigiria evolução desse relacionamento.
-4. Validar que gerador e quitador da parcela pertencem à mesma venda. A venda da parcela é obtida por PARCELA → GERA → PAGAMENTO → RECEBE → VENDA, sem ligação direta.
-5. O identificador de CONTÉM na futura projeção relacional deve incluir o número da linha. A chave apenas (venda, produto) perderia as duas linhas do mesmo produto. O losango e a nota do DER registram essa intenção; a transformação automática do editor precisa ser conferida.
-6. OFERECE e ADQUIRE, como desenhados, descrevem uma associação por par de entidades. A repetição do mesmo produto em linhas distintas foi confirmada apenas para VENDA; não acrescentar número de linha aos outros relacionamentos sem novo requisito.
-7. A especialização é total e disjunta conforme a nota do DER. O losango usado no editor é uma adaptação gráfica; não deve ser interpretado como uma associação ternária exigindo simultaneamente lente e armação.
-8. Cada movimento possui exatamente uma das três origens. Não acrescentar motivo AJUSTE sem origem, pois isso contrariaria o XOR do DER final.
-9. Campo nulo significa que a informação ainda não foi registrada ou não se aplica; zero monetário significa valor explicitamente definido como zero. Não preencher avaliação, retirada, reembolso ou quitação com datas presumidas.
-
-
-## 7. Diagrama Entidade-Relacionamento (DER)
-
-
-### DER da Ótica Kadosh
-
-<img width="3673" height="2898" alt="Diagrama entidade-relacionamento da Ótica Kadosh" src="./DER_Otica_Kadosh.png" />
-
-A imagem é a exportação do DER final elaborado no brModelo. As regras de exclusão mútua, especialização e linhas repetidas estão nas notas do diagrama e nas seções 4, 6 e 8. A evolução para o modelo relacional deve preservar essas regras; não basta aceitar automaticamente a conversão do editor.
-
-
-## 8. Justificativa Técnica
-
-
-### 8.1 Separação dos eventos
-
-
-CLIENTE e FUNCIONARIO permanecem cadastrados mesmo quando não há uma nova venda. O ATENDIMENTO registra a passagem do cliente pela ótica; o ORCAMENTO guarda a proposta e seu prazo; a VENDA representa o negócio fechado. Assim, um atendimento sem compra continua no histórico, e um orçamento que não foi convertido em venda não é perdido.
-
-
-### 8.2 Produtos e relacionamentos com atributos
-
-
-Por orientação do professor, a venda e a compra se ligam diretamente a PRODUTO por CONTÉM e ADQUIRE. OFERECE registra as condições do orçamento. Quantidade e preço são propriedades da associação, preservando valores históricos sem alterar o cadastro do produto. O mesmo produto pode ocorrer em mais de uma linha de venda: a futura associação relacional deve ser identificada por venda e número da linha. A chave apenas venda/produto não atende esse requisito.
-
-
-### 8.3 Parcelas e recebimentos
-
-
-PAGAMENTO é um fato ocorrido, enquanto PARCELA é uma obrigação futura. Retirou-se a ligação direta VENDA–PARCELA. A parcela tem identificador próprio e é alcançada pelo sinal que a gerou; QUITA opcional permite registrar vencimentos antes do recebimento. As cardinalidades 0:1 de QUITA limitam esta versão à quitação integral de uma parcela por um pagamento. A restrição de mesma venda entre sinal e quitador deve ser validada na transação.
-
-
-### 8.4 Receita e responsáveis
-
-
-A ligação direta RECEITA–VENDA foi retirada por orientação do professor. A receita necessária é obtida pelo atendimento, que também identifica o cliente. A igualdade entre o atendimento direto da venda e o atendimento de seu orçamento impede caminhos contraditórios. EMISSOR DE identifica o autor do laudo, enquanto CONDUZ identifica o responsável pelo atendimento; não foi criado um vínculo de vendedor que não esteja no desenho.
-
-
-### 8.5 Medidas e especialização
-
-
-RECEITA_MEDIDA permite diferentes valores por olho e distância, com chave composta e no máximo quatro combinações válidas. PRODUTO concentra referência, marca e unidade de estoque; LENTE e ARMACAO guardam características específicas. A nota total e disjunta define a semântica pretendida da adaptação gráfica usada no editor; a implementação deve assegurar exatamente um subtipo.
-
-
-### 8.6 Compras, estoque e pós-venda
-
-
-COMPRA pode repor estoque sem venda de origem, por isso DEMANDA é opcional do lado da compra. TROCA_DEVOLUCAO liga-se diretamente à venda e ao produto; o número da linha resolve a referência quando o produto se repete. MOVIMENTO_ESTOQUE registra cada efeito físico, com exatamente uma origem e condição disponível/segregada; saldos são derivados dos lançamentos.
-
-
-### 8.7 Escopo, integridade e evolução
-
-
-O DER desta entrega descreve o modelo conceitual, não um banco em operação. Os tipos físicos, tamanhos, índices, chaves estrangeiras e controles de acesso do dicionário HTML são propostas para as próximas etapas. Ao transformar o modelo em tabelas, os relacionamentos N:N precisarão de estruturas associativas, sem transformar ITEM_VENDA e ITEM_COMPRA em novas entidades conceituais. Como o levantamento não confirmou um laboratório independente, uma adquirente de cartão ou políticas detalhadas de crédito e reembolso, esses elementos ficaram fora do modelo. A auditoria e o controle de acesso ainda terão de ser implementados.
-
-
-### 8.8 Conferência com o esqueleto
-
-
-| Pedido do professor | Localização | Atendimento documental |
+| Apontamento da correção da E1 | O que mudou no trabalho | Por quê |
 | --- | --- | --- |
-| Caracterização, acesso e evidências | Seção 1 | Organização, porte, problemas, contato, visita e referência à fotografia. |
-| Processos e integração | Seção 2 | Entradas, responsáveis, sequência e resultados; fluxograma opcional. |
-| Requisitos e regras | Seções 3 e 4 | 18 RF, 7 RNF e 34 regras com origem indicada. |
-| Dicionário conceitual por entidade | Seção 5 | 16 tabelas de entidades e três de atributos de relacionamentos. |
-| Entidades, atributos e relacionamentos | Seção 6 | Classificações, cardinalidades e restrições complementares. |
-| DER anexado em imagem | Seção 7 | Imagem PNG do DER incluída no repositório e exibida diretamente no README. |
-| Justificativa técnica | Seção 8 | Decisões e limites da representação. |
-| Uso de IA | Seção 9 | Ferramentas, prompts, respostas, correções e reflexão. |
-| Dicionário HTML conforme exemplo | Arquivo HTML, seções 1 a 6 | Notação, tabelas, índices propostos, log e matriz de acesso. |
+| **3.1** O README não dá nome, endereço nem contato da organização; a foto do repositório não é citada. | Nome, endereço, telefone da loja e responsável passaram a constar na caracterização; a foto é citada no README e no levantamento. | Comprovar que a organização é real e que o grupo teve acesso a ela. |
+| **3.2** Não há relato de entrevista; o entrevistado não é identificado. | Seção "Relato da entrevista": quem (nome e função), quando, onde, comprovação, observação separada do relato e confirmações posteriores; levantamento em `levantamento/levantamento.md`. A foto da visita tem legenda com o nome e a função de cada pessoa, e o perfil da ótica no Google Maps está citado nas evidências. | A entrevista precisa ser comprovada e identificável para o contato ser válido. |
+| **4** Caracterização genérica, deduzida do DER, com evidências a preencher. | Porte com números e origem (informado ou estimativa), problemas P1 a P5 ligados ao DER e aos requisitos, escopo e justificativa. | Os números dimensionam a massa de dados; os problemas precisam estar no DER. |
+| **5** Processos eram listas de atributos das entidades, sem fluxo. | 12 processos (PR01 a PR12) com entrada, responsável, sequência, dados e saída; processos comuns não incluídos foram justificados. | Processo é fluxo de trabalho, e não lista de campos. |
+| **6** Requisitos e regras genéricos, derivados do DER. | 19 RF com os dados envolvidos e ligados a processo e problema; 7 RNF; requisitos comuns não incluídos foram justificados. | Cada problema declarado precisa de requisito que o resolva. |
+| **7** Distinção entre RF e RNF (atendido). | Mantida; RF e RNF foram revisados e numerados. | — |
+| **8** Regras repetiam os relacionamentos do DER e eram genéricas. | 33 regras vigentes (RN-01 a RN-30, RN-33, RN-34 e RN-35), cada uma com origem (relato do gerente, formulário, DER ou decisão técnica); RN-31 e RN-32 retiradas; RN-22 refeita. | Regras de negócio vêm da operação da ótica, e não do desenho. |
+| **9** Dicionário era só Atributo/Descrição/Regra, sem as seções do modelo. | Dicionário HTML com relacionamentos e cardinalidades, fluxo de dados, convenções, expressão e índices por entidade, log de acesso, papéis e LGPD; refeito conforme o DER final (18 entidades). | Seguir o modelo 02-03g do professor. |
+| **10** O DER estava fora do repositório. | O DER está no repositório como `DER_OticaKadosh.png` (exportado do brModelo em 28/10/2026) e no brModelo (link acima). | Só o que está no repositório é corrigido. |
+| **11** Justificativa técnica genérica. | Será reescrita na seção 1.5, com decisões concretas e as RN que cada restrição implementa. | Justificar escolhas reais e alternativas descartadas. |
+| **12** Uso de IA sem o prompt e com pendências. | Seção 6 com os registros de uso de IA (Usos 1 a 18), que trazem prompts, respostas, trechos rejeitados e reflexão crítica. | Documentar o uso de IA por completo. |
+| **Orientação do professor em aula:** incluir as entidades de nota fiscal. | Criadas NOTA_FISCAL_SAIDA (ligada a PAGAMENTO por GERA) e NOTA_FISCAL_ENTRADA (ligada a COMPRA por POSSUI); o atributo de data de emissão da nota saiu de VENDA. | A ótica emite nota a cada pagamento, e a nota de entrada vem do fornecedor. |
+| **Orientação do professor:** retirar as ligações diretas VENDA–PARCELA e VENDA–RECEITA. | Retiradas; a receita é obtida pelo atendimento da venda, e a parcela é quitada por um pagamento (QUITA). | Evitar vínculos redundantes que permitiam inconsistência. |
+| **Ajuste do grupo:** entidades de item e relacionamentos extras. | Removidas ITEM_VENDA e ITEM_COMPRA; quantidade e preço ficam em CONTÉM; ESTOQUE (antes MOVIMENTO_ESTOQUE) liga-se a PRODUTO e, nas entradas, a COMPRA. | O DER final do grupo é a fonte da verdade; o que ele não tem foi retirado da documentação. |
 
+Nenhum apontamento foi rejeitado. Apontamentos não citados nesta tabela não existem na correção recebida.
 
-## 9. Uso de Inteligência Artificial
+> **Limitações do DER revisado, declaradas pelo grupo:** com a retirada de relacionamentos, PARCELA só se liga a PAGAMENTO (por QUITA); ORCAMENTO não se liga a VENDA nem a PRODUTO; TROCA_DEVOLUCAO não se liga a VENDA nem a PRODUTO; ESTOQUE só se liga a COMPRA; COMPRA não tem itens nem custos; e a receita não registra quem a emitiu. Essas lacunas serão tratadas no modelo lógico (seção 2) e afetam as consultas da seção 3.
 
-O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As decisões de modelagem e o levantamento de campo são do grupo.
+---
+
+## Andamento da Entrega 2
+
+| Seção | Situação |
+| --- | --- |
+| 1.1 Revisão do Modelo Conceitual | Pronta (acima) |
+| 1.2 Conversão do modelo conceitual para o lógico | A entregar na parte 2 |
+| 1.3 Chaves primárias e estrangeiras | A entregar na parte 2 |
+| 1.4 Normalização (1FN, 2FN e 3FN) | A entregar na parte 2 |
+| 1.5 Justificativas técnicas | A entregar na parte 3 |
+| 1.6 Arquitetura analítica para BI e IA (com rastreabilidade) | A entregar na parte 3 |
+| 2. Modelo lógico relacional (diagrama) | A entregar na parte 4 |
+| 3. Script SQL completo (`docs/script.sql`) | A entregar na parte 5 |
+| 4. Massa de dados | A entregar na parte 5 |
+| 5. Repositório | Em andamento (histórico de commits, dicionário, levantamento e DER já no repositório) |
+| 6. Uso de inteligência artificial | Em andamento (abaixo; atualizado a cada parte) |
+| 7. Apresentação corporativa final | A entregar na parte 6 |
+
+---
+
+## 6. Uso de Inteligência Artificial
+
+O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As decisões de modelagem e o levantamento de campo são do grupo. Os Usos 1 a 15 documentam a Entrega 1; os Usos 16 a 18 documentam a revisão e a Entrega 2.
 
 ### Uso 1 — análise do material inicial
 
@@ -857,20 +510,42 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Reflexão crítica | A navegação rápida não era um erro técnico, apenas um recurso opcional de leitura. Conferir textos e caminhos não equivale a validar visualmente o PNG do DER; por isso a revisão não tratou as cardinalidades como um defeito comprovado nem modificou o diagrama. |
 
 
-## Critérios Atitudinais (20%)
+### Uso 16 — alinhamento de README e dicionário ao DER final e correção de cardinalidades (27/10/2026)
 
-
-Participação (5%), comprometimento (5%), colaboração (5%) e autonomia (5%) serão avaliados pela avaliação 360º entre integrantes e, quanto à colaboração, pelo histórico de commits. Este README não atribui notas nem declara contribuições individuais que não tenham sido verificadas.
-
-
-## Resumo dos Pesos
-
-
-| Dimensão | Peso total |
+| Item | Registro |
 | --- | --- |
-| Conceitual | 30% |
-| Procedimental | 50% |
-| Atitudinal | 20% |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5), com acesso ao navegador e ao repositório: leitura do DER no brModelo, correção de três cardinalidades e atualização do README e do dicionário HTML. |
+| **Motivação** | O grupo confirmou que o DER no brModelo é a versão mais recente, que as entidades de nota fiscal foram orientadas pelo professor e que README e dicionário estavam desatualizados. |
+| **Prompt(s) utilizados** | “Fiz uma mudança no DER [...] o que você acha?”; “pode arrumar as cardinalidade voce mesmo!”; “o que não tem no DER deve ser tirado do README e do dicionário de dados (e me mostrar uma prévia antes de preparar o commit)”. |
+| **Resposta recebida** | Lista de divergências entre DER, README e dicionário; alteração para (0,1) das participações de PAGAMENTO em GERA, de COMPRA em POSSUI e de TROCA_DEVOLUCAO em REFERE-SE A no brModelo; README e dicionário reescritos conforme o DER. |
+| **Fontes consultadas e verificadas** | DER no brModelo (lido pela página), README, dicionário HTML e levantamento do repositório. As cardinalidades alteradas foram relidas no diagrama após a mudança. |
+| **Trechos rejeitados ou corrigidos** | Retirados do README e do dicionário os relacionamentos EMISSOR DE, ORIGINA VENDA, OFERECE, GERA (PAGAMENTO–PARCELA), ADQUIRE, TEM OCORRÊNCIA, OBJETO DE, GERA SAÍDA e ORIGINA (TROCA_DEVOLUCAO–ESTOQUE), o atributo NR_LINHA_VENDA, os campos fiscais de VENDA e as regras RN-31 e RN-32. |
+| **Justificativa da escolha final** | O grupo decidiu que o DER é a fonte da verdade e que o que ele não contém sai da documentação. Depois, o grupo informou que a ótica emite nota a cada pagamento e atualizou o DER: GERA e POSSUI passaram a (1,1)/(1,1) e REFERE-SE A passou a (0,n)/(1,1); a RN-22 e a RN-35 foram ajustadas (ver Uso 17). |
+| **Reflexão crítica** | A leitura do diagrama foi automatizada sobre a página do brModelo e pode errar rótulos. Os relacionamentos retirados deixam lacunas, como a parcela sem vínculo direto com a venda, que precisam ser resolvidas no modelo lógico. As regras RN-22 e RN-35 e os atributos das notas fiscais são propostas, ainda sem validação com a ótica. |
 
 
-**Entrega final:** `README.md` completo + DER em imagem + `Dicionario_de_Dados_Otica_Kadosh.html` anexados no mesmo repositório. A fotografia da visita é referenciada na Seção 1. A página HTML pode ser aberta após download ou publicada via GitHub Pages; o GitHub exibe o código do HTML na visualização padrão.
+### Uso 17 — nota fiscal a cada pagamento e leitura da correção da Entrega 1 (28/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): ajuste da RN-22 e dos textos ligados à nota fiscal de saída; leitura da correção do professor para montar a revisão do modelo conceitual (seção 1.1 da Entrega 2). |
+| **Motivação** | O gerente informou que a ótica emite nota fiscal sempre que um pagamento é feito, e não só quando o cliente pede. |
+| **Prompt(s) utilizados** | “Isso também preciso que você arrume no RN porque eles emitem a nota sempre que é feito um pagamento”; “Aqui está a correção do professor” (critérios 1 a 12). |
+| **Resposta recebida** | RN-22, PR12, RF-17, relacionamentos e restrições reescritos: todo pagamento tem exatamente uma nota de saída (GERA passa a (1,1)/(1,1)). |
+| **Fontes consultadas e verificadas** | Relato do grupo sobre a prática da ótica; DER do brModelo. O grupo ajustou o DER no brModelo e subiu a imagem exportada em 28/10/2026, que foi conferida. |
+| **Trechos rejeitados ou corrigidos** | Removida a ideia de nota opcional “só se o cliente solicitar”; mantida a participação (0,1) de COMPRA em POSSUI. |
+| **Justificativa da escolha final** | A regra vem do relato do gerente. O DER exportado pelo grupo em 28/10/2026 traz GERA (1,1)/(1,1), POSSUI (1,1)/(1,1) e REFERE-SE A (0,n)/(1,1); a documentação foi alinhada a ele. |
+| **Reflexão crítica** | A regra ainda não foi confirmada por escrito com a ótica; número, valor e tributos da nota continuam como proposta a validar. |
+
+### Uso 18 — seção 1.1 da Entrega 2: processos, requisitos e regras comuns e montagem do README (28/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): redação da seção 1.1 do README da Entrega 2, levantamento de processos, requisitos e regras comuns em óticas e tabela de apontamentos da correção. |
+| **Motivação** | O esqueleto da Entrega 2 pede que o grupo compare os processos, requisitos e regras da ótica com os típicos desse tipo de organização e justifique o que ficou de fora. |
+| **Prompt(s) utilizados** | “Aqui está a correção do professor” (critérios 3.1 a 12); respostas do grupo sobre vínculo com a ótica, identificação das pessoas na foto, link do Google Maps e manutenção dos números fictícios. |
+| **Resposta recebida** | Rascunho da seção 1.1: porte com origem de cada número, processos PR01 a PR12 com os campos, 19 requisitos funcionais e 7 não funcionais, listas de processos, requisitos e regras comuns não incluídos e tabela do Caso A. |
+| **Fontes consultadas e verificadas** | Correção do professor, levantamento, DER exportado em 28/10/2026 (conferido imagem a imagem, o que revelou duas cardinalidades diferentes da documentação) e dicionário HTML. A busca na web não encontrou o perfil da ótica; o link foi fornecido pelo grupo. Os processos e regras comuns vêm do conhecimento geral da IA, sem fonte externa citada. |
+| **Trechos rejeitados ou corrigidos** | O grupo manteve os números de porte fictícios, marcados como estimativa. As justificativas dos itens não incluídos são propostas e dependem de confirmação do gerente. A ordem dos nomes na legenda da foto foi informada pelo grupo. |
+| **Justificativa da escolha final** | Cada item de porte indica se foi informado, calculado ou estimado, para que a massa de dados (seção 4) seja justificada sem apresentar estimativa como fato. |
+| **Reflexão crítica** | A lista de processos e regras comuns pode estar incompleta ou não valer para a ótica; só a confirmação com o gerente resolve. A IA também não tem como verificar a fotografia ou o perfil no Google. |
