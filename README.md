@@ -5,6 +5,8 @@
 
 **Organização estudada: Ótica Kadosh** · Projeto acadêmico de Modelagem de Dados
 
+**Navegação rápida:** [Metadados](#metadados) · [1. Organização](#1-caracterização-da-organização) · [2. Processos](#2-processos-de-negócio) · [3. Requisitos](#3-requisitos-do-sistema) · [4. Regras](#4-regras-de-negócio) · [5. Dicionário](#5-dicionário-de-dados-conceitual-preliminar) · [6. Modelagem](#6-modelagem-conceitual-entidades-atributos-relacionamentos) · [7. DER](#7-diagrama-entidade-relacionamento-der) · [8. Justificativa](#8-justificativa-técnica) · [9. Uso de IA](#9-uso-de-inteligência-artificial)
+
 ---
 
 ## Metadados
@@ -33,6 +35,7 @@
   - **Data da visita e entrevista:** 05/09/2026, presencial, com observação do formulário de pedido, do comprovante entregue ao cliente e do laudo produzido na ótica. Depois da visita, o gerente respondeu por mensagem a dúvidas pontuais (venda sem receita e medidas por olho).
   - Fotografia feita no interior da ótica durante a visita: [Fotografia da visita](https://github.com/jfpiresoficial/otica-kadosh-modelagem-dados/blob/main/Otica%20kadoshi.jpeg).
   - As fotos do formulário e do laudo contêm dados pessoais e de saúde reais; por isso **não foram publicadas**.
+  - O registro da visita, da entrevista e dos esclarecimentos posteriores está no [levantamento de campo](./levantamento/levantamento.md).
 
 **Problemas de gestão numerados.** Cada um aparece no DER e terá ao menos uma consulta gerencial no script SQL. Os processos de negócio da Seção 2 usam o prefixo PR para não se confundir com estes códigos.
 
