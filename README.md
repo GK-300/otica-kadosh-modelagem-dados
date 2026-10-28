@@ -825,6 +825,20 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Reflexão crítica | Conferir o caminho do PNG prova que o arquivo existe, não que o desenho corresponde às 16 entidades e aos relacionamentos documentados. Essa comparação visual ficou fora do escopo dos três commits. |
 
 
+### Uso 13 — documentação das revisões e texto alternativo do DER (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para completar o histórico de uso de IA da Entrega 1 e revisar a descrição textual da imagem no README. |
+| Motivação | Os PRs #3 e #4 já estavam integrados, mas suas revisões ainda não constavam na Seção 9. Além disso, o texto alternativo da imagem mencionava DER_Otica_Kadosh_reorganizado, nome de um PNG que já havia sido retirado do repositório. |
+| Prompt(s) utilizados | “Então vamos evitar mexer no que diz respeito pra imagem, entendi certo? Beleza. Por enquanto trabalha naqueles dois primeiros que você sugeriu.” |
+| Resposta recebida | O PR #5 acrescentou os usos 11 e 12, com as correções realizadas nos PRs #3 e #4, e trocou o texto alternativo do DER por “Diagrama entidade-relacionamento da Ótica Kadosh”. Foram três commits, sem substituir o PNG nem alterar seu caminho. |
+| Fontes consultadas e verificadas | Esqueleto da Entrega 1; Seção 9 do README; dicionário HTML; arquivos existentes e histórico dos PRs #3 e #4 no GitHub. A alteração do texto alternativo foi conferida no diff do PR #5. |
+| Trechos rejeitados ou corrigidos | Não se renomeou nem redesenhou o DER para acompanhar o texto antigo. A mudança ficou restrita à descrição acessível da imagem e ao registro das atividades já realizadas. |
+| Justificativa da escolha final | O esqueleto pede que o grupo relate os usos relevantes de IA. Registrar as duas revisões deixava esse histórico completo até o PR #4; corrigir o texto alternativo evitava manter, na descrição da figura, o nome de um arquivo excluído. |
+| Reflexão crítica | A conferência do nome e do caminho da imagem não permite afirmar que o desenho corresponde ao modelo descrito no README. O conteúdo visual do DER não foi validado nesse PR; a IA também não substitui a conferência do grupo sobre o histórico registrado. |
+
+
 ## Critérios Atitudinais (20%)
 
 
