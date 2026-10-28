@@ -86,12 +86,16 @@ Comparação com a versão que recebeu a correção do professor.
 - As medidas da receita foram organizadas por olho (direito e esquerdo) e distância (longe e perto), incluindo DNP e altura por olho.
 - Foram diferenciados o funcionário responsável pelo atendimento comercial e o optometrista que emite o laudo.
 - Foram detalhados o orçamento, a previsão de conclusão, o horário previsto de retirada e as datas efetivas de montagem e entrega.
-Nas regras de negócio
+
+### Nas regras de negócio
+
 - Foram esclarecidas as condições para liberar uma encomenda: recebimento de sinal mínimo de 30% e registro da previsão de conclusão.
 - Foram detalhados os prazos e as coberturas da garantia relatados pelo gerente, além do suporte para ajustes, plaquetas e parafusos.
 - As regras de troca e devolução passaram a considerar avaliação, aprovação ou recusa, reaproveitamento e descarte dos produtos.
 - Foram registradas restrições para evitar pagamentos acima do saldo devido e movimentações duplicadas de estoque.
-Na documentação
+
+### Na documentação
+
 - Os processos passaram a ser apresentados com entradas, responsáveis, sequência de atividades e resultados.
 - O dicionário passou a detalhar o significado dos atributos, sua obrigatoriedade, os valores permitidos e as regras associadas.
 - Foram acrescentadas propostas de índices, registros de auditoria e permissões de acesso por função.

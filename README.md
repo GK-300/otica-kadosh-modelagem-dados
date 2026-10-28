@@ -5,8 +5,6 @@
 
 **Organização estudada: Ótica Kadosh** · Projeto acadêmico de Modelagem de Dados
 
-**Navegação rápida:** [Metadados](#metadados) · [1. Organização](#1-caracterização-da-organização) · [2. Processos](#2-processos-de-negócio) · [3. Requisitos](#3-requisitos-do-sistema) · [4. Regras](#4-regras-de-negócio) · [5. Dicionário](#5-dicionário-de-dados-conceitual-preliminar) · [6. Modelagem](#6-modelagem-conceitual-entidades-atributos-relacionamentos) · [7. DER](#7-diagrama-entidade-relacionamento-der) · [8. Justificativa](#8-justificativa-técnica) · [9. Uso de IA](#9-uso-de-inteligência-artificial)
-
 ---
 
 ## Metadados
@@ -48,10 +46,6 @@
 | P5 | Os dados de saúde das receitas precisam de proteção; lente de grau só é vendida com receita (RN-16). | RECEITA, RECEITA_MEDIDA, VENDA, LENTE |
 
 ---
-
-
-
-
 
 ## 2. Processos de Negócio
 
@@ -586,10 +580,6 @@ As cardinalidades nas duas colunas correspondem à participação de cada entida
 
 <img width="3673" height="2898" alt="Diagrama entidade-relacionamento da Ótica Kadosh" src="./DER_Otica_Kadosh.png" />
 
-
-
-
-
 A imagem é a exportação do DER final elaborado no brModelo. As regras de exclusão mútua, especialização e linhas repetidas estão nas notas do diagrama e nas seções 4, 6 e 8. A evolução para o modelo relacional deve preservar essas regras; não basta aceitar automaticamente a conversão do editor.
 
 
@@ -851,6 +841,20 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Trechos rejeitados ou corrigidos | Foi descartada a proposta de apontar o link do GitHub Pages diretamente para o HTML, porque o grupo preferiu não depender dessa verificação naquele momento. Não se mudaram os prompts históricos nem se acrescentaram fatos não registrados na visita. |
 | Justificativa da escolha final | O texto passou a explicar o que foi observado na Ótica Kadosh — registros separados em papel e planilhas, acompanhamento de pagamentos e reposição do estoque — em vez de justificar o modelo só com termos abstratos. O link do levantamento permite consultar a origem dessas informações sem duplicá-las no README. |
 | Reflexão crítica | Uma redação mais fluida não comprova, por si só, a correção das regras. Os números e as práticas relatadas continuam dependendo do registro de campo, e a revisão documental não substitui a conferência visual das cardinalidades do DER. |
+
+
+### Uso 15 — revisão final da apresentação documental (28/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para conferir o README, o levantamento de campo e as notas do dicionário HTML antes de finalizar pequenos ajustes da Entrega 1. |
+| Motivação | O grupo decidiu retirar a navegação rápida do início do README: as seções já têm títulos próprios e o esqueleto do professor não exige esse índice. Na seção histórica do levantamento, “Nas regras de negócio” e “Na documentação” apareciam como linhas comuns entre listas, sem a hierarquia usada nos demais subtítulos. |
+| Prompt(s) utilizados | “adiciona ai também pra tirar aquele **Navegação rápida**”; “vocÊ já olhou em volta desses 0,1 e 1,1 pra ver se realmente são um problema ou só uma questão de contexto que você ignorou?”; “Então analisa os três, vê se eles realmente são problemas a serem resolvidos”. |
+| Resposta recebida | Foram organizadas três alterações: retirar o índice e diminuir espaços vazios próximos à Seção 2 e à imagem do DER; marcar os dois subtítulos do levantamento em Markdown; e registrar esta revisão na Seção 9. A análise da especialização de PRODUTO foi revista após consultar a RN-14 e a nota da Seção 6.4. |
+| Fontes consultadas e verificadas | Esqueleto da Entrega 1 fornecido pelo professor; README, levantamento/levantamento.md e dicionário HTML do repositório; histórico dos PRs anteriores; RN-14 e Seções 6.3, 6.4 e 8.5. As mudanças de formatação foram comparadas com os textos anteriores, preservando os dados da visita, as regras e os relacionamentos. |
+| Trechos rejeitados ou corrigidos | Não se inverteram automaticamente as cardinalidades `(1,1)` e `(0,1)` das duas linhas de especialização: o próprio documento descreve uma adaptação gráfica do brModelo e define a participação total e disjunta por nota complementar. Também não foram retirados os links para o levantamento e para o DER. |
+| Justificativa da escolha final | Remover o índice atende à preferência do grupo sem alterar os títulos exigidos pelo professor. Corrigir a hierarquia do levantamento ajuda a separar o que mudou nas regras daquilo que mudou na documentação, sem reescrever os relatos do gerente ou acrescentar requisitos. |
+| Reflexão crítica | A navegação rápida não era um erro técnico, apenas um recurso opcional de leitura. Conferir textos e caminhos não equivale a validar visualmente o PNG do DER; por isso a revisão não tratou as cardinalidades como um defeito comprovado nem modificou o diagrama. |
 
 
 ## Critérios Atitudinais (20%)
