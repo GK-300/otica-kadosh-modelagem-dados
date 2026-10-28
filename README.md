@@ -581,7 +581,7 @@ As cardinalidades nas duas colunas correspondem à participação de cada entida
 
 ### DER da Ótica Kadosh
 
-<img width="3673" height="2898" alt="DER_Otica_Kadosh_reorganizado" src="./DER_Otica_Kadosh.png" />
+<img width="3673" height="2898" alt="Diagrama entidade-relacionamento da Ótica Kadosh" src="./DER_Otica_Kadosh.png" />
 
 
 
@@ -792,6 +792,34 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Trechos rejeitados ou corrigidos | Não foi criado um PDF apenas para manter um link antigo, nem foram alterados o DER, seus relacionamentos ou regras comerciais. Referências históricas a PDFs usados na elaboração foram preservadas. |
 | Justificativa da escolha final | Manter o modelo conceitual e corrigir somente divergências verificáveis na documentação publicada. |
 | Reflexão crítica | A IA não participou da entrevista com o gerente e não pode inferir a intenção dos autores dos commits. A conferência automatizada dos arquivos não substitui a revisão dos integrantes e do professor. |
+
+
+### Uso 11 — revisão do dicionário e sincronização da RN-34 (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: revisão da apresentação do dicionário HTML, do domínio TP_ORIGEM e da atualização do levantamento. |
+| Motivação | Verificar divergências documentais e resolver problemas pontuais sem modificar o DER ou substituir informações de outros integrantes. |
+| Prompt(s) utilizados | “Procura esses dois probleminhas, identifica eles, vê se realmente são problemas, procura uma solução, vê se a solução vai resolver isso sem ter consequências no GitHub”; “Feito isso adiciona os outros dois. Estrutura se eles realmente são problemas a serem resolvidos [...]”. |
+| Resposta recebida | Revisadas as regras de apresentação das tabelas; corrigido TP_ORIGEM de varchar(10) para varchar(11), pois LAUDO_OTICA tem 11 caracteres; acrescentada a RN-34 ao levantamento, com registro da evolução de 33 para 34 regras. Alterações reunidas em três commits do PR #3. |
+| Fontes consultadas e verificadas | README, dicionário HTML, levantamento e histórico do repositório GitHub; comparação do domínio de TP_ORIGEM, da redação da RN-34 e das alterações da equipe. |
+| Trechos rejeitados ou corrigidos | Não se alterou a regra comercial do estoque mínimo nem o desenho do DER; evitou-se substituir o levantamento por uma versão antiga da branch. |
+| Justificativa da escolha final | Corrigir incompatibilidade de tamanho de campo e divergência entre documentos, preservando a estrutura conceitual e o trabalho existente dos colegas. |
+| Reflexão crítica | A conferência textual e as verificações de formatação não substituem testes em todos os navegadores nem validação presencial da regra pelo gerente. |
+
+
+### Uso 12 — correções de referências e padronização documental (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: conferência de caminhos do DER, nomenclatura dos processos e metadados de versão do dicionário HTML. |
+| Motivação | Resolver links desatualizados após a substituição da imagem do DER e eliminar diferenças de identificação e revisão entre README e HTML. |
+| Prompt(s) utilizados | “Se vamos mexer nos links do DER seria ideal trabalhar em outros dois”; “Aproveita então, analisa o Github de novo. Analisa o que mudamos e se estão bem integrados, se os links do DER ainda precisam ser mexidos”; “Erfeito manda bala”. |
+| Resposta recebida | Atualizados os caminhos do PNG para DER_Otica_Kadosh.png no README e no HTML; padronizados os doze processos do HTML de P01–P12 para PR01–PR12; atualizados versão e data de revisão do HTML para 1.1 e 27/10/2026. Alterações reunidas em três commits do PR #4. |
+| Fontes consultadas e verificadas | Árvore de arquivos, README, dicionário HTML, histórico do GitHub e lista de processos; conferidos os destinos dos links e os nomes dos processos nos dois documentos. |
+| Trechos rejeitados ou corrigidos | Mantidos o conteúdo do diagrama, os nomes das entidades, os relacionamentos e as regras de negócio; a mudança no link não foi tratada como validação visual do novo PNG. |
+| Justificativa da escolha final | Corrigir referências quebradas e manter identificadores consistentes, com alterações documentais restritas e separadas por commit. |
+| Reflexão crítica | A existência do arquivo PNG e a correção dos caminhos não comprovam que seu conteúdo visual coincide com o modelo textual; essa comparação exige revisão específica. |
 
 
 ## Critérios Atitudinais (20%)
