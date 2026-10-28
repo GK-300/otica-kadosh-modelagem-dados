@@ -839,6 +839,20 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Reflexão crítica | A conferência do nome e do caminho da imagem não permite afirmar que o desenho corresponde ao modelo descrito no README. O conteúdo visual do DER não foi validado nesse PR; a IA também não substitui a conferência do grupo sobre o histórico registrado. |
 
 
+### Uso 14 — revisão de linguagem e acesso ao levantamento (27/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub, para revisar a redação do README e do levantamento, conferir as mudanças e organizá-las em commits. |
+| Motivação | O README descrevia corretamente a ótica, mas algumas justificativas usavam expressões genéricas, como “preservar a estrutura conceitual”, sem mostrar o problema concreto. O documento também era longo e não tinha um atalho direto para o registro da visita de 05/09/2026. |
+| Prompt(s) utilizados | “Eu não quero que você adicione coisas pra deixar o arquivo mais pomposo. [...] eu quero focar mais em otimizações escritas”; “Coisas que estejam muito padrão [...] deixar elas mais atreladas ao projeto, mais naturais, mais fluidas, mais originais e menos genéricas”; “Ok, checa de novo esses três commits novos que você fez, e me diz se acha que eles estão bons mesmo”. |
+| Resposta recebida | O PR #6 incluiu dez links de navegação e uma referência ao levantamento na Seção 1. Reescreveu justificativas dos usos 11 e 12 com exemplos das correções de TP_ORIGEM, RN-34 e dos códigos dos processos. Também tornou mais direta a descrição dos três funcionários, dos cerca de 100 atendimentos e 80 vendas semanais e da separação entre atendimento, orçamento e venda; ajustou a redação do estoque mínimo no levantamento. |
+| Fontes consultadas e verificadas | README, levantamento/levantamento.md, dicionário HTML, esqueleto da Entrega 1 e diff do PR #6 no GitHub. Foram conferidos os destinos dos dez atalhos, o link da pesquisa e a preservação dos requisitos, regras e atributos. |
+| Trechos rejeitados ou corrigidos | Foi descartada a proposta de apontar o link do GitHub Pages diretamente para o HTML, porque o grupo preferiu não depender dessa verificação naquele momento. Não se mudaram os prompts históricos nem se acrescentaram fatos não registrados na visita. |
+| Justificativa da escolha final | O texto passou a explicar o que foi observado na Ótica Kadosh — registros separados em papel e planilhas, acompanhamento de pagamentos e reposição do estoque — em vez de justificar o modelo só com termos abstratos. O link do levantamento permite consultar a origem dessas informações sem duplicá-las no README. |
+| Reflexão crítica | Uma redação mais fluida não comprova, por si só, a correção das regras. Os números e as práticas relatadas continuam dependendo do registro de campo, e a revisão documental não substitui a conferência visual das cardinalidades do DER. |
+
+
 ## Critérios Atitudinais (20%)
 
 
