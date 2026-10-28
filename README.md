@@ -788,13 +788,13 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Item | Registro |
 | --- | --- |
 | Ferramenta e etapa | ChatGPT (OpenAI), conectado ao GitHub: revisão da Entrega 1 e correções documentais no README e no dicionário HTML. |
-| Motivação | Corrigir divergências confirmadas entre arquivos do mesmo projeto antes de avançar à Entrega 2. |
+| Motivação | A RN-34 sobre estoque mínimo já aparecia no README, mas faltava no dicionário HTML. O HTML também mantinha links para arquivos antigos do DER, enquanto o README mencionava um PDF que não estava publicado no repositório. |
 | Prompt(s) utilizados | “Reanalise [...] baseado no esqueleto da entrega 1 e no que tá lá no GitHub [...] encontre os problemas”; “Pega essas três [...] e estrutura [...] como você vai fazer a mudança”; “Analisa de novo o GitHub e tenta achar um porquê esses problemas estão aí”; “Pode ir lá no meu github e fazer os commits”. |
 | Resposta recebida | Identificadas três inconsistências: RN-34 presente somente no README, links antigos de imagem/PDF no rodapé do HTML e afirmação no README sobre PDF não publicado. Proposta e execução de três commits documentais em branch separada no fork. |
 | Fontes consultadas e verificadas | Esqueleto da Entrega 1 fornecido ao grupo, README, HTML, árvore de arquivos, histórico de commits e imagem do DER no GitHub. A RN-34 foi reproduzida conforme o README, sem novo levantamento de campo. |
 | Trechos rejeitados ou corrigidos | Não foi criado um PDF apenas para manter um link antigo, nem foram alterados o DER, seus relacionamentos ou regras comerciais. Referências históricas a PDFs usados na elaboração foram preservadas. |
-| Justificativa da escolha final | Manter o modelo conceitual e corrigir somente divergências verificáveis na documentação publicada. |
-| Reflexão crítica | A IA não participou da entrevista com o gerente e não pode inferir a intenção dos autores dos commits. A conferência automatizada dos arquivos não substitui a revisão dos integrantes e do professor. |
+| Justificativa da escolha final | Como o estoque mínimo já estava documentado no README, a RN-34 podia ser reproduzida no HTML sem criar uma nova regra. Quanto aos anexos, optou-se por corrigir ou retirar referências desatualizadas, sem inventar um PDF nem redesenhar o DER. |
+| Reflexão crítica | Conferir a RN-34 em dois arquivos não comprova o estoque físico da ótica: essa informação veio do relato registrado pelo grupo. Da mesma forma, o histórico do GitHub mostra os links alterados, mas não permite deduzir a intenção de quem criou cada versão. |
 
 
 ### Uso 11 — revisão do dicionário e sincronização da RN-34 (27/10/2026)
