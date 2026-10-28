@@ -58,7 +58,7 @@ As fotos do formulário e do laudo mostram dados pessoais e de saúde de cliente
 | Desistência | Relatada a política de considerar o pedido ainda não enviado ao fornecedor e o limite de 24 horas da compra | RN-24 |
 | Troca e Devolução |  Depende de avaliação do produto e da causa do dano, e pode ser aprovada ou recusada. Peças intactas podem ser reaproveitadas e as demais são descartadas | RN-08 e RN-25 |
 | Formulário | O campo “Retirada a partir das” indica o horário previsto para a retirada do produto. | RN-27 |
-| Estoque mínimo | Conforme a RN-34 do README (origem indicada: resposta do gerente), a loja mantém no mínimo 100 pares de lentes e 500 armações em estoque; abaixo disso, precisa repor. Lentes são contadas por par (RN-26). | RN-34 |
+| Estoque mínimo | Segundo o gerente, a loja deve manter pelo menos 100 pares de lentes e 500 armações. Se o estoque ficar abaixo desses valores, é preciso repor; as lentes são contadas por par (RN-26). | RN-34 |
 
 ## 5. O que não foi confirmado
 

@@ -26,9 +26,9 @@
 ## 1. Caracterização da Organização
 
 - **Nome e natureza da organização:** **Ótica Kadosh**, estabelecimento comercial **com fins lucrativos** que vende produtos ópticos (armações e lentes). Fica na Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP, CEP 08191-000.
-- **Contexto e porte:** pequeno comércio com **três funcionários**: um optometrista (**Guilherme de Souza Silva**), um gerente (**Marcos Vinícius Silva Menezes**) e um consultor óptico (**Kaique Batista dos Santos**). O gerente informou cerca de **100 atendimentos e 80 vendas por semana**, o que indica que parte dos atendimentos não termina em venda. A ótica atende clientes presencialmente, vende armações e lentes, recebe pagamentos à vista, parcelados ou em partes, mantém estoque, compra de fornecedores quando falta produto e trata trocas e devoluções.
-- **Problemas e necessidades identificados:** pedidos, estoque e parcelas são controlados em **papel e planilhas separadas**, e um banco de dados usado antes apresentava falhas frequentes. Hoje não há vínculo seguro entre atendimento, receita, pedido, pagamentos, compras ao fornecedor, estoque e trocas, e cada consulta exige abrir vários registros. O sistema precisa relacionar tudo isso, saber o saldo de estoque e o saldo a pagar de cada pedido e proteger os dados de saúde dos clientes. Os problemas de gestão estão numerados de P1 a P5 na tabela ao final desta seção.
-- **Justificativa da escolha:** o grupo tem acesso presencial à ótica e ao gerente. O negócio é pequeno o bastante para o primeiro DER, mas tem processos encadeados e observáveis (atendimento, receita, venda, pagamento, compra, montagem, retirada, garantia e troca) que exigem relacionamentos variados: 1:1, 1:N, entidades fracas e generalização.
+- **Contexto e porte:** a equipe tem **três funcionários**: o optometrista (**Guilherme de Souza Silva**), o gerente (**Marcos Vinícius Silva Menezes**) e o consultor óptico (**Kaique Batista dos Santos**). Segundo o gerente, são cerca de **100 atendimentos e 80 vendas por semana**; nem todo atendimento termina em compra. Além de vender armações e lentes, a ótica recebe pagamentos à vista, parcelados ou em partes, compra de fornecedores quando falta produto e atende pedidos de troca e devolução.
+- **Problemas e necessidades identificados:** pedidos, estoque e parcelas ficam registrados em **papel e planilhas separadas**. O gerente também relatou falhas frequentes em um banco de dados usado anteriormente. Para acompanhar uma venda, conferir o que já foi pago ou saber o que precisa ser reposto, a equipe precisa consultar registros diferentes. A proposta é reunir essas informações, ligando atendimento, receita, orçamento, venda, pagamentos, compras e estoque, sem deixar de restringir o acesso aos dados de saúde. Os problemas estão detalhados de P1 a P5 na tabela abaixo.
+- **Justificativa da escolha:** a visita e o contato com o gerente permitiram conhecer as etapas que vão do atendimento à entrega e ao pós-venda. Embora tenha apenas três funcionários, a ótica reúne situações suficientes para estudar relações 1:1 e 1:N, entidades fracas e a especialização de produtos em lentes e armações, sem precisar modelar uma operação maior.
 - **Evidências da organização:**
   - Endereço: Av. Diogo da Costa Tavares, 125, Jardim Romano, São Paulo/SP.
   - Contato da loja: (11) 99349-4371. Entrevistado: **Marcos Vinícius Silva Menezes**, gerente.
@@ -599,7 +599,7 @@ A imagem é a exportação do DER final elaborado no brModelo. As regras de excl
 ### 8.1 Separação dos eventos
 
 
-CLIENTE e FUNCIONARIO são cadastros reutilizados. ATENDIMENTO preserva o contato com a ótica mesmo sem compra; ORCAMENTO conserva a oferta e sua validade; VENDA registra a contratação. Essa separação explica as participações opcionais antes do fechamento e a obrigatoriedade de atendimento e orçamento em toda venda.
+CLIENTE e FUNCIONARIO permanecem cadastrados mesmo quando não há uma nova venda. O ATENDIMENTO registra a passagem do cliente pela ótica; o ORCAMENTO guarda a proposta e seu prazo; a VENDA representa o negócio fechado. Assim, um atendimento sem compra continua no histórico, e um orçamento que não foi convertido em venda não é perdido.
 
 
 ### 8.2 Produtos e relacionamentos com atributos
@@ -635,7 +635,7 @@ COMPRA pode repor estoque sem venda de origem, por isso DEMANDA é opcional do l
 ### 8.7 Escopo, integridade e evolução
 
 
-Esta é a Entrega 1, de modelo conceitual. Tipos físicos, tamanhos, índices, chaves estrangeiras e controles administrativos do HTML são uma proposta documentada para a próxima etapa, não um banco implementado. As associações N:N precisarão de estruturas associativas na transformação relacional; isso não recoloca ITEM_VENDA e ITEM_COMPRA como entidades no DER conceitual. Laboratório, adquirente de cartão e regras comerciais de crédito/reembolso não foram inventados. A política de acesso e a auditoria são requisitos a implementar.
+O DER desta entrega descreve o modelo conceitual, não um banco em operação. Os tipos físicos, tamanhos, índices, chaves estrangeiras e controles de acesso do dicionário HTML são propostas para as próximas etapas. Ao transformar o modelo em tabelas, os relacionamentos N:N precisarão de estruturas associativas, sem transformar ITEM_VENDA e ITEM_COMPRA em novas entidades conceituais. Como o levantamento não confirmou um laboratório independente, uma adquirente de cartão ou políticas detalhadas de crédito e reembolso, esses elementos ficaram fora do modelo. A auditoria e o controle de acesso ainda terão de ser implementados.
 
 
 ### 8.8 Conferência com o esqueleto
@@ -822,7 +822,7 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | Fontes consultadas e verificadas | Árvore de arquivos, README, dicionário HTML, histórico do GitHub e lista de processos; conferidos os destinos dos links e os nomes dos processos nos dois documentos. |
 | Trechos rejeitados ou corrigidos | Mantidos o conteúdo do diagrama, os nomes das entidades, os relacionamentos e as regras de negócio; a mudança no link não foi tratada como validação visual do novo PNG. |
 | Justificativa da escolha final | A imagem com o novo nome já estava no repositório, portanto não era preciso criar outro arquivo. Para os processos, mantivemos os nomes e alteramos somente os códigos do HTML, seguindo o README. |
-| Reflexão crítica | Conferir o caminho do PNG prova que o arquivo existe, não que o desenho corresponde aos 16 cadastros e às relações documentadas. Essa comparação visual ficou fora do escopo dos três commits. |
+| Reflexão crítica | Conferir o caminho do PNG prova que o arquivo existe, não que o desenho corresponde às 16 entidades e aos relacionamentos documentados. Essa comparação visual ficou fora do escopo dos três commits. |
 
 
 ## Critérios Atitudinais (20%)
