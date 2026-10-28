@@ -54,7 +54,7 @@ As fotos do formulário e do laudo mostram dados pessoais e de saúde de cliente
 | Garantia | A garantia é contada a partir da montagem: um ano para armações e seis meses para lentes. Para armações, cobre defeitos de fabricação, mola e parafuso. Para lentes, cobre adaptação, erro de grau, eficácia do tratamento e riscos, conforme o regulamento da ótica | RN-07 e RN-19 |
 | Suporte após a entrega | Ajustes, plaquetas e parafusos, de graça e sem prazo | RN-20 |
 | Retirada | O cliente retira o óculos com o canhoto de compra e venda | RN-21 |
-| Nota fiscal | A loja emite quando solicitada. O grupo registra tipo, número e data do documento emitido | RN-22 |
+| Nota fiscal | A loja emite uma nota fiscal a cada pagamento recebido (informado depois da visita). O grupo registra número, data de emissão, valor total e tributos | RN-22 |
 | Desistência | Relatada a política de considerar o pedido ainda não enviado ao fornecedor e o limite de 24 horas da compra | RN-24 |
 | Troca e Devolução |  Depende de avaliação do produto e da causa do dano, e pode ser aprovada ou recusada. Peças intactas podem ser reaproveitadas e as demais são descartadas | RN-08 e RN-25 |
 | Formulário | O campo “Retirada a partir das” indica o horário previsto para a retirada do produto. | RN-27 |
@@ -69,6 +69,8 @@ As fotos do formulário e do laudo mostram dados pessoais e de saúde de cliente
 ## 6. Comprovação
 
 - Foto do grupo dentro da ótica, com o letreiro "Ótica Kadosh" na parede: [Otica kadoshi.jpeg](../Otica%20kadoshi.jpeg).
+  Da esquerda para a direita: Kaique Batista dos Santos (consultor óptico), Guilherme de Souza Silva (optometrista), Marcos Vinícius Silva Menezes (gerente, o entrevistado), Victor Augusto Silva Marcilio, João Felipe de Sousa Pires e Cauã Batista Freire (integrantes do grupo).
+- Perfil da ótica no Google Maps: [Óticas kadosh](https://www.google.com/maps/place/%C3%93ticas+kadosh/@-23.4853128,-46.3896531,17z/data=!3m1!4b1!4m6!3m5!1s0x94ce63a88cc3646f:0x458e7b7ae1e2b7bb!8m2!3d-23.4853177!4d-46.3870782!16s%2Fg%2F11qwsc5n75).
 
 ## 7. O que mudou desde a primeira versão da Entrega 1
 
@@ -110,3 +112,10 @@ Comparação com a versão que recebeu a correção do professor.
 - Venda e compra passaram a ligar direto ao PRODUTO (CONTÉM e ADQUIRE), sem entidades de item. TROCA_DEVOLUCAO liga à venda e ao produto.
 - PRODUTO ganhou especialização total e disjunta em LENTE e ARMACAO.
 - O DER agora está dentro do repositório, e o dicionário em HTML tem relacionamentos, fluxo de dados, convenções, log de acesso e LGPD.
+
+## 8. O que mudou na Entrega 2
+
+- O DER passou por nova revisão no brModelo (18 entidades). Entraram NOTA_FISCAL_SAIDA e NOTA_FISCAL_ENTRADA, por orientação do professor; ESTOQUE substituiu MOVIMENTO_ESTOQUE; e saíram os relacionamentos OFERECE, ADQUIRE, EMISSOR DE, ORIGINA VENDA, a ligação GERA entre pagamento e parcela, TEM OCORRÊNCIA, OBJETO DE e as origens do movimento de estoque por venda e por ocorrência. As seções 4 e 7 acima descrevem o modelo anterior. O modelo vigente está no README e no dicionário.
+- Depois da visita, o gerente informou que a ótica emite nota fiscal a cada pagamento recebido. A RN-22 foi reescrita (RN-31 e RN-32 foram retiradas e a RN-35 foi criada).
+- Os números de porte que o gerente não informou (clientes ativos, itens em estoque, compras por mês e outros) são estimativas fictícias do grupo, marcadas no README. Servem para dimensionar a massa de dados.
+- A última confirmação com o gerente foi por mensagem. Os processos, requisitos e regras comuns em óticas que ficaram de fora do modelo têm justificativa proposta pelo grupo e ainda precisam da confirmação dele.
