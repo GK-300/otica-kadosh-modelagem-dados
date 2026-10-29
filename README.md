@@ -14,7 +14,7 @@
 | João Victor Gobi Romero | 48114642 | [joaovromero](https://github.com/joaovromero) |
 | Guilherme Araujo de Oliveira | 47116862 | [GK-300](https://github.com/GK-300) |
 
-**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_OticaKadosh.png) · modelo lógico, script SQL e massa de dados (nas próximas partes).
+**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_Otica_Kadosh.png) · modelo lógico, script SQL e massa de dados (nas próximas partes).
 
 ---
 
@@ -228,7 +228,7 @@ O DER foi criado no **brModelo Web** ([modelo "Ótica"](https://app.brmodeloweb.
 
 **18 entidades:** CLIENTE, FUNCIONARIO, ATENDIMENTO, RECEITA, RECEITA_MEDIDA, ORCAMENTO, VENDA, PAGAMENTO, PARCELA, NOTA_FISCAL_SAIDA, FORNECEDOR, COMPRA, NOTA_FISCAL_ENTRADA, PRODUTO, LENTE, ARMACAO, TROCA_DEVOLUCAO e ESTOQUE.
 
-![DER conceitual revisado da Ótica Kadosh](./DER_OticaKadosh.png)
+![DER conceitual revisado da Ótica Kadosh](./DER_Otica_Kadosh.png)
 
 | Entidade A | Relacionamento | Entidade B | Em A | Em B |
 | --- | --- | --- | --- | --- |
@@ -265,7 +265,7 @@ CONTÉM é o único relacionamento com atributos próprios (número da linha, qu
 | **7** Distinção entre RF e RNF (atendido). | Mantida; RF e RNF foram revisados e numerados. | — |
 | **8** Regras repetiam os relacionamentos do DER e eram genéricas. | 33 regras vigentes (RN-01 a RN-30, RN-33, RN-34 e RN-35), cada uma com origem (relato do gerente, formulário, DER ou decisão técnica); RN-31 e RN-32 retiradas; RN-22 refeita. | Regras de negócio vêm da operação da ótica, e não do desenho. |
 | **9** Dicionário era só Atributo/Descrição/Regra, sem as seções do modelo. | Dicionário HTML com relacionamentos e cardinalidades, fluxo de dados, convenções, expressão e índices por entidade, log de acesso, papéis e LGPD; refeito conforme o DER final (18 entidades). | Seguir o modelo 02-03g do professor. |
-| **10** O DER estava fora do repositório. | O DER está no repositório como `DER_OticaKadosh.png` (exportado do brModelo em 28/10/2026) e no brModelo (link acima). | Só o que está no repositório é corrigido. |
+| **10** O DER estava fora do repositório. | O DER está no repositório como `DER_Otica_Kadosh.png` (exportado do brModelo em 29/10/2026) e no brModelo (link acima). | Só o que está no repositório é corrigido. |
 | **11** Justificativa técnica genérica. | Será reescrita na seção 1.5, com decisões concretas e as RN que cada restrição implementa. | Justificar escolhas reais e alternativas descartadas. |
 | **12** Uso de IA sem o prompt e com pendências. | Seção 6 com os registros de uso de IA (Usos 1 a 18), que trazem prompts, respostas, trechos rejeitados e reflexão crítica. | Documentar o uso de IA por completo. |
 | **Orientação do professor em aula:** incluir as entidades de nota fiscal. | Criadas NOTA_FISCAL_SAIDA (ligada a PAGAMENTO por GERA) e NOTA_FISCAL_ENTRADA (ligada a COMPRA por POSSUI); o atributo de data de emissão da nota saiu de VENDA. | A ótica emite nota a cada pagamento, e a nota de entrada vem do fornecedor. |
@@ -1122,7 +1122,7 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | --- | --- |
 | **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): conversão do DER para o modelo lógico, definição de chaves primárias e estrangeiras e redação do processo de normalização. |
 | **Motivação** | O esqueleto da Entrega 2 pede a conversão do modelo conceitual para o lógico, as chaves e a normalização em 1FN, 2FN e 3FN com justificativa. |
-| **Prompt(s) utilizados** | “Vamos a parte 2”; “O que podemos fazer para resolver as exceções controladas à 3FN?”; “Removi, dê uma olhada pelo meu navegador” (DER no brModelo); “Vamos manter do jeito que estava mesmo” (lacunas do DER). |
+| **Prompt(s) utilizados** | “Vamos a link do DER”; “O que podemos fazer para resolver as exceções controladas à 3FN?”; “Removi, dê uma olhada pelo meu navegador” (DER no brModelo); “Vamos manter do jeito que estava mesmo” (lacunas do DER). |
 | **Resposta recebida** | Esquema lógico com 19 tabelas e 132 colunas, tabelas de relacionamentos e cardinalidades, estratégia de especialização de PRODUTO com chave estrangeira composta, chaves e unicidades, normalização a partir do formulário de pedido e quatro propostas para as exceções à 3FN. |
 | **Fontes consultadas e verificadas** | DER do brModelo (conferido atributo por atributo após a remoção de VL_TOTAL, DT_QUITACAO, CD_STATUS da parcela e CD_UNIDADE_ESTOQUE), dicionário de dados e regras de negócio do README. As regras de conversão são conhecimento geral de modelagem relacional. |
 | **Trechos rejeitados ou corrigidos** | Duas justificativas da IA foram corrigidas: a do total da venda (a linha de CONTÉM já guarda o preço praticado, então o total é calculável) e a do formulário de pedido (as fotos não foram publicadas, então o formulário é uma reconstrução do grupo). O grupo decidiu retirar do DER os atributos derivados, manter o CEP como única exceção à 3FN e manter o DER sem recolocar a ligação VENDA–PARCELA, que o professor mandou retirar. |
