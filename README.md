@@ -137,9 +137,9 @@ Os requisitos abaixo foram reescritos com os dados envolvidos e correspondem aos
 | RF-05 | Emitir e guardar orçamentos com data e hora de emissão, validade (24 horas), aprovação, status e observação, preservando os não aprovados. | PR03 | P1 |
 | RF-06 | Registrar venda com data e hora, total, status, observação e, por linha, número da linha, produto, quantidade, preço unitário e observação. | PR04 | P1, P4 |
 | RF-07 | Registrar pagamentos com valor, data, forma (PIX, DINHEIRO, DEBITO, CREDITO) e finalidade (SINAL, INTEGRAL, PARCIAL, QUITACAO_PARCELA), sem exceder o saldo devido, e emitir/registrar a nota fiscal de saída de cada pagamento com número, data de emissão, valor total e tributos. | PR05, PR12 | P1 |
-| RF-08 | Registrar as parcelas do saldo (número de 1 a 10, valor mínimo de R$ 50,00, vencimento, status) e a quitação por pagamento. | PR05 | P1 |
+| RF-08 | Registrar as parcelas do saldo (número de 1 a 10, valor mínimo de R$ 50,00 e vencimento) e a quitação por pagamento; a situação da parcela (aberta, paga ou atrasada) é calculada, não gravada. | PR05 | P1 |
 | RF-09 | Cadastrar fornecedores (nome, CNPJ, endereço, contato) e compras (data do pedido, chegada, status, venda de origem opcional), e registrar a nota fiscal de entrada (número, data de emissão, valor total, tributos). | PR06 | P2 |
-| RF-10 | Cadastrar produtos (tipo, referência, marca, unidade) com as características de lente (índice, tratamento, possui grau) ou de armação (tipo, material). | PR04, PR07 | P2, P3 |
+| RF-10 | Cadastrar produtos (tipo, referência e marca; a unidade, par ou unidade, é derivada do tipo, RN-26) com as características de lente (índice, tratamento, possui grau) ou de armação (tipo, material). | PR04, PR07 | P2, P3 |
 | RF-11 | Registrar movimentos de estoque (data, quantidade, direção, motivo, condição, produto, compra de origem) e consultar o saldo por produto e condição. | PR07 | P2 |
 | RF-12 | Indicar produtos cujo saldo disponível está abaixo do mínimo de 100 pares de lentes ou 500 armações (RN-34). | PR07 | P2 |
 | RF-13 | Registrar previsão de conclusão, liberação da encomenda, envio ao fornecedor, montagem/finalização, horário previsto, retirada efetiva e conferência do canhoto. | PR08, PR09 | P1 |
@@ -155,7 +155,7 @@ Os requisitos abaixo foram reescritos com os dados envolvidos e correspondem aos
 | ID | Característica | Critério proposto |
 | --- | --- | --- |
 | RNF-01 | Segurança e privacidade | Acesso individual e por função, com o mínimo necessário; proteção dos dados de saúde (LGPD). |
-| RNF-02 | Integridade | Validar identificadores, vínculos, totais (soma das linhas igual ao total da venda) e saldos. |
+| RNF-02 | Integridade | Validar identificadores, vínculos, saldos e totais; o total da venda é calculado pela soma das linhas, e não gravado. |
 | RNF-03 | Recuperação | Cópia de segurança diária e teste periódico de restauração; infraestrutura a definir com a loja. |
 | RNF-04 | Usabilidade | Localizar cliente, histórico e situação do pedido em uma única consulta; validar com a equipe. |
 | RNF-05 | Rastreabilidade | Registrar autor, instante, operação, objeto e resultado; proteger os registros de auditoria. |
@@ -181,7 +181,7 @@ Os códigos da Entrega 1 foram mantidos. **RN-31 e RN-32** foram retiradas porqu
 | RN-01 | Toda venda pertence a um atendimento; um atendimento pode não resultar em venda e resulta em no máximo uma. | Levantamento e DER |
 | RN-02 | A receita é obtida pelo atendimento da venda, sem ligação direta RECEITA–VENDA. Quando exigida, deve pertencer ao mesmo atendimento e cliente; a prescrição daquele pedido não é reutilizada em outro pedido. | Levantamento; ajuste do professor |
 | RN-03 | A ótica aceita receita trazida com até um ano da emissão na data de aceitação do pedido; caso contrário, realiza novo teste. Trata-se de prática relatada, sem definir validade legal geral. | Entrevista |
-| RN-04 | Os preços são por armação e por par de lentes. O total original da venda é a soma das quantidades multiplicadas pelos preços das linhas de CONTÉM. | Formulário e entrevista |
+| RN-04 | Os preços são por armação e por par de lentes. O total da venda não é gravado: é calculado pela soma das quantidades multiplicadas pelos preços das linhas de CONTÉM (a linha guarda o preço praticado na venda). | Formulário e entrevista |
 | RN-05 | A venda pode ter pagamentos em momentos diferentes. PAGAMENTO representa recebimento; PARCELA representa compromisso futuro. | Entrevista e modelagem |
 | RN-06 | A venda pode usar estoque e não gerar compra. COMPRA possui um fornecedor e pode atender uma venda ou repor estoque sem venda de origem. | Confirmação do grupo e DER final |
 | RN-07 | A garantia comercial relatada começa na montagem/finalização: um ano para armação e seis meses para lente; calcular por produto vendido. | Entrevista |
@@ -195,7 +195,7 @@ Os códigos da Entrega 1 foram mantidos. **RN-31 e RN-32** foram retiradas porqu
 | RN-15 | O optometrista emite o laudo interno; o consultor conduz o atendimento comercial que fecha a venda. O DER não registra o emissor do laudo; o responsável pelo atendimento é obtido por CONDUZ. | Respostas do gerente; DER final |
 | RN-16 | Lente com possui_grau verdadeiro exige receita no atendimento da venda, trazida pelo cliente ou emitida internamente. | Resposta do gerente |
 | RN-17 | Depois do sinal, o saldo pode ser parcelado no cartão em até dez parcelas de no mínimo R$ 50,00; o sinal não integra essas parcelas. | Confirmação de 15/10/2026 |
-| RN-18 | Encomenda só é liberada após recebimento de sinal de pelo menos 30% do total e registro da previsão de conclusão. Uma venda aberta pode existir antes desse recebimento. | Resposta do gerente |
+| RN-18 | Encomenda só é liberada após recebimento de sinal de pelo menos 30% do total da venda (soma das linhas de CONTÉM) e registro da previsão de conclusão. Uma venda aberta pode existir antes desse recebimento. | Resposta do gerente |
 | RN-19 | Segundo o gerente, a garantia da armação cobre defeito de fabricação, mola e parafuso; a da lente cobre adaptação, erro de grau, eficácia do tratamento e arranhões, conforme regulamento da ótica. O regulamento não foi apresentado ao grupo. | Relato de 14/10/2026 |
 | RN-20 | O suporte relatado após a entrega é gratuito e vitalício para ajustes, plaquetas e parafusos; registrar como atendimento de manutenção. | Resposta do gerente |
 | RN-21 | A entrega é feita ao portador do canhoto de compra e venda; registrar a conferência ao preencher a retirada efetiva. | Resposta do gerente |
@@ -203,9 +203,9 @@ Os códigos da Entrega 1 foram mantidos. **RN-31 e RN-32** foram retiradas porqu
 | RN-23 | Toda venda, inclusive pronta entrega, é precedida de orçamento. Orçamentos são guardados mesmo sem venda, com emissão e validade usual de 24 horas. A venda só é feita com aprovação dentro da validade. O DER não liga ORCAMENTO diretamente a VENDA. | Confirmações do grupo; DER final |
 | RN-24 | Na desistência sem defeito, a política comercial relatada considera o pedido ainda não enviado ao fornecedor e o limite de 24 horas da compra. Solicitação não significa cancelamento automático; preservar a decisão. | Relato de 15/10/2026 |
 | RN-25 | Troca depende de avaliação do produto e causa do dano, podendo ser aprovada ou recusada. Parecer e data são exigidos na decisão; não presumir política de reembolso ou crédito. | Resposta do gerente |
-| RN-26 | Lentes são compradas, vendidas e contadas por par; armações por unidade. | Confirmação de 15/10/2026 |
+| RN-26 | Lentes são compradas, vendidas e contadas por par; armações por unidade. A unidade não é gravada: deriva do tipo do produto (LENTE = par; ARMACAO = unidade). | Confirmação de 15/10/2026 |
 | RN-27 | O campo “A partir das” é horário previsto de retirada. O índice de refração registra o valor numérico; observações da linha descrevem características adicionais da lente. | Formulário e resposta do gerente |
-| RN-28 | PARCELA possui id_parcela próprio. QUITA é opcional e 1:1: um pagamento quita no máximo uma parcela e cada parcela é quitada por no máximo um pagamento. | DER final |
+| RN-28 | PARCELA possui id_parcela próprio. QUITA é opcional e 1:1: um pagamento quita no máximo uma parcela e cada parcela é quitada por no máximo um pagamento. A situação da parcela é calculada: PAGA se há pagamento ligado; ATRASADA se não há e o vencimento passou; ABERTA nos demais casos. | DER final |
 | RN-29 | CONTÉM distingue linhas por numero_linha único dentro da venda. O mesmo produto pode ocorrer em duas linhas com preços diferentes. | Confirmação do usuário e nota do DER |
 | RN-30 | Todo movimento de ESTOQUE refere-se a um produto (É MOVIMENTADO EM); a entrada por compra liga-se à COMPRA de origem (GERA ENTRADA). Os demais motivos (venda, retorno, substituição, descarte) são registrados no atributo motivo. | DER final |
 | RN-33 | Campos de reembolso e abatimento registram apenas acertos efetivamente autorizados; não comprovam que a loja oferece essas alternativas em todos os casos. | Limite do levantamento e campos do DER |
@@ -278,14 +278,580 @@ Nenhum apontamento foi rejeitado. Apontamentos não citados nesta tabela não ex
 
 ---
 
+## 1.2 Conversão do Modelo Conceitual para o Modelo Lógico
+
+O modelo lógico foi derivado do DER conceitual revisado na seção 1.1 (18 entidades e 18 relacionamentos, um deles, CONTÉM, com atributos). O resultado são **19 tabelas** e **132 colunas**, para MySQL 8 (InnoDB). O diagrama do modelo lógico está na seção 2; o dicionário de dados detalha domínios e regras de cada coluna.
+
+### Regras de conversão aplicadas
+
+| Elemento do DER | Regra aplicada | Onde aparece |
+| --- | --- | --- |
+| Entidade | Vira uma tabela com o mesmo nome. | 18 tabelas |
+| Atributo simples | Vira uma coluna com o nome padronizado do dicionário (prefixos `ID_`, `NM_`, `DT_`, `VL_` etc.) e o tipo físico do dicionário. | seção "Atributos → colunas" |
+| Atributo identificador | Vira a chave primária; inteiro com `AUTO_INCREMENT` quando é um código gerado pelo sistema. | seção 1.3 |
+| Atributo opcional | Coluna que aceita `NULL`; atributo obrigatório vira `NOT NULL`. | seção "Atributos → colunas" |
+| Relacionamento 1:N | A chave primária do lado 1 vira chave estrangeira no lado N. | seção "Relacionamentos → chaves" |
+| Relacionamento 1:1 | Chave estrangeira com `UNIQUE` na tabela que participa de forma obrigatória (ou, havendo as duas obrigatórias, na tabela que depende da outra). | seção "Cardinalidades" |
+| Relacionamento N:N com atributos (CONTÉM) | Vira uma tabela associativa com chave composta e os atributos do relacionamento. | tabela `CONTEM` |
+| Especialização total e disjunta (PRODUTO) | Uma tabela por entidade; as especializações herdam a chave do produto como PK e FK. | seção "Generalização/especialização" |
+| Entidade fraca (RECEITA_MEDIDA) | A chave da receita entra na chave primária composta. | `RECEITA_MEDIDA` |
+
+### Entidades → tabelas
+
+| Entidade ou relacionamento do DER | Tabela | Observação |
+| --- | --- | --- |
+| CLIENTE | `CLIENTE` | Cadastro único; CPF opcional e único. |
+| FUNCIONARIO | `FUNCIONARIO` | Inativação em vez de exclusão (`IN_ATIVO`). |
+| ATENDIMENTO | `ATENDIMENTO` | Recebe as chaves de cliente e funcionário. |
+| RECEITA | `RECEITA` | Uma receita por atendimento. |
+| RECEITA_MEDIDA | `RECEITA_MEDIDA` | Chave composta (receita, olho, distância): no máximo 4 linhas por receita. |
+| ORCAMENTO | `ORCAMENTO` | Vários por atendimento. |
+| VENDA | `VENDA` | Uma venda por atendimento. |
+| PAGAMENTO | `PAGAMENTO` | Pertence a uma venda; pode quitar uma parcela. |
+| PARCELA | `PARCELA` | Sem chave estrangeira própria: a ligação com o pagamento fica no pagamento (QUITA). |
+| NOTA_FISCAL_SAIDA | `NOTA_FISCAL_SAIDA` | Uma por pagamento. |
+| FORNECEDOR | `FORNECEDOR` | CNPJ opcional e único. |
+| COMPRA | `COMPRA` | Fornecedor obrigatório; venda de origem opcional. |
+| NOTA_FISCAL_ENTRADA | `NOTA_FISCAL_ENTRADA` | Uma por compra. |
+| PRODUTO | `PRODUTO` | Supertipo; guarda o tipo (LENTE ou ARMACAO). |
+| LENTE | `LENTE` | Especialização de PRODUTO. |
+| ARMACAO | `ARMACAO` | Especialização de PRODUTO. |
+| TROCA_DEVOLUCAO | `TROCA_DEVOLUCAO` | Referencia a nota fiscal de saída da venda original. |
+| ESTOQUE | `ESTOQUE` | Movimento por produto; entradas podem apontar para a compra. |
+| Relacionamento CONTÉM (com atributos) | `CONTEM` | Tabela associativa entre VENDA e PRODUTO. |
+
+### Atributos → colunas
+
+Todos os atributos do DER viraram colunas, sem perda. Regras gerais:
+
+- **Nomes:** as colunas usam o nome padronizado do dicionário (por exemplo, o atributo `nome` de CLIENTE virou `NM_CLIENTE`). Tabelas e colunas são escritas em maiúsculas neste relatório; no script SQL ficam em minúsculas para evitar diferença entre sistemas operacionais.
+- **Tipos:** os tipos do dicionário foram mantidos (`INT`, `VARCHAR(n)`, `CHAR(n)`, `DECIMAL(p,s)`, `DATE`, `DATETIME`, `TIME`, `BOOLEAN`). Valores monetários usam `DECIMAL`, nunca ponto flutuante.
+- **Colunas acrescentadas pela conversão:** só chaves estrangeiras (ver abaixo) e a coluna `CD_TIPO` das tabelas `LENTE` e `ARMACAO`, que garante a especialização. Nenhum atributo novo de negócio foi criado.
+- **Atributos condicionais** (por exemplo, `DH_APROVACAO` e `DT_RETIRADA`) aceitam `NULL`; a condição de preenchimento é uma restrição `CHECK` ou uma consulta de auditoria (seção 3).
+
+As tabelas abaixo mostram o resultado. Abra cada uma para ver as colunas, os tipos e as restrições de chave.
+
+<details><summary><b>CLIENTE</b> (12 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_CLIENTE | INT | NOT NULL | PK, AUTO_INCREMENT |
+| NM_CLIENTE | VARCHAR(120) | NOT NULL |  |
+| DT_NASCIMENTO | DATE | NULL |  |
+| NR_CPF | CHAR(11) | NULL | UNIQUE (quando informado) |
+| DS_EMAIL | VARCHAR(120) | NULL |  |
+| NR_TELEFONE_FIXO | VARCHAR(11) | NULL |  |
+| NR_TELEFONE_CELULAR | VARCHAR(11) | NULL |  |
+| DS_LOGRADOURO | VARCHAR(120) | NULL |  |
+| NR_ENDERECO | VARCHAR(10) | NULL |  |
+| NM_BAIRRO | VARCHAR(60) | NULL |  |
+| NM_CIDADE | VARCHAR(60) | NULL |  |
+| NR_CEP | CHAR(8) | NULL |  |
+
+</details>
+
+<details><summary><b>FUNCIONARIO</b> (5 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_FUNCIONARIO | INT | NOT NULL | PK, AUTO_INCREMENT |
+| NM_FUNCIONARIO | VARCHAR(120) | NOT NULL |  |
+| TP_FUNCAO | VARCHAR(20) | NOT NULL |  |
+| NR_TELEFONE | VARCHAR(11) | NULL |  |
+| IN_ATIVO | BOOLEAN | NOT NULL | DEFAULT TRUE |
+
+</details>
+
+<details><summary><b>ATENDIMENTO</b> (7 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_ATENDIMENTO | INT | NOT NULL | PK, AUTO_INCREMENT |
+| DH_ATENDIMENTO | DATETIME | NOT NULL |  |
+| TP_MEIO_CONTATO | VARCHAR(30) | NULL |  |
+| TP_ATENDIMENTO | VARCHAR(20) | NOT NULL |  |
+| DS_SERVICO | VARCHAR(255) | NULL |  |
+| ID_CLIENTE | INT | NOT NULL | FK → CLIENTE |
+| ID_FUNCIONARIO | INT | NOT NULL | FK → FUNCIONARIO |
+
+</details>
+
+<details><summary><b>RECEITA</b> (5 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_RECEITA | INT | NOT NULL | PK, AUTO_INCREMENT |
+| DT_RECEITA | DATE | NOT NULL |  |
+| TP_ORIGEM | VARCHAR(11) | NOT NULL |  |
+| DS_OBSERVACAO | VARCHAR(255) | NULL |  |
+| ID_ATENDIMENTO | INT | NOT NULL | FK → ATENDIMENTO, UNIQUE |
+
+</details>
+
+<details><summary><b>RECEITA_MEDIDA</b> (9 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_RECEITA | INT | NOT NULL | PK, FK → RECEITA |
+| CD_OLHO | CHAR(2) | NOT NULL | PK |
+| CD_DISTANCIA | VARCHAR(5) | NOT NULL | PK |
+| VL_ESFERICO | DECIMAL(4,2) | NULL |  |
+| VL_CILINDRICO | DECIMAL(4,2) | NULL |  |
+| VL_EIXO | SMALLINT | NULL |  |
+| VL_ACUIDADE_VISUAL | VARCHAR(10) | NULL |  |
+| VL_DNP | DECIMAL(4,1) | NULL |  |
+| VL_ALTURA | DECIMAL(4,1) | NULL |  |
+
+</details>
+
+<details><summary><b>ORCAMENTO</b> (7 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_ORCAMENTO | INT | NOT NULL | PK, AUTO_INCREMENT |
+| DH_EMISSAO | DATETIME | NOT NULL |  |
+| DH_VALIDADE | DATETIME | NOT NULL |  |
+| DH_APROVACAO | DATETIME | NULL |  |
+| CD_STATUS | VARCHAR(15) | NOT NULL |  |
+| DS_OBSERVACAO | VARCHAR(255) | NULL |  |
+| ID_ATENDIMENTO | INT | NOT NULL | FK → ATENDIMENTO |
+
+</details>
+
+<details><summary><b>VENDA</b> (13 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_VENDA | INT | NOT NULL | PK, AUTO_INCREMENT |
+| DH_COMPRA | DATETIME | NOT NULL |  |
+| CD_STATUS | VARCHAR(20) | NOT NULL |  |
+| DS_OBSERVACAO | VARCHAR(255) | NULL |  |
+| DT_MONTAGEM_FINALIZACAO | DATE | NULL |  |
+| DT_RETIRADA | DATE | NULL |  |
+| HR_PREVISTA_RETIRADA | TIME | NULL |  |
+| DT_PREVISTA_CONCLUSAO | DATE | NULL |  |
+| DT_LIBERACAO_ENCOMENDA | DATE | NULL |  |
+| IN_CANHOTO_CONFERIDO | BOOLEAN | NULL |  |
+| DH_ENVIO_FORNECEDOR | DATETIME | NULL |  |
+| DH_SOLICITACAO_CANCELAMENTO | DATETIME | NULL |  |
+| ID_ATENDIMENTO | INT | NOT NULL | FK → ATENDIMENTO, UNIQUE |
+
+</details>
+
+<details><summary><b>CONTEM</b> (6 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_VENDA | INT | NOT NULL | PK, FK → VENDA |
+| NR_LINHA | SMALLINT | NOT NULL | PK |
+| QT_PRODUTO | INT | NOT NULL |  |
+| VL_PRECO_UNITARIO | DECIMAL(10,2) | NOT NULL |  |
+| DS_OBSERVACAO | VARCHAR(255) | NULL |  |
+| ID_PRODUTO | INT | NOT NULL | FK → PRODUTO |
+
+</details>
+
+<details><summary><b>PRODUTO</b> (4 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_PRODUTO | INT | NOT NULL | PK, AUTO_INCREMENT |
+| CD_TIPO | VARCHAR(10) | NOT NULL |  |
+| DS_REFERENCIA | VARCHAR(60) | NOT NULL |  |
+| NM_MARCA | VARCHAR(60) | NULL |  |
+
+</details>
+
+<details><summary><b>LENTE</b> (5 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_PRODUTO | INT | NOT NULL | PK, FK → PRODUTO |
+| CD_TIPO | VARCHAR(10) | NOT NULL | FK composta → PRODUTO (ID_PRODUTO, CD_TIPO); CHECK = 'LENTE' |
+| VL_INDICE | DECIMAL(3,2) | NULL |  |
+| DS_TRATAMENTO | VARCHAR(60) | NULL |  |
+| IN_POSSUI_GRAU | BOOLEAN | NOT NULL |  |
+
+</details>
+
+<details><summary><b>ARMACAO</b> (4 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_PRODUTO | INT | NOT NULL | PK, FK → PRODUTO |
+| CD_TIPO | VARCHAR(10) | NOT NULL | FK composta → PRODUTO (ID_PRODUTO, CD_TIPO); CHECK = 'ARMACAO' |
+| TP_ARMACAO | VARCHAR(40) | NULL |  |
+| DS_MATERIAL | VARCHAR(40) | NULL |  |
+
+</details>
+
+<details><summary><b>PAGAMENTO</b> (7 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_PAGAMENTO | INT | NOT NULL | PK, AUTO_INCREMENT |
+| VL_PAGAMENTO | DECIMAL(10,2) | NOT NULL |  |
+| DT_PAGAMENTO | DATE | NOT NULL |  |
+| TP_FORMA | VARCHAR(10) | NOT NULL |  |
+| TP_FINALIDADE | VARCHAR(20) | NOT NULL |  |
+| ID_VENDA | INT | NOT NULL | FK → VENDA |
+| ID_PARCELA_QUITADA | INT | NULL | FK → PARCELA, UNIQUE |
+
+</details>
+
+<details><summary><b>PARCELA</b> (4 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_PARCELA | INT | NOT NULL | PK, AUTO_INCREMENT |
+| NR_PARCELA | SMALLINT | NOT NULL |  |
+| VL_PARCELA | DECIMAL(10,2) | NOT NULL |  |
+| DT_VENCIMENTO | DATE | NOT NULL |  |
+
+</details>
+
+<details><summary><b>NOTA_FISCAL_SAIDA</b> (6 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_NOTA_SAIDA | INT | NOT NULL | PK, AUTO_INCREMENT |
+| NR_NOTA | VARCHAR(20) | NOT NULL |  |
+| DT_EMISSAO | DATE | NOT NULL |  |
+| VL_TOTAL | DECIMAL(12,2) | NOT NULL |  |
+| VL_TRIBUTOS | DECIMAL(12,2) | NULL |  |
+| ID_PAGAMENTO | INT | NOT NULL | FK → PAGAMENTO, UNIQUE |
+
+</details>
+
+<details><summary><b>FORNECEDOR</b> (5 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_FORNECEDOR | INT | NOT NULL | PK, AUTO_INCREMENT |
+| NM_FORNECEDOR | VARCHAR(120) | NOT NULL |  |
+| NR_CNPJ | VARCHAR(14) | NULL | UNIQUE (quando informado) |
+| DS_ENDERECO | VARCHAR(200) | NULL |  |
+| DS_CONTATO | VARCHAR(120) | NULL |  |
+
+</details>
+
+<details><summary><b>COMPRA</b> (6 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_COMPRA | INT | NOT NULL | PK, AUTO_INCREMENT |
+| DT_PEDIDO | DATE | NOT NULL |  |
+| DT_CHEGADA | DATE | NULL |  |
+| CD_STATUS | VARCHAR(15) | NOT NULL |  |
+| ID_FORNECEDOR | INT | NOT NULL | FK → FORNECEDOR |
+| ID_VENDA | INT | NULL | FK → VENDA |
+
+</details>
+
+<details><summary><b>NOTA_FISCAL_ENTRADA</b> (6 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_NOTA_ENTRADA | INT | NOT NULL | PK, AUTO_INCREMENT |
+| NR_NOTA | VARCHAR(20) | NOT NULL |  |
+| DT_EMISSAO | DATE | NOT NULL |  |
+| VL_TOTAL | DECIMAL(12,2) | NOT NULL |  |
+| VL_TRIBUTOS | DECIMAL(12,2) | NULL |  |
+| ID_COMPRA | INT | NOT NULL | FK → COMPRA, UNIQUE |
+
+</details>
+
+<details><summary><b>TROCA_DEVOLUCAO</b> (13 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_OCORRENCIA | INT | NOT NULL | PK, AUTO_INCREMENT |
+| TP_OCORRENCIA | VARCHAR(10) | NOT NULL |  |
+| DT_OCORRIDO | DATE | NOT NULL |  |
+| CD_STATUS | VARCHAR(15) | NOT NULL |  |
+| QT_AFETADA | INT | NOT NULL |  |
+| DS_DANO | VARCHAR(255) | NULL |  |
+| DS_PARECER_AVALIACAO | VARCHAR(255) | NULL |  |
+| DT_AVALIACAO | DATE | NULL |  |
+| VL_COBRADO | DECIMAL(10,2) | NULL |  |
+| VL_ABATIMENTO | DECIMAL(10,2) | NULL |  |
+| VL_REEMBOLSADO | DECIMAL(10,2) | NULL |  |
+| DT_REEMBOLSO | DATE | NULL |  |
+| ID_NOTA_SAIDA | INT | NOT NULL | FK → NOTA_FISCAL_SAIDA |
+
+</details>
+
+<details><summary><b>ESTOQUE</b> (8 colunas)</summary>
+
+| Coluna | Tipo | Nulo? | Chave / restrição |
+| --- | --- | --- | --- |
+| ID_MOVIMENTO | INT | NOT NULL | PK, AUTO_INCREMENT |
+| DT_MOVIMENTO | DATE | NOT NULL |  |
+| QT_MOVIMENTO | INT | NOT NULL |  |
+| CD_DIRECAO | VARCHAR(7) | NOT NULL |  |
+| CD_MOTIVO | VARCHAR(25) | NOT NULL |  |
+| CD_CONDICAO | VARCHAR(12) | NOT NULL |  |
+| ID_PRODUTO | INT | NOT NULL | FK → PRODUTO |
+| ID_COMPRA | INT | NULL | FK → COMPRA |
+
+</details>
+
+### Relacionamentos → chaves
+
+| Relacionamento | Entidades | Cardinalidades no DER | Tipo | Como virou chave |
+| --- | --- | --- | --- | --- |
+| SOLICITA | CLIENTE – ATENDIMENTO | (0,n) – (1,1) | 1:N | `ATENDIMENTO.ID_CLIENTE`, FK `NOT NULL`. |
+| CONDUZ | FUNCIONARIO – ATENDIMENTO | (0,n) – (1,1) | 1:N | `ATENDIMENTO.ID_FUNCIONARIO`, FK `NOT NULL`. |
+| ORIGINA | ATENDIMENTO – RECEITA | (0,1) – (1,1) | 1:1 | `RECEITA.ID_ATENDIMENTO`, FK `NOT NULL UNIQUE`. |
+| POSSUI | RECEITA – RECEITA_MEDIDA | (1,n) – (1,1) | 1:N | `RECEITA_MEDIDA.ID_RECEITA`, FK que integra a PK. |
+| ORIGINA ORÇAMENTO | ATENDIMENTO – ORCAMENTO | (0,n) – (1,1) | 1:N | `ORCAMENTO.ID_ATENDIMENTO`, FK `NOT NULL`. |
+| RESULTA EM | ATENDIMENTO – VENDA | (0,1) – (1,1) | 1:1 | `VENDA.ID_ATENDIMENTO`, FK `NOT NULL UNIQUE`. |
+| CONTÉM | VENDA – PRODUTO | (1,n) – (0,n) | N:N | Tabela `CONTEM`, PK (`ID_VENDA`, `NR_LINHA`), FK para venda e para produto. |
+| RECEBE | VENDA – PAGAMENTO | (0,n) – (1,1) | 1:N | `PAGAMENTO.ID_VENDA`, FK `NOT NULL`. |
+| QUITA | PAGAMENTO – PARCELA | (0,1) – (0,1) | 1:1 | `PAGAMENTO.ID_PARCELA_QUITADA`, FK `NULL UNIQUE`. |
+| GERA | PAGAMENTO – NOTA_FISCAL_SAIDA | (1,1) – (1,1) | 1:1 | `NOTA_FISCAL_SAIDA.ID_PAGAMENTO`, FK `NOT NULL UNIQUE`. |
+| REFERE-SE A | NOTA_FISCAL_SAIDA – TROCA_DEVOLUCAO | (0,n) – (1,1) | 1:N | `TROCA_DEVOLUCAO.ID_NOTA_SAIDA`, FK `NOT NULL`. |
+| FORNECE | FORNECEDOR – COMPRA | (0,n) – (1,1) | 1:N | `COMPRA.ID_FORNECEDOR`, FK `NOT NULL`. |
+| DEMANDA | VENDA – COMPRA | (0,n) – (0,1) | 1:N | `COMPRA.ID_VENDA`, FK `NULL` (compra pode repor estoque sem venda). |
+| POSSUI | COMPRA – NOTA_FISCAL_ENTRADA | (1,1) – (1,1) | 1:1 | `NOTA_FISCAL_ENTRADA.ID_COMPRA`, FK `NOT NULL UNIQUE`. |
+| GERA ENTRADA | COMPRA – ESTOQUE | (0,n) – (0,1) | 1:N | `ESTOQUE.ID_COMPRA`, FK `NULL` (só entradas por compra). |
+| É MOVIMENTADO EM | ESTOQUE – PRODUTO | (1,1) – (0,n) | 1:N | `ESTOQUE.ID_PRODUTO`, FK `NOT NULL`. |
+| ESPECIALIZA-SE EM | PRODUTO – LENTE | (1,1) – (0,1) | 1:1 (especialização) | `LENTE.ID_PRODUTO`, PK e FK. |
+| ESPECIALIZA-SE EM | PRODUTO – ARMACAO | (1,1) – (0,1) | 1:1 (especialização) | `ARMACAO.ID_PRODUTO`, PK e FK. |
+
+### Cardinalidades: como cada tipo foi tratado
+
+**1:N (10 relacionamentos).** A chave estrangeira fica sempre na tabela do lado N. Quando o lado N tem participação mínima 1 (por exemplo, cada atendimento tem um cliente), a coluna é `NOT NULL`. Quando o mínimo é 0 (por exemplo, uma compra pode não ter venda de origem), a coluna aceita `NULL`.
+
+**1:1 (5 relacionamentos e 2 especializações).** A chave estrangeira recebe `UNIQUE` para impedir que dois registros apontem para o mesmo.
+- ORIGINA e RESULTA EM, (0,1)–(1,1): a FK fica na tabela de participação obrigatória (receita e venda). Um atendimento sem receita ou sem venda continua válido.
+- QUITA, (0,1)–(0,1): as duas pontas são opcionais. A FK ficou em `PAGAMENTO` e aceita `NULL`, porque a maioria dos pagamentos não quita parcela; o `UNIQUE` garante que uma parcela seja quitada por no máximo um pagamento (RN-28).
+- GERA e POSSUI, (1,1)–(1,1): as duas pontas são obrigatórias. A FK ficou na **nota fiscal**, que é o documento que depende do pagamento ou da compra. O banco garante que cada nota tem um pagamento ou uma compra e que não há duas notas para o mesmo. O contrário, "todo pagamento tem nota" e "toda compra tem nota", não pode ser declarado só com chaves, porque o pagamento é gravado antes da nota. Essa regra (RN-22 e RN-35) fica na transação da aplicação e na consulta de auditoria correspondente (seção 3).
+
+**N:N (CONTÉM).** Virou a tabela `CONTEM`, com chave primária composta por venda e número da linha, e não por venda e produto: a mesma armação pode aparecer em duas linhas com preços diferentes (RN-29). Quantidade, preço unitário e observação são atributos da linha.
+
+### Generalização/especialização
+
+PRODUTO é especializado em LENTE e ARMACAO (total e disjunta, RN-14). A estratégia adotada foi **uma tabela por entidade**:
+
+- `PRODUTO` guarda o que é comum (tipo, referência e marca). `LENTE` guarda índice, tratamento e se possui grau. `ARMACAO` guarda tipo e material. A chave primária de cada especialização é a própria chave do produto, que também é chave estrangeira.
+- **Por que não uma tabela única:** os atributos específicos ficariam `NULL` na metade das linhas, e `IN_POSSUI_GRAU` (obrigatório para lentes) não poderia ser `NOT NULL`.
+- **Por que não só as especializações:** `CONTEM` e `ESTOQUE` apontam para qualquer produto, lente ou armação. Sem a tabela `PRODUTO`, cada uma precisaria de duas chaves opcionais, e a regra "um ou outro" ficaria sem proteção.
+- **Disjunção garantida pelo banco:** `PRODUTO.CD_TIPO` aceita só `LENTE` ou `ARMACAO`. `LENTE` e `ARMACAO` repetem `CD_TIPO` (valor fixo) e têm uma **chave estrangeira composta** (`ID_PRODUTO`, `CD_TIPO`) para `PRODUTO`, que por isso tem um `UNIQUE (ID_PRODUTO, CD_TIPO)`. Assim, um produto do tipo LENTE só pode ter linha em `LENTE`, nunca em `ARMACAO`.
+- **Totalidade:** que todo produto tenha a sua especialização não pode ser declarado só com chaves. Fica a cargo da gravação em uma transação (produto e especialização juntos) e de uma consulta de auditoria (seção 3).
+
+### Consequências da conversão (limitações herdadas do DER)
+
+O DER revisado não traz alguns relacionamentos que existiam na versão anterior. A conversão **respeita o DER** e não acrescenta chaves que ele não tem; as consequências ficam declaradas:
+
+| Lacuna no DER | Consequência no modelo lógico | Como é tratada |
+| --- | --- | --- |
+| PARCELA não se liga a VENDA nem ao sinal. | Uma parcela ainda não quitada não aponta para nenhuma venda; só depois de quitada ela chega à venda (`PAGAMENTO.ID_PARCELA_QUITADA`). | O saldo devedor da venda é o total calculado (view `vw_venda_total`) menos a soma dos pagamentos, sem as parcelas. Consultas sobre parcelas em aberto mostram vencimento e valor, sem cliente. |
+| ORCAMENTO não se liga a VENDA nem a PRODUTO. | Não há como saber qual orçamento originou a venda, nem os produtos orçados. | A conversão em venda é medida por atendimento: atendimentos com orçamento e com venda (P4). |
+| TROCA_DEVOLUCAO liga-se só à nota fiscal de saída. | A venda é obtida por nota → pagamento → venda, mas o produto devolvido não é identificado. | A garantia é calculada por produto vendido (venda → `CONTEM` → `PRODUTO`), e a ocorrência é tratada no nível da venda. |
+| ESTOQUE liga-se só a PRODUTO e (nas entradas) a COMPRA. | Saídas por venda e movimentos de troca não apontam para a venda ou a ocorrência. | O motivo do movimento (`CD_MOTIVO`) distingue a origem; o saldo por produto e condição não depende do vínculo (RN-12). |
+| COMPRA não tem itens nem custos. | Não há quantidade comprada nem custo por produto. | As entradas no `ESTOQUE` registram quantidade e produto recebidos; custo fica fora do modelo. |
+| RECEITA não registra o emissor do laudo. | Não se sabe qual optometrista emitiu a receita. | O funcionário do atendimento (`CONDUZ`) é o responsável registrado. |
+
+Se o grupo decidir reintroduzir algum desses vínculos, a mudança começa no DER (seção 1.1) e depois chega ao modelo lógico e ao script.
+
+## 1.3 Definição de Chaves Primárias e Estrangeiras
+
+### Chaves primárias
+
+| Tabela | Chave primária | Tipo de chave |
+| --- | --- | --- |
+| `CLIENTE` | `ID_CLIENTE` | Simples, substituta (inteiro gerado pelo sistema) |
+| `FUNCIONARIO` | `ID_FUNCIONARIO` | Simples, substituta (inteiro gerado pelo sistema) |
+| `ATENDIMENTO` | `ID_ATENDIMENTO` | Simples, substituta (inteiro gerado pelo sistema) |
+| `RECEITA` | `ID_RECEITA` | Simples, substituta (inteiro gerado pelo sistema) |
+| `RECEITA_MEDIDA` | `ID_RECEITA`, `CD_OLHO`, `CD_DISTANCIA` | Composta (chave da receita + olho + distância) |
+| `ORCAMENTO` | `ID_ORCAMENTO` | Simples, substituta (inteiro gerado pelo sistema) |
+| `VENDA` | `ID_VENDA` | Simples, substituta (inteiro gerado pelo sistema) |
+| `CONTEM` | `ID_VENDA`, `NR_LINHA` | Composta (venda + número da linha) |
+| `PRODUTO` | `ID_PRODUTO` | Simples, substituta (inteiro gerado pelo sistema) |
+| `LENTE` | `ID_PRODUTO` | Herdada de PRODUTO (PK e FK) |
+| `ARMACAO` | `ID_PRODUTO` | Herdada de PRODUTO (PK e FK) |
+| `PAGAMENTO` | `ID_PAGAMENTO` | Simples, substituta (inteiro gerado pelo sistema) |
+| `PARCELA` | `ID_PARCELA` | Simples, substituta (inteiro gerado pelo sistema) |
+| `NOTA_FISCAL_SAIDA` | `ID_NOTA_SAIDA` | Simples, substituta (inteiro gerado pelo sistema) |
+| `FORNECEDOR` | `ID_FORNECEDOR` | Simples, substituta (inteiro gerado pelo sistema) |
+| `COMPRA` | `ID_COMPRA` | Simples, substituta (inteiro gerado pelo sistema) |
+| `NOTA_FISCAL_ENTRADA` | `ID_NOTA_ENTRADA` | Simples, substituta (inteiro gerado pelo sistema) |
+| `TROCA_DEVOLUCAO` | `ID_OCORRENCIA` | Simples, substituta (inteiro gerado pelo sistema) |
+| `ESTOQUE` | `ID_MOVIMENTO` | Simples, substituta (inteiro gerado pelo sistema) |
+
+### Chaves estrangeiras
+
+Todas as chaves estrangeiras usam `ON DELETE RESTRICT` e `ON UPDATE RESTRICT`, por decisão do grupo: o histórico de atendimentos, vendas e pagamentos não deve ser apagado por exclusão em cascata.
+
+| # | Tabela | Coluna(s) FK | Tabela referenciada | Relacionamento | Obrigatória | Única |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | `ATENDIMENTO` | `ID_CLIENTE` | `CLIENTE` | SOLICITA | Sim | Não |
+| 2 | `ATENDIMENTO` | `ID_FUNCIONARIO` | `FUNCIONARIO` | CONDUZ | Sim | Não |
+| 3 | `RECEITA` | `ID_ATENDIMENTO` | `ATENDIMENTO` | ORIGINA | Sim | Sim |
+| 4 | `RECEITA_MEDIDA` | `ID_RECEITA` | `RECEITA` | POSSUI | Sim (parte da PK) | Não |
+| 5 | `ORCAMENTO` | `ID_ATENDIMENTO` | `ATENDIMENTO` | ORIGINA ORÇAMENTO | Sim | Não |
+| 6 | `VENDA` | `ID_ATENDIMENTO` | `ATENDIMENTO` | RESULTA EM | Sim | Sim |
+| 7 | `CONTEM` | `ID_VENDA` | `VENDA` | CONTÉM | Sim (parte da PK) | Não |
+| 8 | `CONTEM` | `ID_PRODUTO` | `PRODUTO` | CONTÉM | Sim | Não |
+| 9 | `PAGAMENTO` | `ID_VENDA` | `VENDA` | RECEBE | Sim | Não |
+| 10 | `PAGAMENTO` | `ID_PARCELA_QUITADA` | `PARCELA` | QUITA | Não | Sim |
+| 11 | `NOTA_FISCAL_SAIDA` | `ID_PAGAMENTO` | `PAGAMENTO` | GERA | Sim | Sim |
+| 12 | `TROCA_DEVOLUCAO` | `ID_NOTA_SAIDA` | `NOTA_FISCAL_SAIDA` | REFERE-SE A | Sim | Não |
+| 13 | `COMPRA` | `ID_FORNECEDOR` | `FORNECEDOR` | FORNECE | Sim | Não |
+| 14 | `COMPRA` | `ID_VENDA` | `VENDA` | DEMANDA | Não | Não |
+| 15 | `NOTA_FISCAL_ENTRADA` | `ID_COMPRA` | `COMPRA` | POSSUI | Sim | Sim |
+| 16 | `ESTOQUE` | `ID_PRODUTO` | `PRODUTO` | É MOVIMENTADO EM | Sim | Não |
+| 17 | `ESTOQUE` | `ID_COMPRA` | `COMPRA` | GERA ENTRADA | Não | Não |
+| 18 | `LENTE` | `ID_PRODUTO + CD_TIPO` | `PRODUTO (ID_PRODUTO, CD_TIPO)` | ESPECIALIZA-SE EM | Sim (PK) | Sim |
+| 19 | `ARMACAO` | `ID_PRODUTO + CD_TIPO` | `PRODUTO (ID_PRODUTO, CD_TIPO)` | ESPECIALIZA-SE EM | Sim (PK) | Sim |
+
+### Chaves alternativas e restrições de unicidade
+
+| Tabela | Restrição | Motivo |
+| --- | --- | --- |
+| `CLIENTE` | `UNIQUE (NR_CPF)` | Um CPF identifica um cliente. Vários clientes sem CPF são permitidos, pois a coluna aceita `NULL`. |
+| `FORNECEDOR` | `UNIQUE (NR_CNPJ)` | Um CNPJ identifica um fornecedor. A coluna aceita `NULL`. |
+| `PRODUTO` | `UNIQUE (ID_PRODUTO, CD_TIPO)` | Permite a chave estrangeira composta das especializações. |
+| `RECEITA` | `UNIQUE (ID_ATENDIMENTO)` | ORIGINA: no máximo uma receita por atendimento. |
+| `VENDA` | `UNIQUE (ID_ATENDIMENTO)` | RESULTA EM: no máximo uma venda por atendimento (RN-01). |
+| `PAGAMENTO` | `UNIQUE (ID_PARCELA_QUITADA)` | QUITA: uma parcela é quitada por no máximo um pagamento (RN-28). |
+| `NOTA_FISCAL_SAIDA` | `UNIQUE (ID_PAGAMENTO)` | GERA: uma nota por pagamento (RN-22). |
+| `NOTA_FISCAL_ENTRADA` | `UNIQUE (ID_COMPRA)` | POSSUI: uma nota por compra (RN-35). |
+
+Os números de nota (`NR_NOTA`) não são únicos no banco: a numeração depende do emissor fiscal e dos fornecedores, o que não foi validado com a ótica. Ficam com índice e com consulta de auditoria.
+
+## 1.4 Processo de Normalização (1FN, 2FN e 3FN)
+
+A normalização partiu do documento que a ótica usa na venda: o **formulário de pedido**, visto pelo grupo na visita de 05/09/2026 junto com o canhoto e o laudo. Ele junta, numa só folha, cliente, receita, produtos, pagamentos e retirada, e é a "tabela" que o papel e as planilhas da ótica reproduzem (problema P1). As fotos não foram publicadas (dados de clientes reais); por isso o formulário abaixo é a **reconstrução do grupo**, feita com os campos observados e as informações do gerente, e não uma cópia do original.
+
+### Ponto de partida (forma não normalizada)
+
+```
+PEDIDO_PAPEL (nr_pedido, data_compra, consultor, meio_contato,
+              cliente_nome, data_nasc, cpf, tel_fixo, tel_celular, email,
+              logradouro, numero, bairro, cidade, cep,
+              data_receita, origem_receita, observacao_receita,
+              esferico_OD_longe, cilindro_OD_longe, eixo_OD_longe, ... (4 combinações OD/OE x LONGE/PERTO),
+              dnp, altura, acuidade_visual,
+              { ref_armacao, marca, tipo_armacao, material, unidade, qtd, preco_unit },
+              { indice_lente, tratamento, possui_grau, qtd, preco_unit },
+              total, sinal, forma_pagamento, saldo,
+              { n_parcela, valor_parcela, vencimento, pago_em },
+              { n_nota, data_emissao_nota, valor_nota },
+              horario_previsto_retirada, data_retirada, canhoto_conferido, obs )
+```
+
+Os grupos entre `{ }` se repetem. As medidas da receita também se repetem, em colunas (um conjunto para cada olho e distância).
+
+### 1FN: valores atômicos e sem grupos repetidos
+
+Problemas encontrados e correção:
+
+| Problema na forma não normalizada | Correção |
+| --- | --- |
+| Produtos em lista dentro do pedido (armação, lente) | Cada produto vira uma linha própria, com chave (pedido + número da linha). Origem de `CONTEM`. |
+| Medidas da receita repetidas em colunas (`esferico_OD_longe`, `esferico_OE_perto` ...) | Uma linha por olho e distância, com chave (receita + olho + distância). Origem de `RECEITA_MEDIDA`. |
+| Parcelas em lista dentro do pedido | Cada parcela é uma linha. Origem de `PARCELA`. |
+| Notas fiscais em lista (uma por pagamento) | Cada nota é uma linha. Origem de `NOTA_FISCAL_SAIDA`. |
+| Pagamentos (sinal e demais) sem estrutura | Cada recebimento é uma linha. Origem de `PAGAMENTO`. |
+| Endereço escrito em um campo só | Separado em logradouro, número, bairro, cidade e CEP, como o DER já define. |
+| Telefone fixo e celular | Mantidos como dois atributos distintos, porque têm usos diferentes (o celular avisa que o óculos ficou pronto). |
+
+**Por que foi necessária:** sem a 1FN, um pedido com dois produtos ou cinco parcelas não cabe no formulário sem inventar colunas, e consultas como "quantas armações foram vendidas por mês" ou "quais parcelas vencem esta semana" exigiriam ler texto livre.
+
+Resultado da 1FN: `PEDIDO(nr_pedido, ...)`, `PEDIDO_PRODUTO(nr_pedido, nr_linha, ...)`, `MEDIDA(nr_pedido, olho, distancia, ...)`, `PARCELA(nr_pedido, nr_parcela, ...)`, `PAGAMENTO(nr_pedido, ...)`, `NOTA(nr_pedido, ...)`.
+
+### 2FN: sem dependências parciais
+
+A 2FN só interessa às tabelas de chave composta. Em cada uma, todo atributo deve depender da chave inteira:
+
+| Tabela de chave composta | Dependência parcial encontrada | Correção |
+| --- | --- | --- |
+| `PEDIDO_PRODUTO (nr_pedido, nr_linha)` | `ref_armacao`, `marca`, `tipo_armacao`, `material`, `indice`, `tratamento`, `unidade` dependem **só do produto**, e não da linha do pedido. Repetir esses dados em cada venda dá anomalia de atualização (a marca muda em mil linhas). | Extrair `PRODUTO` (e, depois, `LENTE` e `ARMACAO`). Na linha ficam só `quantidade`, `preco_unitario`, `observacao` e a referência ao produto: nasce `CONTEM`. |
+| `MEDIDA (nr_pedido, olho, distancia)` | `data_receita`, `origem` e `observacao` dependem só da **receita**, e não do olho ou da distância. | Extrair `RECEITA`; `RECEITA_MEDIDA` mantém só esférico, cilindro, eixo, acuidade visual, DNP e altura (todos dependem do trio olho, distância e receita). |
+| `PARCELA (nr_pedido, nr_parcela)` | Vencimento e valor dependem da parcela inteira. | Sem dependência parcial. Ganha chave própria `ID_PARCELA` (RN-28). |
+| `CONTEM (venda, linha)` | `quantidade`, `preco_unitario`, `observacao` e o produto dependem da linha inteira. | Já está em 2FN. |
+
+**Por que foi necessária:** a ótica repete as mesmas armações e lentes em centenas de pedidos. Sem a 2FN, o preço de tabela, a marca ou o índice de uma lente ficariam copiados em cada pedido, e uma correção exigiria mexer em todos.
+
+### 3FN: sem dependências transitivas
+
+Na 3FN, nenhum atributo comum depende de outro atributo comum. Dependências transitivas encontradas e removidas:
+
+| Onde estava | Dependência transitiva | Correção |
+| --- | --- | --- |
+| `PEDIDO` | `nr_pedido → cliente (CPF) → nome, data_nasc, telefones, endereço`. Os dados do cliente dependem do cliente, e não do pedido. | Extrair `CLIENTE`. |
+| `PEDIDO` | `nr_pedido → consultor → função, telefone`. | Extrair `FUNCIONARIO`. |
+| `PEDIDO` | `nr_pedido → atendimento → cliente, consultor, data e hora, meio de contato`. O atendimento existe antes do pedido e pode nem gerar pedido. | Extrair `ATENDIMENTO`; a venda aponta para o atendimento, e o cliente e o funcionário vêm dele. |
+| `PEDIDO` | A receita, o orçamento e a venda têm vida própria (uma receita é de um atendimento, e um atendimento pode ter vários orçamentos). | Extrair `RECEITA` e `ORCAMENTO`, ligados ao atendimento. |
+| `PEDIDO` | `nr_pedido → fornecedor → CNPJ, contato`, na parte de compras. | Extrair `FORNECEDOR` e `COMPRA`. |
+| `PAGAMENTO` e `NOTA` | `valor_nota` e dados do documento fiscal dependem da nota, e não do pagamento. | `NOTA_FISCAL_SAIDA` separada, ligada a `PAGAMENTO`. |
+| Estoque (planilha) | `saldo` dependia do histórico de entradas e saídas, não de um atributo do produto. | `ESTOQUE` guarda movimentos; o saldo é calculado. |
+
+**Por que foi necessária:** com os dados do cliente dentro de cada pedido, um telefone corrigido ficaria certo num pedido e errado nos outros, e um cliente que só foi atendido e não comprou ficaria fora do cadastro. Separar atendimento, venda e pagamento permite medir a conversão de atendimentos em vendas (P4) e acompanhar o saldo de cada venda (P1).
+
+### Verificação das tabelas finais
+
+| Tabela | Chave | Dependências funcionais principais | Forma normal |
+| --- | --- | --- | --- |
+| `CLIENTE` | `ID_CLIENTE` | `ID_CLIENTE → nome, nascimento, CPF, contatos, endereço` | 3FN (ver exceção do CEP) |
+| `FUNCIONARIO` | `ID_FUNCIONARIO` | `ID_FUNCIONARIO → nome, função, telefone, ativo` | BCNF |
+| `ATENDIMENTO` | `ID_ATENDIMENTO` | `ID_ATENDIMENTO → data e hora, meio, tipo, serviço, cliente, funcionário` | BCNF |
+| `RECEITA` | `ID_RECEITA` | `ID_RECEITA → data, origem, observação, atendimento` | BCNF |
+| `RECEITA_MEDIDA` | `ID_RECEITA, CD_OLHO, CD_DISTANCIA` | A chave inteira → esférico, cilindro, eixo, AV, DNP, altura | BCNF |
+| `ORCAMENTO` | `ID_ORCAMENTO` | `ID_ORCAMENTO → emissão, validade, aprovação, status, atendimento` | BCNF |
+| `VENDA` | `ID_VENDA` | `ID_VENDA → datas, status, observação, atendimento` | BCNF |
+| `CONTEM` | `ID_VENDA, NR_LINHA` | Chave → produto, quantidade, preço, observação | BCNF |
+| `PRODUTO` | `ID_PRODUTO` | `ID_PRODUTO → tipo, referência, marca` | BCNF |
+| `LENTE` / `ARMACAO` | `ID_PRODUTO` | `ID_PRODUTO → atributos do subtipo` | BCNF |
+| `PAGAMENTO` | `ID_PAGAMENTO` | `ID_PAGAMENTO → valor, data, forma, finalidade, venda, parcela quitada` | BCNF |
+| `PARCELA` | `ID_PARCELA` | `ID_PARCELA → número, valor, vencimento` | BCNF |
+| `NOTA_FISCAL_SAIDA` | `ID_NOTA_SAIDA` | `ID_NOTA_SAIDA → número, emissão, total, tributos, pagamento` | BCNF |
+| `FORNECEDOR` | `ID_FORNECEDOR` | `ID_FORNECEDOR → nome, CNPJ, endereço, contato` | BCNF |
+| `COMPRA` | `ID_COMPRA` | `ID_COMPRA → pedido, chegada, status, fornecedor, venda` | BCNF |
+| `NOTA_FISCAL_ENTRADA` | `ID_NOTA_ENTRADA` | `ID_NOTA_ENTRADA → número, emissão, total, tributos, compra` | BCNF |
+| `TROCA_DEVOLUCAO` | `ID_OCORRENCIA` | `ID_OCORRENCIA → tipo, datas, status, quantidade, valores, nota` | BCNF |
+| `ESTOQUE` | `ID_MOVIMENTO` | `ID_MOVIMENTO → data, quantidade, direção, motivo, condição, produto, compra` | BCNF |
+
+### Dados derivados retirados do modelo
+
+Na revisão da 3FN o grupo encontrou três atributos que podiam ser calculados a partir de outros dados. Eles **foram retirados do DER** (e do dicionário), e o valor passa a ser obtido por visões (views), criadas no script da seção 3:
+
+| Atributo retirado | Por que violava a normalização | Como o valor é obtido agora |
+| --- | --- | --- |
+| `VENDA.VL_TOTAL` | Dependia de outras tabelas: é a soma de quantidade × preço das linhas de `CONTEM` (RN-04). A linha já guarda o preço praticado, então o total nunca se perde. Duas fontes para o mesmo valor permitem divergência. | View `vw_venda_total`, usada no saldo devedor, na regra dos 30% do sinal (RN-18) e nos KPIs. |
+| `PARCELA.DT_QUITACAO` e `PARCELA.CD_STATUS` | A data de quitação repetia `PAGAMENTO.DT_PAGAMENTO` (via QUITA). O status dependia da data de hoje: `ATRASADA` gravado ficaria errado no dia seguinte, a menos que uma rotina o recalculasse. | View `vw_parcela_situacao`: `PAGA` se há pagamento ligado (data de quitação = data do pagamento); `ATRASADA` se não há e o vencimento passou; `ABERTA` nos demais casos (RN-28). |
+| `PRODUTO.CD_UNIDADE_ESTOQUE` | Dependia do tipo (`ID_PRODUTO → CD_TIPO → unidade`): lente em PAR e armação em UNIDADE (RN-26). | View `vw_produto_unidade` (ou `CASE` sobre `CD_TIPO`), usada nas consultas de estoque. |
+
+### Exceções controladas à 3FN
+
+Resta uma dependência que formalmente viola a 3FN e foi mantida de propósito:
+
+| Exceção | Por que não foi removida | Proteção |
+| --- | --- | --- |
+| `CLIENTE`: o CEP determina logradouro, bairro e cidade no mundo real. | Os campos são opcionais, a base de CEPs é dos Correios e está fora do escopo, e há CEPs genéricos de cidade. Uma tabela de CEPs traria mais problemas do que resolveria. | Validação de formato do CEP (8 dígitos) e dados digitados pela equipe. |
+
+Também se mantém, por decisão, o valor em `NOTA_FISCAL_SAIDA.VL_TOTAL` e `NOTA_FISCAL_ENTRADA.VL_TOTAL`: a nota é um documento fiscal já emitido e guarda o que foi emitido, mesmo que o valor do pagamento ou da compra seja corrigido depois. Não é cálculo repetido, e sim o dado do documento.
+
+### Justificativa do processo
+
+- **1FN** foi necessária porque o formulário da ótica mistura listas (produtos, parcelas, notas) e medidas em colunas repetidas. Sem ela, a tabela única que o papel e as planilhas reproduzem não responde às perguntas da gestão.
+- **2FN** foi necessária porque as mesmas armações, lentes e receitas se repetem em muitos registros. Separar o produto e a receita evita copiar marca, índice e data a cada venda ou olho.
+- **3FN** foi necessária, também, para retirar valores calculáveis (total da venda, situação da parcela, unidade do produto). Cliente, funcionário e atendimento existem independentemente da venda; é a separação que resolve o problema central da ótica (P1): enxergar o atendimento, a receita, a venda e os pagamentos como registros ligados, e não como uma folha de papel.
+- O modelo final não foi desnormalizado por desempenho: a ótica faz cerca de 80 vendas por semana, volume que não exige.
+
+---
+
 ## Andamento da Entrega 2
 
 | Seção | Situação |
 | --- | --- |
 | 1.1 Revisão do Modelo Conceitual | Pronta (acima) |
-| 1.2 Conversão do modelo conceitual para o lógico | A entregar na parte 2 |
-| 1.3 Chaves primárias e estrangeiras | A entregar na parte 2 |
-| 1.4 Normalização (1FN, 2FN e 3FN) | A entregar na parte 2 |
+| 1.2 Conversão do modelo conceitual para o lógico | Pronta (acima) |
+| 1.3 Chaves primárias e estrangeiras | Pronta (acima) |
+| 1.4 Normalização (1FN, 2FN e 3FN) | Pronta (acima) |
 | 1.5 Justificativas técnicas | A entregar na parte 3 |
 | 1.6 Arquitetura analítica para BI e IA (com rastreabilidade) | A entregar na parte 3 |
 | 2. Modelo lógico relacional (diagrama) | A entregar na parte 4 |
@@ -549,3 +1115,16 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | **Trechos rejeitados ou corrigidos** | O grupo manteve os números de porte fictícios, marcados como estimativa. As justificativas dos itens não incluídos são propostas e dependem de confirmação do gerente. A ordem dos nomes na legenda da foto foi informada pelo grupo. |
 | **Justificativa da escolha final** | Cada item de porte indica se foi informado, calculado ou estimado, para que a massa de dados (seção 4) seja justificada sem apresentar estimativa como fato. |
 | **Reflexão crítica** | A lista de processos e regras comuns pode estar incompleta ou não valer para a ótica; só a confirmação com o gerente resolve. A IA também não tem como verificar a fotografia ou o perfil no Google. |
+
+### Uso 19 — seções 1.2, 1.3 e 1.4 da Entrega 2: modelo lógico, chaves e normalização (29/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): conversão do DER para o modelo lógico, definição de chaves primárias e estrangeiras e redação do processo de normalização. |
+| **Motivação** | O esqueleto da Entrega 2 pede a conversão do modelo conceitual para o lógico, as chaves e a normalização em 1FN, 2FN e 3FN com justificativa. |
+| **Prompt(s) utilizados** | “Vamos a parte 2”; “O que podemos fazer para resolver as exceções controladas à 3FN?”; “Removi, dê uma olhada pelo meu navegador” (DER no brModelo); “Vamos manter do jeito que estava mesmo” (lacunas do DER). |
+| **Resposta recebida** | Esquema lógico com 19 tabelas e 132 colunas, tabelas de relacionamentos e cardinalidades, estratégia de especialização de PRODUTO com chave estrangeira composta, chaves e unicidades, normalização a partir do formulário de pedido e quatro propostas para as exceções à 3FN. |
+| **Fontes consultadas e verificadas** | DER do brModelo (conferido atributo por atributo após a remoção de VL_TOTAL, DT_QUITACAO, CD_STATUS da parcela e CD_UNIDADE_ESTOQUE), dicionário de dados e regras de negócio do README. As regras de conversão são conhecimento geral de modelagem relacional. |
+| **Trechos rejeitados ou corrigidos** | Duas justificativas da IA foram corrigidas: a do total da venda (a linha de CONTÉM já guarda o preço praticado, então o total é calculável) e a do formulário de pedido (as fotos não foram publicadas, então o formulário é uma reconstrução do grupo). O grupo decidiu retirar do DER os atributos derivados, manter o CEP como única exceção à 3FN e manter o DER sem recolocar a ligação VENDA–PARCELA, que o professor mandou retirar. |
+| **Justificativa da escolha final** | O modelo lógico segue o DER sem acrescentar chaves; as lacunas do DER ficam declaradas com a consequência de cada uma. Valores calculáveis viram visões no script, para não existir duas fontes do mesmo dado. |
+| **Reflexão crítica** | O formulário de pedido e a lista de exceções são propostas do grupo, não práticas confirmadas pela ótica. A IA não consegue ver o formulário real. |
