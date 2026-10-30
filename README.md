@@ -14,7 +14,7 @@
 | João Victor Gobi Romero | 48114642 | [joaovromero](https://github.com/joaovromero) |
 | Guilherme Araujo de Oliveira | 47116862 | [GK-300](https://github.com/GK-300) |
 
-**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_OticaKadosh.png) · modelo lógico, script SQL e massa de dados (nas próximas partes).
+**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_OticaKadosh.png) · [Modelo lógico](./docs/modelo_logico.png) · [Script SQL com a massa de dados](./docs/script.sql) · [Gerador da massa](./docs/gerar_massa.py) · [Gerador do diagrama lógico](./docs/gerar_diagrama_logico.py).
 
 ---
 
@@ -39,7 +39,7 @@ Os números abaixo dimensionam a massa de dados (seção 4). A coluna **Origem**
 | Orçamentos por semana | ≈ 90 (toda venda tem orçamento, RN-23, e alguns não viram venda) | Estimativa fictícia do grupo |
 | Vendas parceladas | ≈ 35% das vendas (≈ 120 por mês) | Estimativa fictícia do grupo |
 | Pagamentos por mês | ≈ 800 (345 sinais ou pagamentos integrais + ≈ 4 parcelas por venda parcelada) | Calculado a partir das estimativas |
-| Itens em estoque | ≈ 900 armações e ≈ 250 pares de lentes, em ≈ 350 produtos cadastrados | Estimativa fictícia do grupo (acima do mínimo da RN-34) |
+| Itens em estoque | ≈ 900 armações e ≈ 90 pares de lentes, em ≈ 350 produtos cadastrados | Estimativa fictícia do grupo (armações acima do mínimo da RN-34 e lentes abaixo, com reposição pendente) |
 | Fornecedores ativos | ≈ 6 | Estimativa fictícia do grupo |
 | Compras a fornecedores | ≈ 12 por mês | Estimativa fictícia do grupo |
 | Trocas e devoluções | ≈ 15 por mês (≈ 4% das vendas) | Estimativa fictícia do grupo |
@@ -265,7 +265,7 @@ CONTÉM é o único relacionamento com atributos próprios (número da linha, qu
 | **7** Distinção entre RF e RNF (atendido). | Mantida; RF e RNF foram revisados e numerados. | — |
 | **8** Regras repetiam os relacionamentos do DER e eram genéricas. | 33 regras vigentes (RN-01 a RN-30, RN-33, RN-34 e RN-35), cada uma com origem (relato do gerente, formulário, DER ou decisão técnica); RN-31 e RN-32 retiradas; RN-22 refeita. | Regras de negócio vêm da operação da ótica, e não do desenho. |
 | **9** Dicionário era só Atributo/Descrição/Regra, sem as seções do modelo. | Dicionário HTML com relacionamentos e cardinalidades, fluxo de dados, convenções, expressão e índices por entidade, log de acesso, papéis e LGPD; refeito conforme o DER final (18 entidades). | Seguir o modelo 02-03g do professor. |
-| **10** O DER estava fora do repositório. | O DER está no repositório como `DER_OticaKadosh.png` (exportado do brModelo em 29/10/2026) e no brModelo (link acima). | Só o que está no repositório é corrigido. |
+| **10** O DER estava fora do repositório. | O DER está no repositório como `DER_OticaKadosh.png` (exportado do brModelo em 30/10/2026) e no brModelo (link acima). | Só o que está no repositório é corrigido. |
 | **11** Justificativa técnica genérica. | Será reescrita na seção 1.5, com decisões concretas e as RN que cada restrição implementa. | Justificar escolhas reais e alternativas descartadas. |
 | **12** Uso de IA sem o prompt e com pendências. | Seção 6 com os registros de uso de IA (Usos 1 a 18), que trazem prompts, respostas, trechos rejeitados e reflexão crítica. | Documentar o uso de IA por completo. |
 | **Orientação do professor em aula:** incluir as entidades de nota fiscal. | Criadas NOTA_FISCAL_SAIDA (ligada a PAGAMENTO por GERA) e NOTA_FISCAL_ENTRADA (ligada a COMPRA por POSSUI); o atributo de data de emissão da nota saiu de VENDA. | A ótica emite nota a cada pagamento, e a nota de entrada vem do fornecedor. |
@@ -926,7 +926,8 @@ Estas são as restrições que o script SQL (seção 3) cria. Os valores permiti
 | `TROCA_DEVOLUCAO.DS_PARECER_AVALIACAO`, `DT_AVALIACAO` | `CHECK`: obrigatórios quando o status é APROVADA ou RECUSADA | RN-25 | Parecer e data são exigidos na decisão. |
 | `TROCA_DEVOLUCAO.VL_COBRADO`, `VL_ABATIMENTO`, `VL_REEMBOLSADO` | `CHECK` maior ou igual a 0 | RN-33 | Só registram acertos efetivamente autorizados. |
 | `ESTOQUE.QT_MOVIMENTO` | `CHECK` maior que 0 | RN-12 | A direção diz se entra ou sai. |
-| `ESTOQUE.CD_DIRECAO`, `CD_MOTIVO`, `CD_CONDICAO` | `CHECK IN` (ENTRADA, SAIDA); (COMPRA, VENDA, REAPROVEITAMENTO, DEVOLUCAO_AVARIA, DESCARTE, SUBSTITUICAO); (DISPONIVEL, SEGREGADO) | RN-12 | Compatibilidade entre direção, motivo e condição. |
+| `ESTOQUE.CD_DIRECAO`, `CD_MOTIVO`, `CD_CONDICAO` | `CHECK IN` (ENTRADA, SAIDA); (COMPRA, VENDA, REAPROVEITAMENTO, DEVOLUCAO_AVARIA, DESCARTE, SUBSTITUICAO); (DISPONIVEL, SEGREGADO) | RN-12 | Valores permitidos de cada código. |
+| `ESTOQUE` | `CHECK`: cada motivo fixa a direção e a condição (COMPRA e REAPROVEITAMENTO entram como DISPONIVEL; VENDA e SUBSTITUICAO saem como DISPONIVEL; DEVOLUCAO_AVARIA entra como SEGREGADO; DESCARTE sai de SEGREGADO) | RN-12 | Direção, motivo e condição compatíveis: o descarte de peça devolvida sai do saldo segregado, e nunca do disponível. |
 | `ESTOQUE` | `CHECK`: `ID_COMPRA` preenchido se e só se o motivo é COMPRA | RN-30 | Só a entrada por compra aponta para a compra. |
 
 ### Regras que o banco não declara sozinho
@@ -936,7 +937,7 @@ O MySQL não aceita, em `CHECK`, funções como `CURDATE()` nem consultas a outr
 | Consulta | Regra conferida | Pergunta que responde |
 | --- | --- | --- |
 | A01 | RN-22 | Existe pagamento sem nota fiscal de saída? |
-| A02 | RN-35 | Existe compra sem nota fiscal de entrada? |
+| A02 | RN-35 | Existe compra, exceto as canceladas, sem nota fiscal de entrada? |
 | A03 | RN-11 | Existe venda com pagamentos acima do total das linhas? |
 | A04 | RN-18 | Existe encomenda liberada sem sinal de pelo menos 30% do total? |
 | A05 | RN-16 | Existe venda de lente de grau em atendimento sem receita? |
@@ -987,10 +988,10 @@ Cada KPI tem fórmula, período e meta. A coluna **Origem da meta** diz de onde 
 | K6 | Giro de estoque | Saídas por venda no período ÷ saldo médio disponível, por tipo de produto | Ano | 3 a 5 voltas por ano, no caso de armações | Referência |
 | K7 | Prazo médio de entrega | Média de `DT_CHEGADA` menos `DT_PEDIDO`, por fornecedor | Trimestre | Acompanhar por fornecedor | Sem meta numérica |
 | K8 | Garantias a vencer | Produtos cuja garantia vence nos próximos 30 dias | Semana | Acompanhar | Regra da ótica (RN-07) |
-| K9 | Taxa de trocas e devoluções | Ocorrências ÷ vendas do mês | Mês | Abaixo de 10% | Referência (taxa de refazer pedidos) |
+| K9 | Taxa de trocas e devoluções | Ocorrências (contadas no mês da venda de origem) ÷ vendas do mês | Mês | Abaixo de 10% | Referência (taxa de refazer pedidos) |
 | K10 | Conversão de atendimentos | Vendas ÷ atendimentos | Semana | Cerca de 80% | Informado (≈ 80 vendas para ≈ 100 atendimentos por semana) |
 | K11 | Aprovação de orçamentos | Orçamentos aprovados ÷ orçamentos emitidos | Mês | Acompanhar a tendência | Sem meta numérica |
-| K12 | Conversão por consultor | Vendas ÷ atendimentos conduzidos, por funcionário | Mês | Acompanhar | Sem meta numérica |
+| K12 | Conversão por consultor | Vendas ÷ atendimentos comerciais conduzidos, por funcionário | Mês | Acompanhar | Sem meta numérica |
 | K13 | Conformidade de receita | Vendas de lente de grau com receita ÷ vendas de lente de grau | Mês | 100% | Regra da ótica (RN-16) |
 | K14 | Venda completa | Vendas com armação e lente ÷ vendas | Mês | Cerca de 75% | Referência (proporção de pares completos) |
 
@@ -1066,6 +1067,171 @@ As metas de referência (K6, K9 e K14) são de mercado externo e devem ser confi
 
 ---
 
+## 2. Modelo Lógico Relacional
+
+O diagrama está em [`docs/modelo_logico.png`](docs/modelo_logico.png), com uma versão vetorial em [`docs/modelo_logico.svg`](docs/modelo_logico.svg) que pode ser ampliada sem perder qualidade.
+
+![Modelo lógico relacional da Ótica Kadosh, com 19 tabelas, colunas e tipos, chaves primárias (PK), chaves estrangeiras (FK) e cardinalidades (mín, máx) em cada ponta de ligação](./docs/modelo_logico.png)
+
+**Descrição em texto.** O diagrama tem 19 tabelas em quatro grupos: atendimento (`CLIENTE`, `FUNCIONARIO`, `ATENDIMENTO`, `RECEITA`, `RECEITA_MEDIDA`, `ORCAMENTO`, `VENDA`), itens e produtos (`CONTEM`, `PRODUTO`, `LENTE`, `ARMACAO`), pagamentos (`PAGAMENTO`, `PARCELA`, `NOTA_FISCAL_SAIDA`, `TROCA_DEVOLUCAO`) e compras e estoque (`FORNECEDOR`, `COMPRA`, `NOTA_FISCAL_ENTRADA`, `ESTOQUE`). As 19 ligações são as chaves estrangeiras da seção 1.3, uma a uma.
+
+**Software.** O diagrama foi gerado com o **Graphviz** (comando `dot`) pelo programa [`docs/gerar_diagrama_logico.py`](docs/gerar_diagrama_logico.py), que lê o próprio `docs/script.sql`. Cada tabela, tipo, chave primária e chave estrangeira do desenho vem do script, então desenho e banco não se separam. O programa para com erro se o script deixar de ter 19 tabelas e 19 chaves estrangeiras. As cardinalidades (mín, máx) não existem no script; elas vêm do DER e estão copiadas, ligação por ligação, da tabela “Relacionamentos → chaves” da seção 1.2.
+
+### Notação
+
+O desenho segue a notação do modelo lógico do brModelo pedida no esqueleto:
+
+| Elemento | Como aparece |
+| --- | --- |
+| Tabela | Retângulo com o nome no topo e uma linha por coluna. |
+| Coluna | Nome à esquerda e tipo de dado à direita. |
+| Chave primária | Marca `PK` ao lado do tipo (fundo amarelo). Na chave composta, todas as colunas levam `PK`: `RECEITA_MEDIDA` (`ID_RECEITA`, `CD_OLHO`, `CD_DISTANCIA`) e `CONTEM` (`ID_VENDA`, `NR_LINHA`). |
+| Chave estrangeira | Marca `FK` ao lado do tipo (fundo azul). |
+| Coluna que é PK e FK | Marcas `PK, FK`: `RECEITA_MEDIDA.ID_RECEITA`, `CONTEM.ID_VENDA`, `LENTE.ID_PRODUTO` e `ARMACAO.ID_PRODUTO`. |
+| Ligação | Linha entre a tabela da FK e a tabela referenciada, com a cardinalidade (mín, máx) em cada ponta. |
+
+Duas coisas a mais que o brModelo: o nome do relacionamento, em itálico no meio de cada linha, e o fundo colorido das chaves, só para facilitar a leitura. A posição das tabelas na folha não significa nada.
+
+**Como ler as cardinalidades.** O par junto de uma tabela é a participação dessa tabela no relacionamento, igual ao DER. Em `SOLICITA`, `CLIENTE (0,n)` e `ATENDIMENTO (1,1)` querem dizer que um cliente pode ter de zero a muitos atendimentos, e que cada atendimento tem exatamente um cliente. O N:N entre venda e produto aparece como a tabela `CONTEM`, com uma ligação para cada lado.
+
+**Casos especiais do desenho**
+
+- **Especialização.** `LENTE` e `ARMACAO` têm uma ligação só para `PRODUTO`, que é a chave estrangeira composta (`ID_PRODUTO`, `CD_TIPO`); `CD_TIPO` leva a marca `FK`.
+- **Chaves estrangeiras opcionais.** `PAGAMENTO.ID_PARCELA_QUITADA`, `COMPRA.ID_VENDA` e `ESTOQUE.ID_COMPRA` aceitam nulo, e por isso a ponta da tabela filha mostra `(0,1)`.
+- **Uma nota por pagamento e uma por compra.** As ligações `GERA` e `POSSUI` (da nota de entrada) são `(1,1)` nas duas pontas, como no DER. O banco impõe a unicidade (`UNIQUE`), mas não impõe que todo pagamento e toda compra tenham nota; essa parte é conferida pelas consultas A01 e A02 (seção 3).
+
+### O que não aparece no diagrama
+
+Obrigatoriedade (`NOT NULL`), unicidade (`UNIQUE`), valores permitidos (`CHECK`) e valores padrão (`DEFAULT`) não são desenhados, como pede o esqueleto. Eles estão no dicionário de dados ([`Dicionario_de_Dados_Otica_Kadosh.html`](./Dicionario_de_Dados_Otica_Kadosh.html)) e no script (seção 3). As três visões (`vw_venda_total`, `vw_parcela_situacao` e `vw_produto_unidade`) também ficam de fora, porque não são tabelas.
+
+### Como o diagrama foi feito, e o que foi testado antes
+
+1. **Conversor automático do brModelo.** Em 30/10/2026 o grupo converteu o DER pelo próprio brModelo. O resultado não serve: na maioria das ligações 1:N e 1:1 a chave estrangeira foi para a tabela do lado oposto (por exemplo `CLIENTE.idATENDIMENTO` e `ATENDIMENTO.idRECEITA`), o que cria referências circulares; `ESTOQUE`, `ORCAMENTO` e `TROCA_DEVOLUCAO` ficaram sem chave estrangeira; a chave composta das especializações não foi gerada; e todas as colunas saíram como `INT`. Por isso o conversor não foi usado.
+2. **MySQL Workbench 8.0.47.** O `docs/script.sql` foi importado pela engenharia reversa do Workbench, que terminou com sucesso e leu as 19 tabelas e as 3 visões. Foi uma conferência de que o script é válido. O diagrama que o Workbench desenha sozinho não foi adotado: as ligações cruzam as tabelas, e a notação dele mostra só o pé de galinha, sem o (mín, máx) pedido.
+3. **Graphviz.** Gerou o diagrama final, a partir do script e das cardinalidades do DER.
+
+**Como refazer.** Com o Graphviz instalado: `python3 docs/gerar_diagrama_logico.py docs/script.sql docs/modelo_logico`. O comando gera o `.dot`, o `.png` e o `.svg`. Se uma cardinalidade do DER mudar, basta ajustar a linha correspondente da tabela `REL` no início do programa.
+
+---
+
+## 3. Script SQL Completo
+
+O script está em [`docs/script.sql`](docs/script.sql) e roda em **MySQL 8.0**. Ele recria o banco `otica_kadosh` do zero (`DROP DATABASE IF EXISTS`), cria as 19 tabelas com as restrições da seção 1.5, carrega a massa de dados (seção 4) e traz as consultas pedidas, na ordem do esqueleto. O programa que gera os `INSERT` está em [`docs/gerar_massa.py`](docs/gerar_massa.py).
+
+**Como executar.** `mysql -u root -p < docs/script.sql`, ou abrir o arquivo no MySQL Workbench e executar tudo. As consultas gerenciais usam a data de referência `@hoje = '2026-10-30'` (a da carga), para o resultado ser sempre o mesmo; em produção, troca-se por `CURDATE()`.
+
+**Teste do zero.** O script foi executado em banco vazio, duas vezes seguidas, no MySQL 8.0.46: nenhum erro, nenhum aviso e saídas idênticas. Também foi executado com o modo seguro de `UPDATE` e `DELETE` ligado, que é o padrão do MySQL Workbench.
+
+| Parte do script | O que contém |
+| --- | --- |
+| 1. `CREATE DATABASE` | Banco `otica_kadosh`, `utf8mb4`. |
+| 2. `CREATE TABLE` | As 19 tabelas, com colunas, tipos, `PRIMARY KEY`, `NOT NULL`, `DEFAULT` e `AUTO_INCREMENT`. |
+| 3. Constraints | 8 `UNIQUE`, 19 `FOREIGN KEY` (todas `RESTRICT`) e 40 `CHECK`, cada uma com a regra `RN-xx` em comentário; 5 índices de apoio; as 3 visões `vw_venda_total`, `vw_parcela_situacao` e `vw_produto_unidade` (seção 1.4). |
+| 4. `INSERT INTO` | Massa fictícia de ≈ 12,5 mil linhas (explicada abaixo). |
+| 5. `SELECT` com `JOIN` | J01 a J06: histórico de clientes, linhas de venda com o subtipo do produto, vendas retiradas, receita e medidas, pagamentos com nota e parcela, compras com fornecedor e nota. |
+| 6. `UPDATE` | U01 a U03: registrar a retirada (exige o canhoto, RN-21), corrigir telefone, reprogramar a previsão de uma encomenda. |
+| 7. `DELETE` | D01 e D02: só se apaga o que não tem histórico (cliente sem atendimento; produto de teste, com a ordem imposta pela FK). D03, em comentário, mostra o bloqueio `RESTRICT`. |
+| 8. Consultas gerenciais | G01 a G14, abaixo. |
+| 9. Consultas de auditoria | A01 a A12, abaixo. |
+
+### Consultas gerenciais
+
+Cada uma tem no script o cabeçalho `-- G## — pergunta` e `-- Atende: ...`. A coluna **Resultado** mostra o que a consulta devolve com a massa de dados.
+
+| Código | Pergunta | Atende | Resultado com a massa |
+| --- | --- | --- | --- |
+| G01 | Quanto foi recebido por mês e por forma de pagamento? | P1, K1 | R$ 184,3 mil em setembro e R$ 186,5 mil em outubro. |
+| G02 | Quanto falta receber das vendas não canceladas, por situação da venda? | P1, K2 | R$ 96,2 mil, em 248 vendas com saldo. |
+| G03 | Quantas parcelas venceram, quantas estão atrasadas e quanto, por semana? | P1, K3 | 27 atrasadas entre 124 vencidas (21,8%). |
+| G04 | Qual o ticket médio por mês? | P1, K4 | R$ 678,44 em setembro e R$ 689,12 em outubro. |
+| G05 | Quais tipos de produto estão abaixo do estoque mínimo? | P2, K5 | Lentes: 86 pares, abaixo dos 100 (`REPOR`). Armações: 876, acima dos 500 (`OK`). |
+| G06 | Qual o giro de estoque do período, por tipo? | P2, K6 | Armações: 4,5 voltas por ano (referência de 3 a 5). Lentes: 24,1. |
+| G07 | Qual o prazo médio de entrega de cada fornecedor? | P2, K7 | De 3,5 a 11,3 dias, conforme o fornecedor. |
+| G08 | Quais garantias vencem nos próximos 30 dias? | P3, K8 | 24 linhas de vendas antigas (armação: 1 ano; lente: 6 meses, desde a montagem). |
+| G09 | Qual a taxa de trocas e devoluções sobre as vendas de cada mês? | P3, K9 | 6,1% das vendas de setembro e 2,8% das de outubro. |
+| G10 | Quantos atendimentos viram venda em cada semana? | P4, K10 | De 67,3% a 88,8% por semana; 79,8% no período (referência de 80%). |
+| G11 | Qual a taxa de aprovação dos orçamentos por mês? | P4, K11 | 87,1% em setembro e 83,7% em outubro. |
+| G12 | Qual a conversão de cada funcionário nos atendimentos comerciais? | P4, K12 | De 81,4% a 94,3%. |
+| G13 | Que proporção das vendas de lente de grau tem receita? | P5, K13 | 100% em setembro e 99,2% em outubro (2 vendas sem receita). |
+| G14 | Que proporção das vendas tem armação e lente? | K14 | 78,6% em setembro e 79,9% em outubro (referência de 75%). |
+
+### Consultas de auditoria
+
+Cada uma lista as linhas que violam uma regra que o banco não declara sozinho (seção 1.5), com o cabeçalho `-- A## — pergunta` e `-- Verifica: RN-xx`. A massa traz de propósito **21 violações**, para cada auditoria ter o que encontrar; uma consulta que volta vazia mostra que a regra está sendo respeitada.
+
+| Código | Regra | O que a massa tem de propósito |
+| --- | --- | --- |
+| A01 | RN-22 | 2 pagamentos sem nota fiscal de saída. |
+| A02 | RN-35 | 1 compra recebida sem nota fiscal de entrada. |
+| A03 | RN-11 | 2 vendas com pagamento acima do total (um segundo recebimento indevido). |
+| A04 | RN-18 | 2 encomendas liberadas com sinal de cerca de 15%, abaixo dos 30%. |
+| A05 | RN-16 | 2 vendas de lente de grau em atendimento sem receita. |
+| A06 | RN-14 | 1 produto cadastrado sem linha em `LENTE` ou `ARMACAO`. |
+| A07 | RN-12 | 1 saída de 40 unidades de uma armação com saldo muito menor (erro de digitação). |
+| A08 | RN-10 | 2 receitas sem nenhuma medida. |
+| A09 | RN-04 | 1 venda lançada sem nenhuma linha de produto. |
+| A10 | RN-28 | 2 quitações com valor diferente do da parcela (R$ 15,00 a mais e R$ 12,00 a menos). |
+| A11 | RN-23 | 3 vendas: 2 sem orçamento aprovado e 1 com aprovação registrada depois da validade. |
+| A12 | RN-03 | 2 vendas com receita trazida pelo cliente com mais de um ano. |
+
+---
+
+## 4. Massa de Dados
+
+A massa está dentro do `docs/script.sql` (parte 4), em `INSERT` com várias linhas por comando. **Todos os dados são fictícios**: os nomes são combinações sorteadas de nomes e sobrenomes comuns, os e-mails usam o domínio reservado `example.com`, e CPF e CNPJ são números gerados por algoritmo com dígitos verificadores válidos, sem relação com pessoas ou empresas reais (podem coincidir por acaso com números existentes). Nenhum dado de cliente, funcionário ou fornecedor da ótica foi usado.
+
+A massa é gerada por um programa Python com semente fixa ([`docs/gerar_massa.py`](docs/gerar_massa.py)): rodá-lo de novo produz exatamente os mesmos dados. O uso de IA para isso está registrado no Uso 21 (seção 6).
+
+### Como o volume da seção 1.1 define cada tabela
+
+O período é de **01/09/2026 a 30/10/2026**: 8,6 semanas e 51 dias de funcionamento (segunda a sábado). Foi escolhido para reproduzir os números do gerente (cerca de 100 atendimentos e 80 vendas por semana) com tempo suficiente para haver parcelas pagas e atrasadas. Soma-se uma **amostra de vendas antigas** (18 de maio/2026 e 10 de novembro/2025, sem movimento de estoque), só para os testes de garantia e de períodos diferentes.
+
+| Tabela | Linhas | Como o volume da seção 1.1 justifica |
+| --- | --- | --- |
+| `FUNCIONARIO` | 4 | Os 3 informados pelo gerente, mais 1 ex-consultor inativo (`IN_ATIVO = FALSE`), que só tem atendimentos até 12/09. |
+| `CLIENTE` | 900 (899 depois da D01) | São ≈ 5.200 atendimentos por ano para ≈ 1.800 clientes ativos, ou seja, ≈ 2,9 por cliente. Em 8,6 semanas, 857 atendimentos alcançam 710 clientes diferentes. Os demais cadastros ficam sem atendimento (186 clientes nunca atendidos), o caso de cliente sem compra. |
+| `ATENDIMENTO` | 885 | 857 no período (100 por semana × 8,6) e 28 da amostra antiga. No período: 784 comerciais, 43 avaliações e 30 manutenções. |
+| `ORCAMENTO` | 862 | 831 no período (≈ 97 por semana; a estimativa era ≈ 90). Toda venda tem orçamento aprovado (738 aprovados no total); há 98 recusados, 22 emitidos sem decisão e 4 cancelados. |
+| `VENDA` | 740 | 712 no período, das quais 28 canceladas (≈ 4%). As 684 efetivas dão 79,5 por semana, perto das 80 informadas. Mais 28 da amostra antiga. |
+| `CONTEM` | 1.402 | Média de 1,9 linhas por venda: cerca de 79% das vendas levam armação e lente (G14), e as demais só armação (óculos de sol) ou só lente. |
+| `PRODUTO`, `LENTE`, `ARMACAO` | 351, 120 e 230 | ≈ 350 produtos cadastrados na seção 1.1 (230 armações e 120 lentes), mais 1 produto sem subtipo (caso da A06). 16 lentes são sem grau. |
+| `RECEITA`, `RECEITA_MEDIDA` | 625 e 1.569 | Uma receita para cada venda de lente de grau, mais laudos de avaliação e de orçamentos sem venda. Média de 2,5 medidas por receita (de 1 a 4, RN-10). |
+| `PAGAMENTO` | 846 | 705 sinais e pagamentos integrais (≈ 345 por mês, como na seção 1.1), 42 parciais e 99 quitações de parcela. Os 374 pagamentos de setembro e os 444 de outubro ficam abaixo dos ≈ 800 por mês da seção 1.1 porque a carga começa em setembro e não inclui as parcelas das vendas de agosto. |
+| `PARCELA` | 850 | 232 vendas parceladas (34% das efetivas; a estimativa era 35%), com 2 a 6 parcelas cada. Situação em 30/10: 99 pagas, 27 atrasadas e 724 abertas, com vencimento até abril de 2027. |
+| `NOTA_FISCAL_SAIDA` | 844 | Uma por pagamento (RN-22), exceto 2 pagamentos sem nota, de propósito (A01). |
+| `TROCA_DEVOLUCAO` | 31 | 4,5% das vendas efetivas (≈ 15 por mês, como na seção 1.1): 22 trocas e 9 devoluções. |
+| `FORNECEDOR` | 6 | Os ≈ 6 fornecedores ativos da seção 1.1. |
+| `COMPRA` | 30 | 24 no período (12 por mês) e 6 reposições de agosto que formam o estoque inicial. São 26 recebidas, 3 solicitadas e 1 cancelada; 3 atendem uma venda de origem. |
+| `NOTA_FISCAL_ENTRADA` | 28 | Uma por compra, exceto a cancelada e uma compra recebida sem nota, de propósito (A02). |
+| `ESTOQUE` | 2.235 | Entradas por compra, uma saída por linha de venda efetiva e os movimentos de trocas e devoluções. O saldo disponível fecha em 876 armações (≈ 900 na seção 1.1) e 86 pares de lentes, abaixo do mínimo da RN-34; 19 itens estão segregados. |
+
+### Situações cobertas
+
+A massa cobre não só o caso comum, mas as situações que as consultas precisam mostrar:
+
+| Situação | O que a massa tem |
+| --- | --- |
+| Vendas canceladas | 28 vendas `CANCELADO`, com a solicitação dentro de 24 horas (RN-24), e 4 orçamentos cancelados. |
+| Clientes sem compras | 186 sem nenhum atendimento e 104 atendidos que nunca compraram. |
+| Produto abaixo do mínimo | Lentes com 86 pares (mínimo de 100) e 34 produtos de lente sem saldo (G05). |
+| Formas e finalidades de pagamento | PIX 281, crédito 276, débito 171 e dinheiro 118; sinal 282, integral 423, parcial 42 e quitação de parcela 99. |
+| Períodos diferentes | Setembro e outubro de 2026, mais maio de 2026 e novembro de 2025. |
+| Parcelas em todas as situações | 99 pagas, 27 atrasadas e 724 abertas. |
+| Todas as etapas da venda | `RETIRADO` 629, `PRONTO` 23, `EM_MONTAGEM` 20, `AGUARDANDO_PRODUTO` 33, `ABERTO` 7 e `CANCELADO` 28. |
+| Trocas e devoluções em todas as etapas | `ABERTA` 7, `EM_AVALIACAO` 8, `APROVADA` 4, `RECUSADA` 3 e `CONCLUIDA` 9. |
+| Compras | 26 recebidas, 3 solicitadas, 1 cancelada e 3 ligadas a uma venda. |
+| Orçamentos | 738 aprovados, 98 recusados, 22 emitidos sem decisão e 4 cancelados. |
+| Violações de regra | 21, para as auditorias A01 a A12 (tabela da seção 3). |
+
+### Limites da massa
+
+- **Pagamentos por mês.** Em regime, a ótica recebe ≈ 800 pagamentos por mês, porque as parcelas de vendas de meses anteriores se somam. A massa começa do zero em setembro, então os pagamentos de parcela ainda não chegaram a esse nível (seção 1.1).
+- **Amostra antiga.** As 28 vendas de 2025 e de maio de 2026 não têm movimento de estoque; servem para garantia e períodos, não para o saldo.
+- **Valores inventados.** Preços, prazos de entrega e custos de compra das notas de entrada são fictícios; foram definidos para ficar plausíveis, e não conferidos com a ótica.
+- **Estoque de lentes abaixo do mínimo.** É proposital, para a G05 mostrar o caso de reposição. A seção 1.1 indica o número aproximado.
+
+---
+
 ## Andamento da Entrega 2
 
 | Seção | Situação |
@@ -1076,9 +1242,9 @@ As metas de referência (K6, K9 e K14) são de mercado externo e devem ser confi
 | 1.4 Normalização (1FN, 2FN e 3FN) | Pronta (acima) |
 | 1.5 Justificativas técnicas | Pronta (acima) |
 | 1.6 Arquitetura analítica para BI e IA (com rastreabilidade) | Pronta (acima) |
-| 2. Modelo lógico relacional (diagrama) | A entregar na parte 4 |
-| 3. Script SQL completo (`docs/script.sql`) | A entregar na parte 5 |
-| 4. Massa de dados | A entregar na parte 5 |
+| 2. Modelo lógico relacional (diagrama) | Pronta (acima); as imagens e o gerador entram no repositório em `docs/` |
+| 3. Script SQL completo (`docs/script.sql`) | Pronta (abaixo); o arquivo entra no repositório junto com este texto |
+| 4. Massa de dados | Pronta (abaixo) |
 | 5. Repositório | Em andamento (histórico de commits, dicionário, levantamento e DER já no repositório) |
 | 6. Uso de inteligência artificial | Em andamento (abaixo; atualizado a cada parte) |
 | 7. Apresentação corporativa final | A entregar na parte 6 |
@@ -1087,7 +1253,7 @@ As metas de referência (K6, K9 e K14) são de mercado externo e devem ser confi
 
 ## 6. Uso de Inteligência Artificial
 
-O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As decisões de modelagem e o levantamento de campo são do grupo. Os Usos 1 a 15 documentam a Entrega 1; os Usos 16 a 18 documentam a revisão e a Entrega 2.
+O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As decisões de modelagem e o levantamento de campo são do grupo. Os Usos 1 a 15 documentam a Entrega 1; os Usos 16 a 22 documentam a revisão e a Entrega 2.
 
 ### Uso 1 — análise do material inicial
 
@@ -1363,3 +1529,29 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | **Trechos rejeitados ou corrigidos** | Indicadores de margem, custo de aquisição e satisfação foram descartados porque o modelo não tem os dados. A IA percebeu que três cardinalidades da imagem nova do DER estavam diferentes do texto; o grupo confirmou que era um engano e corrigiu a imagem. |
 | **Justificativa da escolha final** | Cada KPI só entrou se existe uma consulta que o calcule e se as tabelas do modelo têm os dados; a origem de cada meta (informada, regra da ótica ou referência de mercado) está indicada. |
 | **Reflexão crítica** | As referências de mercado são de outro país e de outro porte de loja. A IA não conhece as metas reais da ótica, que só o gerente pode confirmar. |
+
+### Uso 21 — seções 3 e 4 da Entrega 2: script SQL, consultas e massa de dados (30/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): escrita do `docs/script.sql` (tabelas, restrições, visões, consultas de JOIN, UPDATE, DELETE, G01 a G14 e A01 a A12) e do programa `docs/gerar_massa.py`, que gera a massa de dados fictícia. O teste foi feito em um MySQL 8.0.46 instalado no ambiente da IA. |
+| **Motivação** | A massa precisa de ≈ 12 mil linhas coerentes entre 19 tabelas, com volumes da seção 1.1 e casos de teste variados; escrever isso à mão seria inviável e propenso a erros de chave. |
+| **Prompt(s) utilizados** | “Vamos deixar isso para lá, não vai ser bom mudar as coisas agora. Vamos prosseguir onde estávamos” (a IA seguiu o plano combinado: seções 3 e 4 do esqueleto, com G01 a G14 e A01 a A12 aprovados pelo grupo). |
+| **Resposta recebida** | O script completo (≈ 13,5 mil linhas), o gerador em Python com semente fixa e o texto das seções 3 e 4. Para cada violação proposital da massa, a consulta de auditoria correspondente. |
+| **Fontes consultadas e verificadas** | Nenhuma fonte externa. A verificação foi por execução: o script rodou do zero em MySQL 8.0.46 sem erros nem avisos, e um verificador conferiu que as 12 auditorias devolvem exatamente as 21 violações propostas. |
+| **Trechos rejeitados ou corrigidos** | A primeira massa tinha defeitos que a conferência encontrou: a A12 achava 1 dos 2 casos, a amostra antiga ficou toda no mesmo cliente, a A04 apontava 2 encomendas “naturais” por arredondamento do sinal para baixo, 27,5% de vendas parceladas (a seção 1.1 diz ≈ 35%) e conversão de 77% (a referência é 80%). O gerador foi ajustado e a massa recalculada. Ao escrever o script, a IA também ajustou textos já aprovados: o estoque de lentes da seção 1.1 (de ≈ 250 para ≈ 90 pares, para a G05 mostrar um caso de reposição), a regra de compatibilidade do `ESTOQUE`, a A02 (ignora compras canceladas) e as fórmulas de K9 e K12. |
+| **Justificativa da escolha final** | A massa é gerada por programa e reproduzível. As violações são propositais, para as auditorias demonstrarem o que encontram. Cada valor de volume da massa tem uma origem na seção 1.1. |
+| **Reflexão crítica** | A IA só conhece a ótica pelo que está no README; preços, prazos, custos de compra e a distribuição de clientes são inventados e podem parecer regulares demais. O teste foi feito no ambiente da IA, e o grupo deve repetir a execução do zero no MySQL do laboratório antes da entrega. Os pagamentos por mês ficam abaixo dos ≈ 800 da seção 1.1 porque a carga começa em setembro, sem as parcelas de meses anteriores. |
+
+### Uso 22 — seção 2 da Entrega 2: modelo lógico relacional (30/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5), com controle do navegador e da tela do computador do integrante: teste do conversor do brModelo, importação do script no MySQL Workbench e geração do diagrama com o Graphviz pelo programa `docs/gerar_diagrama_logico.py`. |
+| **Motivação** | O esqueleto pede o modelo lógico em diagrama, com tabelas, tipos, PK, FK e cardinalidades (mín, máx) em cada ponta. Um integrante propôs usar o conversor do próprio brModelo. |
+| **Prompt(s) utilizados** | “Pelo brmodelo tem a opção de transformar em modelo logico pelo software mesmo, quer dar uma olhada lá?”; “Vamos pelo 1 então, me de o caminho de qual ferramenta baixar e logar, apos isso vc assume e faz o modelo logico por lá”. |
+| **Resposta recebida** | Três tentativas, nesta ordem: a conversão do brModelo, a importação do script no Workbench (primeiro a versão 26, que não tem modelagem, depois a 8.0.47) e o diagrama final em Graphviz, lido do script. |
+| **Fontes consultadas e verificadas** | A página de versões antigas do MySQL Workbench (dev.mysql.com), para achar a 8.0.47. A verificação foi por conferência: o programa falha se o script não tiver 19 tabelas e 19 chaves estrangeiras, e a importação no Workbench leu as 19 tabelas e as 3 visões. |
+| **Trechos rejeitados ou corrigidos** | O resultado do conversor do brModelo foi rejeitado: chaves estrangeiras no lado errado, três tabelas sem chave estrangeira, sem a chave composta e tudo como `INT`. O desenho automático do Workbench também foi rejeitado, por ligações que cruzam as tabelas e por não mostrar o (mín, máx). No Graphviz, a IA ajustou a posição de alguns rótulos de cardinalidade que se sobrepunham. |
+| **Justificativa da escolha final** | O diagrama é gerado do próprio script, então não diverge do banco, e mostra a cardinalidade nas duas pontas, como o esqueleto exige. |
+| **Reflexão crítica** | As cardinalidades (mín, máx) não estão no script: foram copiadas do DER para o programa e precisam ser atualizadas à mão se o DER mudar. O Graphviz não é uma ferramenta de modelagem de dados; se o professor exigir uma, o diagrama deve ser refeito no brModelo ou no Workbench. |
