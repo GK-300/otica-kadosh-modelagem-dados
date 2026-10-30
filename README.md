@@ -14,7 +14,7 @@
 | João Victor Gobi Romero | 48114642 | [joaovromero](https://github.com/joaovromero) |
 | Guilherme Araujo de Oliveira | 47116862 | [GK-300](https://github.com/GK-300) |
 
-**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_Otica_Kadosh.png) · modelo lógico, script SQL e massa de dados (nas próximas partes).
+**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_OticaKadosh.png) · modelo lógico, script SQL e massa de dados (nas próximas partes).
 
 ---
 
@@ -228,7 +228,7 @@ O DER foi criado no **brModelo Web** ([modelo "Ótica"](https://app.brmodeloweb.
 
 **18 entidades:** CLIENTE, FUNCIONARIO, ATENDIMENTO, RECEITA, RECEITA_MEDIDA, ORCAMENTO, VENDA, PAGAMENTO, PARCELA, NOTA_FISCAL_SAIDA, FORNECEDOR, COMPRA, NOTA_FISCAL_ENTRADA, PRODUTO, LENTE, ARMACAO, TROCA_DEVOLUCAO e ESTOQUE.
 
-![DER conceitual revisado da Ótica Kadosh](./DER_Otica_Kadosh.png)
+![DER conceitual revisado da Ótica Kadosh](./DER_OticaKadosh.png)
 
 | Entidade A | Relacionamento | Entidade B | Em A | Em B |
 | --- | --- | --- | --- | --- |
@@ -265,7 +265,7 @@ CONTÉM é o único relacionamento com atributos próprios (número da linha, qu
 | **7** Distinção entre RF e RNF (atendido). | Mantida; RF e RNF foram revisados e numerados. | — |
 | **8** Regras repetiam os relacionamentos do DER e eram genéricas. | 33 regras vigentes (RN-01 a RN-30, RN-33, RN-34 e RN-35), cada uma com origem (relato do gerente, formulário, DER ou decisão técnica); RN-31 e RN-32 retiradas; RN-22 refeita. | Regras de negócio vêm da operação da ótica, e não do desenho. |
 | **9** Dicionário era só Atributo/Descrição/Regra, sem as seções do modelo. | Dicionário HTML com relacionamentos e cardinalidades, fluxo de dados, convenções, expressão e índices por entidade, log de acesso, papéis e LGPD; refeito conforme o DER final (18 entidades). | Seguir o modelo 02-03g do professor. |
-| **10** O DER estava fora do repositório. | O DER está no repositório como `DER_Otica_Kadosh.png` (exportado do brModelo em 29/10/2026) e no brModelo (link acima). | Só o que está no repositório é corrigido. |
+| **10** O DER estava fora do repositório. | O DER está no repositório como `DER_OticaKadosh.png` (exportado do brModelo em 29/10/2026) e no brModelo (link acima). | Só o que está no repositório é corrigido. |
 | **11** Justificativa técnica genérica. | Será reescrita na seção 1.5, com decisões concretas e as RN que cada restrição implementa. | Justificar escolhas reais e alternativas descartadas. |
 | **12** Uso de IA sem o prompt e com pendências. | Seção 6 com os registros de uso de IA (Usos 1 a 18), que trazem prompts, respostas, trechos rejeitados e reflexão crítica. | Documentar o uso de IA por completo. |
 | **Orientação do professor em aula:** incluir as entidades de nota fiscal. | Criadas NOTA_FISCAL_SAIDA (ligada a PAGAMENTO por GERA) e NOTA_FISCAL_ENTRADA (ligada a COMPRA por POSSUI); o atributo de data de emissão da nota saiu de VENDA. | A ótica emite nota a cada pagamento, e a nota de entrada vem do fornecedor. |
@@ -844,6 +844,228 @@ Também se mantém, por decisão, o valor em `NOTA_FISCAL_SAIDA.VL_TOTAL` e `NOT
 
 ---
 
+## 1.5 Justificativas Técnicas das Decisões
+
+### Chaves primárias
+
+Todas as tabelas de entidade usam uma **chave substituta**: um inteiro gerado pelo banco (`AUTO_INCREMENT`). Nenhum dado do negócio serve de chave com segurança: o CPF é opcional, o número da nota depende do emissor e ainda não foi validado com a ótica, e a referência do produto pode se repetir entre marcas. Um inteiro curto também deixa as chaves estrangeiras e os índices pequenos.
+
+| Tabela | Chave primária | Por que essa escolha |
+| --- | --- | --- |
+| `CLIENTE`, `FUNCIONARIO`, `FORNECEDOR`, `PRODUTO` | `ID_...` (inteiro) | CPF e CNPJ são opcionais e ficam como `UNIQUE`; o produto não tem código único confirmado. |
+| `ATENDIMENTO`, `ORCAMENTO`, `VENDA`, `COMPRA`, `RECEITA` | `ID_...` (inteiro) | Registros cronológicos sem identificador natural; podem se repetir em data, cliente e funcionário. |
+| `PAGAMENTO`, `PARCELA`, `ESTOQUE`, `TROCA_DEVOLUCAO` | `ID_...` (inteiro) | Cada recebimento, parcela, movimento ou ocorrência precisa ser citado de forma única (RN-28 pede `ID_PARCELA` próprio). |
+| `NOTA_FISCAL_SAIDA`, `NOTA_FISCAL_ENTRADA` | `ID_NOTA_...` (inteiro) | `NR_NOTA` pode se repetir entre emissores e não foi validado; a ligação com pagamento ou compra é garantida por `UNIQUE` na FK (RN-22 e RN-35). |
+| `RECEITA_MEDIDA` | (`ID_RECEITA`, `CD_OLHO`, `CD_DISTANCIA`) | A medida é identificada por receita, olho e distância; a chave composta impede combinação repetida e limita a quatro linhas por receita (RN-10). |
+| `CONTEM` | (`ID_VENDA`, `NR_LINHA`) | A linha é o que se repete, não o produto: o mesmo produto pode aparecer em duas linhas com preços diferentes (RN-29). |
+| `LENTE`, `ARMACAO` | `ID_PRODUTO` | A especialização herda a chave do produto: é a mesma coisa vista com mais detalhe, e garante no máximo uma linha de subtipo por produto (RN-14). |
+
+### Chaves estrangeiras e relacionamentos
+
+Cada chave estrangeira implementa um relacionamento do DER. Todas usam `ON DELETE RESTRICT` e `ON UPDATE RESTRICT`: a ótica guarda o histórico e o grupo não quer exclusão em cascata de atendimentos, vendas ou pagamentos.
+
+| Chave estrangeira | Relacionamento que implementa | Por que está nessa tabela e com esse formato |
+| --- | --- | --- |
+| `ATENDIMENTO.ID_CLIENTE` | SOLICITA | Lado N do 1:N; `NOT NULL` porque todo atendimento tem cliente (cardinalidade (1,1)). Dá o histórico do cliente mesmo sem venda (P1). |
+| `ATENDIMENTO.ID_FUNCIONARIO` | CONDUZ | Lado N; `NOT NULL`. É o único vínculo com o funcionário: o consultor da venda vem do atendimento (RN-15). |
+| `RECEITA.ID_ATENDIMENTO` | ORIGINA | 1:1 com `UNIQUE`: uma receita por atendimento. A receita é obtida pelo atendimento da venda, sem ligação direta com a venda (RN-02). |
+| `RECEITA_MEDIDA.ID_RECEITA` | POSSUI | Parte da chave composta; a medida não existe sem a receita (RN-10). |
+| `ORCAMENTO.ID_ATENDIMENTO` | ORIGINA ORÇAMENTO | Lado N: um atendimento pode ter vários orçamentos, guardados mesmo sem venda (RN-23). |
+| `VENDA.ID_ATENDIMENTO` | RESULTA EM | 1:1 com `UNIQUE`: no máximo uma venda por atendimento (RN-01). Um atendimento sem venda continua válido. |
+| `CONTEM.ID_VENDA`, `CONTEM.ID_PRODUTO` | CONTÉM (N:N) | A tabela associativa liga a linha à venda e ao produto, e guarda quantidade e preço praticado (RN-04, RN-29). |
+| `PAGAMENTO.ID_VENDA` | RECEBE | Lado N, `NOT NULL`: todo pagamento pertence a uma venda (RN-05). |
+| `PAGAMENTO.ID_PARCELA_QUITADA` | QUITA | 1:1 opcional (`NULL UNIQUE`): a maioria dos pagamentos não quita parcela, e uma parcela é quitada por no máximo um pagamento (RN-28). |
+| `NOTA_FISCAL_SAIDA.ID_PAGAMENTO` | GERA | A FK fica na nota, que depende do pagamento; `NOT NULL UNIQUE` dá uma nota por pagamento (RN-22). |
+| `TROCA_DEVOLUCAO.ID_NOTA_SAIDA` | REFERE-SE A | Lado N: uma nota pode ter várias ocorrências; `NOT NULL` porque toda ocorrência cita a nota de origem (RN-22). |
+| `COMPRA.ID_FORNECEDOR` | FORNECE | Lado N, `NOT NULL`: toda compra tem fornecedor (RN-06). |
+| `COMPRA.ID_VENDA` | DEMANDA | Opcional (`NULL`): a compra pode repor estoque sem venda de origem (RN-06). |
+| `NOTA_FISCAL_ENTRADA.ID_COMPRA` | POSSUI | A FK fica na nota; `NOT NULL UNIQUE` dá uma nota por compra (RN-35). |
+| `ESTOQUE.ID_PRODUTO` | É MOVIMENTADO EM | Lado N, `NOT NULL`: todo movimento refere-se a um produto (RN-30). |
+| `ESTOQUE.ID_COMPRA` | GERA ENTRADA | Opcional (`NULL`): só a entrada por compra aponta para a compra; os outros motivos ficam em `CD_MOTIVO` (RN-30). |
+| `LENTE` e `ARMACAO` (`ID_PRODUTO`, `CD_TIPO`) → `PRODUTO` | ESPECIALIZA-SE EM | FK composta: garante que um produto do tipo LENTE só tenha linha em `LENTE`, e vice-versa. É o que torna a especialização disjunta (RN-14). |
+
+### Restrições de integridade
+
+Estas são as restrições que o script SQL (seção 3) cria. Os valores permitidos vêm do dicionário de dados.
+
+| Coluna | Restrição | Regra | Por que |
+| --- | --- | --- | --- |
+| `CLIENTE.NM_CLIENTE` | `NOT NULL` | - | O atendimento precisa identificar quem foi atendido. |
+| `CLIENTE.NR_CPF`, `FORNECEDOR.NR_CNPJ` | `UNIQUE`, aceitam `NULL` | - | Não duplicar cadastro; vários clientes sem CPF são permitidos porque o CPF é opcional. |
+| `CLIENTE.NR_CEP` | `CHECK` com 8 dígitos | - | Formato fixo; o endereço é opcional. |
+| `FUNCIONARIO.TP_FUNCAO` | `CHECK IN` (OPTOMETRISTA, GERENTE, CONSULTOR_OPTICO) | RN-15 | A função define quem emite laudo e quem fecha venda. |
+| `FUNCIONARIO.IN_ATIVO` | `NOT NULL DEFAULT TRUE` | - | O funcionário é inativado em vez de excluído, para preservar os atendimentos. |
+| `ATENDIMENTO.TP_ATENDIMENTO` | `CHECK IN` (COMERCIAL, AVALIACAO, MANUTENCAO) | RN-20 | A manutenção gratuita é registrada como atendimento. |
+| `RECEITA.TP_ORIGEM` | `CHECK IN` (TRAZIDA, LAUDO_OTICA) | RN-03, RN-15 | A receita trazida tem prazo de aceitação; o laudo é interno. |
+| `RECEITA_MEDIDA.CD_OLHO`, `CD_DISTANCIA` | `CHECK IN` (OD, OE) e (LONGE, PERTO) | RN-10 | Define as quatro combinações possíveis. |
+| `RECEITA_MEDIDA.VL_EIXO` | `CHECK` entre 0 e 180 | RN-10 | Intervalo do eixo do astigmatismo. |
+| `ORCAMENTO.CD_STATUS` | `CHECK IN` (EM_ELABORACAO, EMITIDO, APROVADO, RECUSADO, CANCELADO) | RN-23 | Situação do orçamento. |
+| `ORCAMENTO.DH_VALIDADE` | `CHECK` maior que `DH_EMISSAO` | RN-23 | Validade usual de 24 horas, nunca anterior à emissão. |
+| `ORCAMENTO.DH_APROVACAO` | `CHECK` obrigatória quando o status é APROVADO | RN-23 | A venda só é feita com aprovação dentro da validade. |
+| `VENDA.CD_STATUS` | `CHECK IN` (ABERTO, AGUARDANDO_PRODUTO, EM_MONTAGEM, PRONTO, RETIRADO, CANCELADO) | RN-24 | Acompanha o ciclo da encomenda. |
+| `VENDA.DT_LIBERACAO_ENCOMENDA` | `CHECK`: exige `DT_PREVISTA_CONCLUSAO` | RN-18 | A encomenda só é liberada com previsão de conclusão. |
+| `VENDA.DT_RETIRADA` | `CHECK`: exige `IN_CANHOTO_CONFERIDO` verdadeiro | RN-21 | A entrega é feita ao portador do canhoto. |
+| `CONTEM.QT_PRODUTO` | `CHECK` maior que 0 | RN-04 | Linha sem quantidade não tem sentido. |
+| `CONTEM.VL_PRECO_UNITARIO` | `NOT NULL`, `CHECK` maior ou igual a 0 | RN-04 | O preço praticado fica gravado na linha, e dele vem o total da venda. |
+| `PRODUTO.CD_TIPO` | `CHECK IN` (LENTE, ARMACAO) | RN-14 | Base da especialização. |
+| `PRODUTO` | `UNIQUE (ID_PRODUTO, CD_TIPO)` | RN-14 | Permite a FK composta das especializações. |
+| `LENTE.CD_TIPO`, `ARMACAO.CD_TIPO` | `CHECK` igual a 'LENTE' ou 'ARMACAO' | RN-14 | Impede que uma lente seja ligada a produto do tipo armação. |
+| `LENTE.IN_POSSUI_GRAU` | `NOT NULL` | RN-16 | Lente de grau exige receita; sem esse dado a regra não é verificável. |
+| `LENTE.VL_INDICE` | `CHECK` maior que 0 | RN-27 | O índice de refração é um número. |
+| `PAGAMENTO.VL_PAGAMENTO` | `CHECK` maior que 0 | RN-11 | Recebimento é sempre positivo; estornos são tratados em `TROCA_DEVOLUCAO`. |
+| `PAGAMENTO.TP_FORMA` | `CHECK IN` (PIX, DINHEIRO, DEBITO, CREDITO) | - | Formas de pagamento da ótica. |
+| `PAGAMENTO.TP_FINALIDADE` | `CHECK IN` (SINAL, INTEGRAL, PARCIAL, QUITACAO_PARCELA) | RN-05, RN-18 | O sinal precisa ser identificado para a regra dos 30%. |
+| `PAGAMENTO` | `CHECK`: finalidade QUITACAO_PARCELA se e só se `ID_PARCELA_QUITADA` não é nulo | RN-28 | Evita pagamento de quitação sem parcela, e o contrário. |
+| `PARCELA.NR_PARCELA` | `CHECK` entre 1 e 10 | RN-17 | No máximo dez parcelas. |
+| `PARCELA.VL_PARCELA` | `CHECK` maior ou igual a 50 | RN-17 | Parcela mínima de R$ 50,00. |
+| `NOTA_FISCAL_SAIDA.NR_NOTA`, `DT_EMISSAO`, `VL_TOTAL` | `NOT NULL`; `VL_TOTAL` maior ou igual a 0 | RN-22 | Dados mínimos da nota que a ótica registra. |
+| `COMPRA.CD_STATUS` | `CHECK IN` (SOLICITADA, RECEBIDA, CANCELADA) | RN-06 | Situação da compra. |
+| `COMPRA.DT_CHEGADA` | `CHECK`: não anterior a `DT_PEDIDO` | RN-06 | Datas coerentes. |
+| `TROCA_DEVOLUCAO.TP_OCORRENCIA`, `CD_STATUS` | `CHECK IN` (TROCA, DEVOLUCAO) e (ABERTA, EM_AVALIACAO, APROVADA, RECUSADA, CONCLUIDA) | RN-25 | Ciclo de avaliação. |
+| `TROCA_DEVOLUCAO.QT_AFETADA` | `CHECK` maior que 0 | RN-25 | Há pelo menos uma peça afetada. |
+| `TROCA_DEVOLUCAO.DS_PARECER_AVALIACAO`, `DT_AVALIACAO` | `CHECK`: obrigatórios quando o status é APROVADA ou RECUSADA | RN-25 | Parecer e data são exigidos na decisão. |
+| `TROCA_DEVOLUCAO.VL_COBRADO`, `VL_ABATIMENTO`, `VL_REEMBOLSADO` | `CHECK` maior ou igual a 0 | RN-33 | Só registram acertos efetivamente autorizados. |
+| `ESTOQUE.QT_MOVIMENTO` | `CHECK` maior que 0 | RN-12 | A direção diz se entra ou sai. |
+| `ESTOQUE.CD_DIRECAO`, `CD_MOTIVO`, `CD_CONDICAO` | `CHECK IN` (ENTRADA, SAIDA); (COMPRA, VENDA, REAPROVEITAMENTO, DEVOLUCAO_AVARIA, DESCARTE, SUBSTITUICAO); (DISPONIVEL, SEGREGADO) | RN-12 | Compatibilidade entre direção, motivo e condição. |
+| `ESTOQUE` | `CHECK`: `ID_COMPRA` preenchido se e só se o motivo é COMPRA | RN-30 | Só a entrada por compra aponta para a compra. |
+
+### Regras que o banco não declara sozinho
+
+O MySQL não aceita, em `CHECK`, funções como `CURDATE()` nem consultas a outras tabelas. As regras abaixo envolvem outras linhas, outras tabelas ou a data de hoje. Ficam sob a responsabilidade da gravação em transação e são conferidas por **consultas de auditoria**, que o script traz (seção 3, códigos A01 a A12).
+
+| Consulta | Regra conferida | Pergunta que responde |
+| --- | --- | --- |
+| A01 | RN-22 | Existe pagamento sem nota fiscal de saída? |
+| A02 | RN-35 | Existe compra sem nota fiscal de entrada? |
+| A03 | RN-11 | Existe venda com pagamentos acima do total das linhas? |
+| A04 | RN-18 | Existe encomenda liberada sem sinal de pelo menos 30% do total? |
+| A05 | RN-16 | Existe venda de lente de grau em atendimento sem receita? |
+| A06 | RN-14 | Existe produto sem linha em `LENTE` ou `ARMACAO`? |
+| A07 | RN-12 | Existe saída de estoque maior que o saldo da condição? |
+| A08 | RN-10 | Existe receita sem nenhuma medida? |
+| A09 | RN-04 | Existe venda sem nenhuma linha em `CONTEM`? |
+| A10 | RN-28 | Existe pagamento de quitação com valor diferente do valor da parcela? |
+| A11 | RN-23 | Existe venda sem orçamento aprovado e válido no mesmo atendimento? |
+| A12 | RN-03 | Existe venda com receita trazida emitida há mais de um ano? |
+
+### Decisões arquiteturais gerais
+
+- **MySQL 8, motor InnoDB, `utf8mb4`.** É o SGBD pedido pelo professor. O InnoDB tem chaves estrangeiras e `CHECK` (a partir do MySQL 8.0.16), e o `utf8mb4` guarda os acentos dos nomes e endereços.
+- **Um esquema só, sem tabelas de apoio além das do DER.** O modelo lógico segue o DER sem acrescentar entidades. As únicas colunas novas são chaves estrangeiras e `CD_TIPO` nas especializações.
+- **Valores calculáveis viram visões.** O total da venda, a situação da parcela e a unidade do produto não são gravados (seção 1.4). Isso evita duas fontes para o mesmo dado.
+- **Dinheiro em `DECIMAL`, nunca em ponto flutuante.** Os valores usam `DECIMAL(10,2)` (e `DECIMAL(12,2)` nas notas), sem erro de arredondamento.
+- **Data e hora só onde o horário importa.** `DATETIME` em atendimento, orçamento, compra da venda e solicitação de cancelamento (que dependem da hora, como a validade de 24 horas); `DATE` nos demais registros.
+- **Códigos como texto com `CHECK`, e não tabelas de domínio.** Os domínios são pequenos e estáveis (por exemplo, formas de pagamento); uma tabela para cada um aumentaria o número de junções sem ganho.
+- **Dados de saúde protegidos por estrutura.** A receita e as medidas ficam em tabelas próprias, separadas de cliente e venda, para permitir acesso restrito (P5). A política de acesso e o registro de acessos estão no dicionário como proposta, e **não** são implementados no script.
+- **Limitações do DER declaradas.** Parcela, orçamento, troca e estoque não se ligam à venda como a ótica gostaria (seção 1.2). O modelo respeita o DER, e as consultas gerenciais foram escolhidas para o que o modelo consegue responder.
+
+---
+
+## 1.6 Proposta de Arquitetura Analítica para BI e IA
+
+### Informações estratégicas
+
+O que a gestão da ótica pode extrair dos dados, ligado aos problemas P1 a P5:
+
+- **Dinheiro (P1):** quanto foi recebido por mês e por forma de pagamento, quanto falta receber de cada venda aberta e quantas parcelas estão atrasadas.
+- **Estoque (P2):** quais armações e lentes estão abaixo do mínimo, quais giram mais devagar e quanto tempo cada fornecedor leva para entregar.
+- **Pós-venda (P3):** quais garantias vencem em breve e qual proporção das vendas termina em troca ou devolução.
+- **Comercial (P4):** quantos atendimentos viram venda, quantos orçamentos são aprovados e quais consultores convertem mais.
+- **Conformidade (P5):** se toda venda de lente de grau tem receita, como exige a regra do gerente (RN-16).
+
+### Indicadores (KPIs)
+
+Cada KPI tem fórmula, período e meta. A coluna **Origem da meta** diz de onde vem o número: **informado** pelo gerente, **regra** da ótica ou **referência** de artigos sobre óticas (veja as fontes abaixo). As referências são de mercado, não foram confirmadas com o gerente, e as de valor em dólar não foram usadas: só entram razões e proporções.
+
+| KPI | Nome | Fórmula | Período | Meta | Origem da meta |
+| --- | --- | --- | --- | --- | --- |
+| K1 | Receita recebida | Soma de `VL_PAGAMENTO`, por forma de pagamento | Mês | Acompanhar a tendência | Sem meta numérica |
+| K2 | Saldo a receber | Total das linhas da venda menos a soma dos pagamentos, nas vendas não canceladas | Dia | Reduzir | Sem meta numérica |
+| K3 | Parcelas atrasadas | Parcelas atrasadas ÷ parcelas já vencidas | Semana | Próxima de 0% | Proposta do grupo |
+| K4 | Ticket médio | Soma dos totais das vendas ÷ número de vendas | Mês | Acompanhar a tendência | Sem meta numérica |
+| K5 | Itens abaixo do mínimo | Produtos com saldo disponível abaixo de 100 pares de lentes ou 500 armações | Dia | 0 | Regra da ótica (RN-34) |
+| K6 | Giro de estoque | Saídas por venda no período ÷ saldo médio disponível, por tipo de produto | Ano | 3 a 5 voltas por ano, no caso de armações | Referência |
+| K7 | Prazo médio de entrega | Média de `DT_CHEGADA` menos `DT_PEDIDO`, por fornecedor | Trimestre | Acompanhar por fornecedor | Sem meta numérica |
+| K8 | Garantias a vencer | Produtos cuja garantia vence nos próximos 30 dias | Semana | Acompanhar | Regra da ótica (RN-07) |
+| K9 | Taxa de trocas e devoluções | Ocorrências ÷ vendas do mês | Mês | Abaixo de 10% | Referência (taxa de refazer pedidos) |
+| K10 | Conversão de atendimentos | Vendas ÷ atendimentos | Semana | Cerca de 80% | Informado (≈ 80 vendas para ≈ 100 atendimentos por semana) |
+| K11 | Aprovação de orçamentos | Orçamentos aprovados ÷ orçamentos emitidos | Mês | Acompanhar a tendência | Sem meta numérica |
+| K12 | Conversão por consultor | Vendas ÷ atendimentos conduzidos, por funcionário | Mês | Acompanhar | Sem meta numérica |
+| K13 | Conformidade de receita | Vendas de lente de grau com receita ÷ vendas de lente de grau | Mês | 100% | Regra da ótica (RN-16) |
+| K14 | Venda completa | Vendas com armação e lente ÷ vendas | Mês | Cerca de 75% | Referência (proporção de pares completos) |
+
+### Potencial para BI
+
+O modelo foi desenhado como base transacional, mas a sua estrutura se presta a relatórios sem mudança:
+
+- **Fatos e dimensões.** Os fatos naturais são `CONTEM` (linha de venda), `PAGAMENTO`, `ESTOQUE` (movimento) e `ATENDIMENTO`. As dimensões são tempo (as datas de cada fato), cliente, produto (com o subtipo), funcionário e fornecedor.
+- **Visões prontas.** `vw_venda_total`, `vw_parcela_situacao` e `vw_produto_unidade` (seção 1.4) entregam o total da venda, a situação da parcela e a unidade, que são os valores que os indicadores mais usam.
+- **Quatro painéis.** Comercial (K4, K10, K11, K12, K14), financeiro (K1, K2, K3), estoque (K5, K6, K7) e pós-venda e conformidade (K8, K9, K13). Qualquer ferramenta que leia MySQL (Metabase, Power BI, Excel) monta esses painéis a partir das consultas do script.
+- **Volume pequeno.** Com cerca de 80 vendas por semana, as consultas rodam direto no banco transacional. Uma base separada só se justificaria se o volume crescesse muito.
+
+### Potencial para IA
+
+São propostas, não funcionalidades implementadas. Com o volume de uma ótica pequena, modelos simples são mais indicados do que modelos complexos.
+
+| Aplicação | Dados do modelo | Para que serve |
+| --- | --- | --- |
+| Previsão de demanda por produto | Saídas de `ESTOQUE` por mês e tipo de produto | Antecipar a reposição de lentes e armações (P2) |
+| Lembrete de renovação de receita | `RECEITA.DT_RECEITA`, `ATENDIMENTO`, `CLIENTE` | A ótica relatou aceitar receita de até um ano (RN-03); o cliente com receita perto de vencer pode ser contatado |
+| Recomendação de lente e armação | `RECEITA_MEDIDA`, `CONTEM`, `PRODUTO`, `LENTE`, `ARMACAO` | Sugerir o produto mais vendido para faixas parecidas de grau e índice |
+| Risco de atraso em parcelas | `PARCELA`, `PAGAMENTO` (forma e valor) | Priorizar o contato com clientes de maior risco (P1) |
+| Alerta de anomalias no estoque | `ESTOQUE` (motivo, condição, quantidade) | Detectar saída maior que o saldo ou descarte fora do padrão |
+
+**Cuidado com os dados de saúde (P5):** receitas e medidas são dados pessoais sensíveis. Qualquer uso em IA deve ser feito com dados anonimizados, sem nome, CPF ou contato, e a ótica precisa confirmar a base legal e o prazo de guarda (pendência registrada no dicionário).
+
+### Rastreabilidade: problema ou KPI → tabelas → consulta
+
+As consultas gerenciais **G01 a G14** são criadas no script SQL (seção 3), com o cabeçalho `-- G## — pergunta` e `-- Atende: ...`.
+
+| Problema ou KPI | Tabelas envolvidas | Consulta no script |
+| --- | --- | --- |
+| P1 — Atendimento, orçamento, venda e pagamento sem vínculo seguro | `ATENDIMENTO`, `ORCAMENTO`, `VENDA`, `CONTEM`, `PAGAMENTO`, `PARCELA` | G01, G02, G03 |
+| P2 — Estoque sem controle de saldo e de mínimo | `PRODUTO`, `ESTOQUE`, `COMPRA`, `FORNECEDOR` | G05, G06, G07 |
+| P3 — Garantia não controlada por produto vendido | `VENDA`, `CONTEM`, `PRODUTO`, `LENTE`, `ARMACAO`, `TROCA_DEVOLUCAO` | G08, G09 |
+| P4 — Conversão de atendimentos em vendas não medida | `ATENDIMENTO`, `ORCAMENTO`, `VENDA`, `FUNCIONARIO` | G10, G11, G12 |
+| P5 — Proteção dos dados de saúde e receita obrigatória | `RECEITA`, `RECEITA_MEDIDA`, `ATENDIMENTO`, `VENDA`, `CONTEM`, `LENTE` | G13 (e auditoria A05) |
+| K1 — Receita recebida | `PAGAMENTO` | G01 |
+| K2 — Saldo a receber | `VENDA`, `CONTEM`, `PAGAMENTO` | G02 |
+| K3 — Parcelas atrasadas | `PARCELA`, `PAGAMENTO` | G03 |
+| K4 — Ticket médio | `VENDA`, `CONTEM` | G04 |
+| K5 — Itens abaixo do mínimo | `PRODUTO`, `ESTOQUE` | G05 |
+| K6 — Giro de estoque | `ESTOQUE`, `PRODUTO` | G06 |
+| K7 — Prazo médio de entrega | `COMPRA`, `FORNECEDOR` | G07 |
+| K8 — Garantias a vencer | `VENDA`, `CONTEM`, `PRODUTO` | G08 |
+| K9 — Taxa de trocas e devoluções | `TROCA_DEVOLUCAO`, `NOTA_FISCAL_SAIDA`, `PAGAMENTO`, `VENDA` | G09 |
+| K10 — Conversão de atendimentos | `ATENDIMENTO`, `VENDA` | G10 |
+| K11 — Aprovação de orçamentos | `ORCAMENTO` | G11 |
+| K12 — Conversão por consultor | `FUNCIONARIO`, `ATENDIMENTO`, `VENDA` | G12 |
+| K13 — Conformidade de receita | `VENDA`, `CONTEM`, `LENTE`, `ATENDIMENTO`, `RECEITA` | G13 |
+| K14 — Venda completa | `VENDA`, `CONTEM`, `PRODUTO` | G14 |
+
+### Indicadores comuns que o modelo não consegue calcular
+
+Estes aparecem na literatura sobre óticas, mas **não foram propostos** porque faltam dados no modelo:
+
+| Indicador | Por que não entrou |
+| --- | --- |
+| Margem bruta de armações e lentes | `COMPRA` não registra itens nem custo (limitação do DER, seção 1.2). |
+| Custo de aquisição de cliente | O modelo não registra campanhas nem gastos de marketing. |
+| Satisfação do cliente | Não há pesquisa de satisfação no modelo. |
+| Taxa de recompra de clientes | Sem fidelidade ou campanhas no modelo, só é possível medir a recompra de forma indireta pelo histórico; fica como análise futura. |
+
+### Fontes consultadas
+
+Os indicadores e as referências de mercado vieram de pesquisa feita com apoio de IA (registrada na seção 6). As referências são de óticas dos Estados Unidos, e só foram usados os valores em razão ou proporção:
+
+- [Optical Shop KPI Metrics (FinModelsLab)](https://finmodelslab.com/blogs/kpi-metrics/optical-shop-kpi-metrics): ticket médio, taxa de conversão, giro de estoque e clientes recorrentes.
+- [Retail optical benchmarks (Anagram)](https://www.goanagram.com/blog/retail-optical-benchmarks): taxa de captura, margem de armações, razão de pares múltiplos e taxa de refazer pedidos.
+- [Using measurement as the first step toward positive change (Ophthalmology Times)](https://ophthalmologytimes.com/using-measurement-first-step-toward-positive-change): refazer pedidos abaixo de 10%, giro de armações de 3 a 5 vezes por ano e razão de pares completos de 75%.
+
+As metas de referência (K6, K9 e K14) são de mercado externo e devem ser confirmadas com o gerente antes de virarem metas da ótica.
+
+---
+
 ## Andamento da Entrega 2
 
 | Seção | Situação |
@@ -852,8 +1074,8 @@ Também se mantém, por decisão, o valor em `NOTA_FISCAL_SAIDA.VL_TOTAL` e `NOT
 | 1.2 Conversão do modelo conceitual para o lógico | Pronta (acima) |
 | 1.3 Chaves primárias e estrangeiras | Pronta (acima) |
 | 1.4 Normalização (1FN, 2FN e 3FN) | Pronta (acima) |
-| 1.5 Justificativas técnicas | A entregar na parte 3 |
-| 1.6 Arquitetura analítica para BI e IA (com rastreabilidade) | A entregar na parte 3 |
+| 1.5 Justificativas técnicas | Pronta (acima) |
+| 1.6 Arquitetura analítica para BI e IA (com rastreabilidade) | Pronta (acima) |
 | 2. Modelo lógico relacional (diagrama) | A entregar na parte 4 |
 | 3. Script SQL completo (`docs/script.sql`) | A entregar na parte 5 |
 | 4. Massa de dados | A entregar na parte 5 |
@@ -1128,3 +1350,16 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | **Trechos rejeitados ou corrigidos** | Duas justificativas da IA foram corrigidas: a do total da venda (a linha de CONTÉM já guarda o preço praticado, então o total é calculável) e a do formulário de pedido (as fotos não foram publicadas, então o formulário é uma reconstrução do grupo). O grupo decidiu retirar do DER os atributos derivados, manter o CEP como única exceção à 3FN e manter o DER sem recolocar a ligação VENDA–PARCELA, que o professor mandou retirar. |
 | **Justificativa da escolha final** | O modelo lógico segue o DER sem acrescentar chaves; as lacunas do DER ficam declaradas com a consequência de cada uma. Valores calculáveis viram visões no script, para não existir duas fontes do mesmo dado. |
 | **Reflexão crítica** | O formulário de pedido e a lista de exceções são propostas do grupo, não práticas confirmadas pela ótica. A IA não consegue ver o formulário real. |
+
+### Uso 20 — seções 1.5 e 1.6 da Entrega 2: justificativas técnicas, KPIs e arquitetura analítica (30/10/2026)
+
+| Item | Registro |
+| --- | --- |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): redação das justificativas técnicas (1.5), pesquisa de KPIs de óticas e proposta de arquitetura de BI e IA com a tabela de rastreabilidade (1.6). |
+| **Motivação** | O esqueleto exige justificar chaves e restrições citando as regras (RNxx) e propor indicadores que o banco consiga calcular, cada um ligado a uma consulta do script. |
+| **Prompt(s) utilizados** | “Pode começar e pesquisar”; resposta do grupo sobre o DER (“Foi um engano, já arrumei o DER”). |
+| **Resposta recebida** | Justificativa de cada chave e restrição, lista de 12 consultas de auditoria (A01 a A12), 14 KPIs com fórmula, período e meta (K1 a K14), ligados às consultas G01 a G14, e lista de indicadores que o modelo não calcula. |
+| **Fontes consultadas e verificadas** | Três artigos sobre óticas dos Estados Unidos, listados ao fim da seção 1.6. Só foram usados valores em razão ou proporção; os valores em dólar foram ignorados. As metas de referência (K6, K9 e K14) ainda precisam ser confirmadas com o gerente. |
+| **Trechos rejeitados ou corrigidos** | Indicadores de margem, custo de aquisição e satisfação foram descartados porque o modelo não tem os dados. A IA percebeu que três cardinalidades da imagem nova do DER estavam diferentes do texto; o grupo confirmou que era um engano e corrigiu a imagem. |
+| **Justificativa da escolha final** | Cada KPI só entrou se existe uma consulta que o calcule e se as tabelas do modelo têm os dados; a origem de cada meta (informada, regra da ótica ou referência de mercado) está indicada. |
+| **Reflexão crítica** | As referências de mercado são de outro país e de outro porte de loja. A IA não conhece as metas reais da ótica, que só o gerente pode confirmar. |
