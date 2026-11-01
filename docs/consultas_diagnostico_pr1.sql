@@ -1,19 +1,18 @@
 -- Consultas de DIAGNÓSTICO de auditoria para revisão do PR #1.
 -- Somente SELECT; execute depois de carregar a massa em um banco descartável.
--- Não alteram as auditorias A04/A11 do script.sql até validação no MySQL.
+-- Duplicam, para conferência, as condições agora corrigidas em A04/A11 de script.sql.
 USE otica_kadosh;
 
--- D04: sinal mínimo RN-18.
--- Somar somente pagamentos classificados como SINAL; outros recebimentos
--- não devem ser contabilizados como sinal sem decisão explícita do grupo.
--- Nota: definir regra própria para pagamento INTEGRAL antes de aplicar em produção.
+-- D04: sinal mínimo RN-18 ou quitação integral antes da liberação.
+-- PARCIAL e QUITACAO_PARCELA não são sinal, e não entram neste cálculo.
+-- Pagamento integral do pedido satisfaz o mínimo financeiro sem sinal separado.
 SELECT v.ID_VENDA, v.DT_LIBERACAO_ENCOMENDA, t.VL_TOTAL,
-       COALESCE(SUM(p.VL_PAGAMENTO), 0) AS total_sinais_ate_liberacao
+       COALESCE(SUM(p.VL_PAGAMENTO), 0) AS sinal_ou_integral_ate_liberacao
   FROM VENDA v
   JOIN vw_venda_total t ON t.ID_VENDA = v.ID_VENDA
   LEFT JOIN PAGAMENTO p
     ON p.ID_VENDA = v.ID_VENDA
-   AND p.TP_FINALIDADE = 'SINAL'
+   AND p.TP_FINALIDADE IN ('SINAL','INTEGRAL')
    AND p.DT_PAGAMENTO <= v.DT_LIBERACAO_ENCOMENDA
  WHERE v.DT_LIBERACAO_ENCOMENDA IS NOT NULL AND t.VL_TOTAL > 0
  GROUP BY v.ID_VENDA, v.DT_LIBERACAO_ENCOMENDA, t.VL_TOTAL
