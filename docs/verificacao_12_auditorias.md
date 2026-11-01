@@ -4,7 +4,7 @@ Fonte: `docs/script.sql` e regras RN-03, RN-04, RN-10, RN-11, RN-12, RN-14, RN-1
 
 ## Método e alcance
 
-A massa do script foi lida por comandos `INSERT INTO ... VALUES`, respeitando aspas e ponto e vírgula dentro dos textos. As condições relevantes de cada auditoria foram **reproduzidas por cálculo independente nos registros extraídos**, inclusive vínculos e agregações. Isso permite conferir a consistência dos dados e dos filtros, **mas não equivale a executar as consultas no MySQL 8**. O script também executa três `UPDATE` e dois `DELETE` efetivos antes das auditorias; eles não mudam os vínculos/valores usados para identificar as 21 anomalias listadas abaixo.
+A massa do script foi lida por comandos `INSERT INTO ... VALUES`, respeitando aspas e ponto e vírgula dentro dos textos. As condições relevantes de cada auditoria foram **reproduzidas por cálculo independente nos registros extraídos**, inclusive vínculos e agregações. Isso permite conferir a consistência dos dados e dos filtros, **mas não equivale a executar as consultas no MySQL 8**. O script também executa três `UPDATE` e três `DELETE` efetivos (D01: um; D02: dois) antes das auditorias; eles não mudam os vínculos/valores usados para identificar as 21 anomalias listadas abaixo.
 
 ## Inventário dos 12 cenários
 
