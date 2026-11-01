@@ -1164,15 +1164,15 @@ Cada uma lista as linhas que violam uma regra que o banco não declara sozinho (
 | A01 | RN-22 | 2 pagamentos sem nota fiscal de saída. |
 | A02 | RN-35 | 1 compra recebida sem nota fiscal de entrada. |
 | A03 | RN-11 | 2 vendas com pagamento acima do total (um segundo recebimento indevido). |
-| A04 | RN-18 | 2 encomendas liberadas com sinal de cerca de 15%, abaixo dos 30%. |
+| A04 | RN-18 | 2 encomendas liberadas com sinal de cerca de 15%, abaixo dos 30%; pagamentos integrais antecipados também satisfazem o limite. |
 | A05 | RN-16 | 2 vendas de lente de grau em atendimento sem receita. |
 | A06 | RN-14 | 1 produto cadastrado sem linha em `LENTE` ou `ARMACAO`. |
 | A07 | RN-12 | 1 saída de 40 unidades de uma armação com saldo muito menor (erro de digitação). |
 | A08 | RN-10 | 2 receitas sem nenhuma medida. |
 | A09 | RN-04 | 1 venda lançada sem nenhuma linha de produto. |
 | A10 | RN-28 | 2 quitações com valor diferente do da parcela (R$ 15,00 a mais e R$ 12,00 a menos). |
-| A11 | RN-23 | 3 vendas: 2 sem orçamento aprovado e 1 com aprovação registrada depois da validade. |
-| A12 | RN-03 | 2 vendas com receita trazida pelo cliente com mais de um ano. |
+| A11 | RN-23 | 3 vendas: 2 sem orçamento aprovado e 1 com aprovação registrada depois da validade. A consulta também verifica se a aprovação ocorreu antes da venda. |
+| A12 | RN-03 | 2 vendas com receita trazida pelo cliente com mais de um ano; datas futuras também são detectadas, sem casos adicionais na massa. |
 
 ---
 
@@ -1194,7 +1194,7 @@ O período é de **01/09/2026 a 30/10/2026**: 8,6 semanas e 51 dias de funcionam
 | `ORCAMENTO` | 862 | 831 no período (≈ 97 por semana; a estimativa era ≈ 90). Toda venda tem orçamento aprovado (738 aprovados no total); há 98 recusados, 22 emitidos sem decisão e 4 cancelados. |
 | `VENDA` | 740 | 712 no período, das quais 28 canceladas (≈ 4%). As 684 efetivas dão 79,5 por semana, perto das 80 informadas. Mais 28 da amostra antiga. |
 | `CONTEM` | 1.402 | Média de 1,9 linhas por venda: cerca de 79% das vendas levam armação e lente (G14), e as demais só armação (óculos de sol) ou só lente. |
-| `PRODUTO`, `LENTE`, `ARMACAO` | 351, 120 e 230 | ≈ 350 produtos cadastrados na seção 1.1 (230 armações e 120 lentes), mais 1 produto sem subtipo (caso da A06). 16 lentes são sem grau. |
+| `PRODUTO`, `LENTE`, `ARMACAO` | 352, 120 e 231 | 351 produtos com subtipo (231 armações e 120 lentes), mais 1 produto sem subtipo proposital (caso da A06). A projeção inicial era ≈ 350 produtos; 16 lentes são sem grau. |
 | `RECEITA`, `RECEITA_MEDIDA` | 625 e 1.569 | Uma receita para cada venda de lente de grau, mais laudos de avaliação e de orçamentos sem venda. Média de 2,5 medidas por receita (de 1 a 4, RN-10). |
 | `PAGAMENTO` | 846 | 705 sinais e pagamentos integrais (≈ 345 por mês, como na seção 1.1), 42 parciais e 99 quitações de parcela. Os 374 pagamentos de setembro e os 444 de outubro ficam abaixo dos ≈ 800 por mês da seção 1.1 porque a carga começa em setembro e não inclui as parcelas das vendas de agosto. |
 | `PARCELA` | 850 | 232 vendas parceladas (34% das efetivas; a estimativa era 35%), com 2 a 6 parcelas cada. Situação em 30/10: 99 pagas, 27 atrasadas e 724 abertas, com vencimento até abril de 2027. |
