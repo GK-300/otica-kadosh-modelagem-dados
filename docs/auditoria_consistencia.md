@@ -30,3 +30,12 @@ Escopo: comparação da revisão conceitual documentada no `README.md`, do inven
 Toda inclusão de vínculo/atributo de negócio deve ser refletida de maneira consistente no **DER → README → dicionário → modelo lógico → SQL → massa de dados → consultas**. Não corrigir lacunas conceituais apenas adicionando uma FK ao script.
 
 A auditoria automática em `docs/verificar_consistencia.py` verifica somente **nomes e inventários estruturais**. Um resultado positivo não garante correção semântica ou execução do SQL.
+
+## Revisão adicional das consultas de auditoria (31/10/2026)
+
+Foram conferidas as consultas A04 e A11 de `docs/script.sql`. Há dois **riscos confirmados na lógica das consultas**, independentemente da existência de registros que os acionem na massa atual:
+
+1. **A04 — sinal de 30%:** o filtro soma todos os `PAGAMENTO` anteriores à data de liberação, mesmo que `TP_FINALIDADE` seja `PARCIAL`, `INTEGRAL` ou `QUITACAO_PARCELA`. Isso não mede especificamente o sinal definido pela RN-18. Solução de diagnóstico: contar apenas `TP_FINALIDADE = 'SINAL'`. **Ressalva:** uma venda paga integralmente pode exigir uma interpretação de negócio distinta; confirmar com o grupo antes de alterar a regra definitiva.
+2. **A11 — orçamento válido:** a consulta exige status `APROVADO` e que a venda tenha ocorrido até a validade, mas não testa se `DH_APROVACAO <= DH_COMPRA` ou se a aprovação veio depois da emissão. Isso permite que a auditoria deixe de apontar uma venda feita **antes** da aprovação. Solução de diagnóstico: exigir `DH_EMISSAO <= DH_APROVACAO <= DH_COMPRA <= DH_VALIDADE`. Essa verificação ainda não cria vínculo inequívoco de um orçamento específico com a venda.
+
+As consultas propostas ficam isoladas em `docs/consultas_diagnostico_pr1.sql` para não alterar diretamente a Entrega 2 sem teste no MySQL. Elas não modificam dados nem substituem as A04/A11 originais. A execução e o resultado sobre a massa de dados seguem **pendentes**.
