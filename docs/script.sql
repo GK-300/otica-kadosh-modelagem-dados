@@ -13451,14 +13451,15 @@ SELECT v.ID_VENDA, v.CD_STATUS, t.VL_TOTAL, SUM(p.VL_PAGAMENTO) AS total_pago,
 HAVING SUM(p.VL_PAGAMENTO) > t.VL_TOTAL
  ORDER BY excesso DESC;
 
--- A04 — Existe encomenda liberada sem sinal de pelo menos 30% do total até a data de liberação?
--- Verifica: RN-18 (encomenda só é liberada com sinal de 30% do total da venda)
+-- A04 — Existe encomenda liberada sem entrada suficiente (sinal ou pagamento integral)?
+-- Verifica: RN-18 (sinal >= 30%; quitação integral antecipada também satisfaz o valor mínimo)
 SELECT v.ID_VENDA, v.DT_LIBERACAO_ENCOMENDA, t.VL_TOTAL,
-       COALESCE(SUM(p.VL_PAGAMENTO), 0) AS recebido_ate_a_liberacao,
+       COALESCE(SUM(p.VL_PAGAMENTO), 0) AS sinal_ou_integral_ate_liberacao,
        ROUND(100 * COALESCE(SUM(p.VL_PAGAMENTO), 0) / t.VL_TOTAL, 1) AS pct_recebido
   FROM VENDA v
   JOIN vw_venda_total t ON t.ID_VENDA = v.ID_VENDA
   LEFT JOIN PAGAMENTO p ON p.ID_VENDA = v.ID_VENDA AND p.DT_PAGAMENTO <= v.DT_LIBERACAO_ENCOMENDA
+                       AND p.TP_FINALIDADE IN ('SINAL','INTEGRAL')
  WHERE v.DT_LIBERACAO_ENCOMENDA IS NOT NULL AND t.VL_TOTAL > 0
  GROUP BY v.ID_VENDA, v.DT_LIBERACAO_ENCOMENDA, t.VL_TOTAL
 HAVING COALESCE(SUM(p.VL_PAGAMENTO), 0) < 0.30 * t.VL_TOTAL
@@ -13522,15 +13523,17 @@ SELECT v.ID_VENDA, v.DH_COMPRA, v.ID_ATENDIMENTO,
   FROM VENDA v
  WHERE NOT EXISTS (SELECT 1 FROM ORCAMENTO o
                     WHERE o.ID_ATENDIMENTO = v.ID_ATENDIMENTO AND o.CD_STATUS = 'APROVADO'
-                      AND o.DH_APROVACAO <= o.DH_VALIDADE AND v.DH_COMPRA <= o.DH_VALIDADE)
+                      AND o.DH_EMISSAO <= o.DH_APROVACAO AND o.DH_APROVACAO <= v.DH_COMPRA
+                      AND v.DH_COMPRA <= o.DH_VALIDADE)
  ORDER BY v.DH_COMPRA;
 
--- A12 — Existe venda cuja receita trazida pelo cliente tinha mais de um ano na data da compra?
--- Verifica: RN-03 (a ótica aceita receita trazida com até um ano de emissão)
+-- A12 — Existe venda com receita trazida fora do período válido (vencida ou futura)?
+-- Verifica: RN-03 (a receita deve estar entre um ano antes da venda e a data da venda)
 SELECT v.ID_VENDA, DATE(v.DH_COMPRA) AS data_compra, r.ID_RECEITA, r.DT_RECEITA,
        DATEDIFF(DATE(v.DH_COMPRA), r.DT_RECEITA) AS dias_de_idade
   FROM VENDA v
   JOIN RECEITA r ON r.ID_ATENDIMENTO = v.ID_ATENDIMENTO
  WHERE r.TP_ORIGEM = 'TRAZIDA'
-   AND r.DT_RECEITA < DATE_SUB(DATE(v.DH_COMPRA), INTERVAL 1 YEAR)
+   AND (r.DT_RECEITA < DATE_SUB(DATE(v.DH_COMPRA), INTERVAL 1 YEAR)
+        OR r.DT_RECEITA > DATE(v.DH_COMPRA))
  ORDER BY dias_de_idade DESC;
