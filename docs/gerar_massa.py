@@ -602,7 +602,8 @@ for p, delta in zip(quit_pays[:2], (Decimal("15.00"), Decimal("-12.00"))):
 pays.sort(key=lambda p: (p["dt"], p["venda"]["vid"], p["fin"] != "SINAL"))
 for i, p in enumerate(pays, 1):
     p["id"] = i
-add_table("PARCELA", ["ID_PARCELA", "NR_PARCELA", "VL_PARCELA", "DT_VENCIMENTO"], [(p["id"], p["nr"], p["val"], p["venc"]) for p in parcelas])
+add_table("PARCELA", ["ID_PARCELA", "NR_PARCELA", "VL_PARCELA", "DT_VENCIMENTO", "ID_VENDA"],
+          [(p["id"], p["nr"], p["val"], p["venc"], p["venda"]["vid"]) for p in parcelas])
 add_table("PAGAMENTO", ["ID_PAGAMENTO", "VL_PAGAMENTO", "DT_PAGAMENTO", "TP_FORMA", "TP_FINALIDADE", "ID_VENDA", "ID_PARCELA_QUITADA"],
           [(p["id"], p["val"], p["dt"], p["forma"], p["fin"], p["venda"]["vid"], p["parcela"]["id"] if p["parcela"] else None) for p in pays])
 # A01: dois pagamentos sem nota fiscal de saída

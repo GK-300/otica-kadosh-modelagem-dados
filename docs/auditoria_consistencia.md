@@ -13,7 +13,7 @@ Escopo: comparação da revisão conceitual documentada no `README.md`, do inven
 | Origem no DER | Efeito verificável no modelo lógico | Decisão segura nesta etapa |
 | --- | --- | --- |
 | `ORCAMENTO` não se relaciona diretamente com `VENDA` ou `PRODUTO`. | É possível localizar orçamentos e vendas do mesmo atendimento, mas não demonstrar qual proposta foi convertida nem os itens originalmente ofertados. | Manter como **limitação**, não inferir origem por simples coexistência. Discutir com o grupo antes de revisar DER, dicionário, SQL e consultas em conjunto. |
-| `PARCELA` não se liga à `VENDA` nem ao pagamento que originou o plano. | Uma parcela ainda em aberto não pode ser associada de forma confiável a um cliente ou venda. | Não criar FK isolada no SQL, pois isso diverge do DER; propor alteração conceitual coordenada no PR de chaves e cardinalidades. |
+| `PARCELA` não se ligava à `VENDA` no modelo inicial. | A parcela em aberto não identificava a venda nem o cliente; pagamentos de outra venda podiam referenciá-la. | **Corrigido na revisão de integridade:** novo relacionamento no DER, FK obrigatória em PARCELA e FK composta em PAGAMENTO. Conferir execução MySQL 8 e aprovação do grupo antes do merge. |
 | `TROCA_DEVOLUCAO` referencia nota fiscal, mas não identifica a linha/produto vendido. | Histórico da ocorrência existe, mas a rastreabilidade da unidade devolvida é insuficiente. | Não presumir produto a partir da nota: revisar o caso de negócio e a participação de `CONTEM`. |
 | `ESTOQUE` referencia produto e, opcionalmente, compra; não tem origem direta de saída por venda. | `CD_MOTIVO` descreve a origem, mas não comprova qual transação provocou a saída. | Manter a limitação explícita; propor alteração de vínculos somente após validar regras para movimentos. |
 | `COMPRA` não detalha itens e custos unitários. | Entradas de estoque indicam produto e quantidade recebidos, mas não constituem histórico integral do pedido. | Evitar declarar que as compras têm itens auditáveis até revisão do DER. |
@@ -24,6 +24,10 @@ Escopo: comparação da revisão conceitual documentada no `README.md`, do inven
 2. Executar `docs/script.sql` em **banco descartável** MySQL 8. O script contém `DROP DATABASE IF EXISTS otica_kadosh` e apaga integralmente o banco de mesmo nome.
 3. Conferir erros do MySQL, integridade de chaves e resultados das auditorias A01–A12 antes de declarar implementação validada.
 4. Confirmar com o grupo qual versão conceitual será congelada para a entrega e se as lacunas acima serão corrigidas na Entrega 2 ou documentadas como limitações.
+
+## Atualização de escopo — revisão de integridade
+
+O quadro acima conserva o histórico da auditoria PR #1. A lacuna VENDA–PARCELA foi tratada em branch separada, com 850 associações de parcela recuperadas do gerador determinístico, 232 vendas distintas, restrição para quitação cruzada e consulta J07. A versão anterior da massa e as outras 12 auditorias não devem ser alteradas. A alteração conceitual requer validação pelo grupo.
 
 ## Regra para futuras alterações
 

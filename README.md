@@ -196,7 +196,7 @@ Os códigos da Entrega 1 foram mantidos. **RN-31 e RN-32** foram retiradas porqu
 | RN-14 | PRODUTO tem especialização total e disjunta: todo produto é LENTE ou ARMACAO, nunca os dois. Os subtipos herdam id_produto. | Nota do DER |
 | RN-15 | O optometrista emite o laudo interno; o consultor conduz o atendimento comercial que fecha a venda. O DER não registra o emissor do laudo; o responsável pelo atendimento é obtido por CONDUZ. | Respostas do gerente; DER final |
 | RN-16 | Lente com possui_grau verdadeiro exige receita no atendimento da venda, trazida pelo cliente ou emitida internamente. | Resposta do gerente |
-| RN-17 | Depois do sinal, o saldo pode ser parcelado no cartão em até dez parcelas de no mínimo R$ 50,00; o sinal não integra essas parcelas. | Confirmação de 15/10/2026 |
+| RN-17 | Depois do sinal, o saldo pode ser parcelado no cartão em até dez parcelas de no mínimo R$ 50,00; o sinal não integra essas parcelas. Cada parcela pertence à venda que originou o saldo e seu número é único dentro dessa venda. | Confirmação de 15/10/2026; vínculo proposto na revisão de integridade |
 | RN-18 | Encomenda só é liberada após recebimento de sinal de pelo menos 30% do total da venda (soma das linhas de CONTÉM) e registro da previsão de conclusão. Uma venda aberta pode existir antes desse recebimento. | Resposta do gerente |
 | RN-19 | Segundo o gerente, a garantia da armação cobre defeito de fabricação, mola e parafuso; a da lente cobre adaptação, erro de grau, eficácia do tratamento e arranhões, conforme regulamento da ótica. O regulamento não foi apresentado ao grupo. | Relato de 14/10/2026 |
 | RN-20 | O suporte relatado após a entrega é gratuito e vitalício para ajustes, plaquetas e parafusos; registrar como atendimento de manutenção. | Resposta do gerente |
@@ -207,7 +207,7 @@ Os códigos da Entrega 1 foram mantidos. **RN-31 e RN-32** foram retiradas porqu
 | RN-25 | Troca depende de avaliação do produto e causa do dano, podendo ser aprovada ou recusada. Parecer e data são exigidos na decisão; não presumir política de reembolso ou crédito. | Resposta do gerente |
 | RN-26 | Lentes são compradas, vendidas e contadas por par; armações por unidade. A unidade não é gravada: deriva do tipo do produto (LENTE = par; ARMACAO = unidade). | Confirmação de 15/10/2026 |
 | RN-27 | O campo “A partir das” é horário previsto de retirada. O índice de refração registra o valor numérico; observações da linha descrevem características adicionais da lente. | Formulário e resposta do gerente |
-| RN-28 | PARCELA possui id_parcela próprio. QUITA é opcional e 1:1: um pagamento quita no máximo uma parcela e cada parcela é quitada por no máximo um pagamento. A situação da parcela é calculada: PAGA se há pagamento ligado; ATRASADA se não há e o vencimento passou; ABERTA nos demais casos. | DER final |
+| RN-28 | PARCELA possui id_parcela próprio e pertence a uma venda. QUITA continua opcional e 1:1: um pagamento quita no máximo uma parcela e uma parcela é quitada por no máximo um pagamento. A FK composta impede que um pagamento quite parcela de outra venda. Situação calculada: PAGA, ATRASADA ou ABERTA. | Regra QUITA original; vínculo VENDA–PARCELA acrescentado na revisão de integridade |
 | RN-29 | CONTÉM distingue linhas por numero_linha único dentro da venda. O mesmo produto pode ocorrer em duas linhas com preços diferentes. | Confirmação do usuário e nota do DER |
 | RN-30 | Todo movimento de ESTOQUE refere-se a um produto (É MOVIMENTADO EM); a entrada por compra liga-se à COMPRA de origem (GERA ENTRADA). Os demais motivos (venda, retorno, substituição, descarte) são registrados no atributo motivo. | DER final |
 | RN-33 | Campos de reembolso e abatimento registram apenas acertos efetivamente autorizados; não comprovam que a loja oferece essas alternativas em todos os casos. | Limite do levantamento e campos do DER |
@@ -242,6 +242,7 @@ O DER foi criado no **brModelo Web** ([modelo "Ótica"](https://app.brmodeloweb.
 | ATENDIMENTO | RESULTA EM | VENDA | (0,1) | (1,1) |
 | VENDA | CONTÉM | PRODUTO | (1,n) | (0,n) |
 | VENDA | RECEBE | PAGAMENTO | (0,n) | (1,1) |
+| VENDA | PARCELA SALDO EM | PARCELA | (0,n) | (1,1) |
 | PAGAMENTO | QUITA | PARCELA | (0,1) | (0,1) |
 | PAGAMENTO | GERA | NOTA_FISCAL_SAIDA | (1,1) | (1,1) |
 | NOTA_FISCAL_SAIDA | REFERE-SE A | TROCA_DEVOLUCAO | (0,n) | (1,1) |
@@ -282,7 +283,7 @@ Nenhum apontamento foi rejeitado. Apontamentos não citados nesta tabela não ex
 
 ## 1.2 Conversão do Modelo Conceitual para o Modelo Lógico
 
-O modelo lógico foi derivado do DER conceitual revisado na seção 1.1 (18 entidades e 18 relacionamentos, um deles, CONTÉM, com atributos). O resultado são **19 tabelas** e **132 colunas**, para MySQL 8 (InnoDB). O diagrama do modelo lógico está na seção 2; o dicionário de dados detalha domínios e regras de cada coluna.
+O modelo lógico foi derivado do DER conceitual revisado na seção 1.1 (18 entidades e 19 relacionamentos, um deles, CONTÉM, com atributos). O resultado são **19 tabelas** e **133 colunas**, para MySQL 8 (InnoDB). O diagrama do modelo lógico está na seção 2; o dicionário de dados detalha domínios e regras de cada coluna.
 
 ### Regras de conversão aplicadas
 
@@ -310,7 +311,7 @@ O modelo lógico foi derivado do DER conceitual revisado na seção 1.1 (18 enti
 | ORCAMENTO | `ORCAMENTO` | Vários por atendimento. |
 | VENDA | `VENDA` | Uma venda por atendimento. |
 | PAGAMENTO | `PAGAMENTO` | Pertence a uma venda; pode quitar uma parcela. |
-| PARCELA | `PARCELA` | Sem chave estrangeira própria: a ligação com o pagamento fica no pagamento (QUITA). |
+| PARCELA | `PARCELA` | FK obrigatória para VENDA; QUITA segue opcional, com FK composta que impede quitação cruzada. |
 | NOTA_FISCAL_SAIDA | `NOTA_FISCAL_SAIDA` | Uma por pagamento. |
 | FORNECEDOR | `FORNECEDOR` | CNPJ opcional e único. |
 | COMPRA | `COMPRA` | Fornecedor obrigatório; venda de origem opcional. |
@@ -501,7 +502,7 @@ As tabelas abaixo mostram o resultado. Abra cada uma para ver as colunas, os tip
 
 </details>
 
-<details><summary><b>PARCELA</b> (4 colunas)</summary>
+<details><summary><b>PARCELA</b> (5 colunas)</summary>
 
 | Coluna | Tipo | Nulo? | Chave / restrição |
 | --- | --- | --- | --- |
@@ -509,6 +510,7 @@ As tabelas abaixo mostram o resultado. Abra cada uma para ver as colunas, os tip
 | NR_PARCELA | SMALLINT | NOT NULL |  |
 | VL_PARCELA | DECIMAL(10,2) | NOT NULL |  |
 | DT_VENCIMENTO | DATE | NOT NULL |  |
+| ID_VENDA | INT | NOT NULL | FK → VENDA; UNIQUE composta com ID_PARCELA e com NR_PARCELA (RN-17/RN-28) |
 
 </details>
 
@@ -610,7 +612,8 @@ As tabelas abaixo mostram o resultado. Abra cada uma para ver as colunas, os tip
 | RESULTA EM | ATENDIMENTO – VENDA | (0,1) – (1,1) | 1:1 | `VENDA.ID_ATENDIMENTO`, FK `NOT NULL UNIQUE`. |
 | CONTÉM | VENDA – PRODUTO | (1,n) – (0,n) | N:N | Tabela `CONTEM`, PK (`ID_VENDA`, `NR_LINHA`), FK para venda e para produto. |
 | RECEBE | VENDA – PAGAMENTO | (0,n) – (1,1) | 1:N | `PAGAMENTO.ID_VENDA`, FK `NOT NULL`. |
-| QUITA | PAGAMENTO – PARCELA | (0,1) – (0,1) | 1:1 | `PAGAMENTO.ID_PARCELA_QUITADA`, FK `NULL UNIQUE`. |
+| PARCELA SALDO EM | VENDA – PARCELA | (0,n) – (1,1) | 1:N | `PARCELA.ID_VENDA`, FK `NOT NULL`; plano existe antes da quitação. |
+| QUITA | PAGAMENTO – PARCELA | (0,1) – (0,1) | 1:1 | `PAGAMENTO.(ID_PARCELA_QUITADA, ID_VENDA)` referencia `PARCELA.(ID_PARCELA, ID_VENDA)`; `ID_PARCELA_QUITADA` continua `NULL UNIQUE`. |
 | GERA | PAGAMENTO – NOTA_FISCAL_SAIDA | (1,1) – (1,1) | 1:1 | `NOTA_FISCAL_SAIDA.ID_PAGAMENTO`, FK `NOT NULL UNIQUE`. |
 | REFERE-SE A | NOTA_FISCAL_SAIDA – TROCA_DEVOLUCAO | (0,n) – (1,1) | 1:N | `TROCA_DEVOLUCAO.ID_NOTA_SAIDA`, FK `NOT NULL`. |
 | FORNECE | FORNECEDOR – COMPRA | (0,n) – (1,1) | 1:N | `COMPRA.ID_FORNECEDOR`, FK `NOT NULL`. |
@@ -623,11 +626,11 @@ As tabelas abaixo mostram o resultado. Abra cada uma para ver as colunas, os tip
 
 ### Cardinalidades: como cada tipo foi tratado
 
-**1:N (10 relacionamentos).** A chave estrangeira fica sempre na tabela do lado N. Quando o lado N tem participação mínima 1 (por exemplo, cada atendimento tem um cliente), a coluna é `NOT NULL`. Quando o mínimo é 0 (por exemplo, uma compra pode não ter venda de origem), a coluna aceita `NULL`.
+**1:N (11 relacionamentos).** A chave estrangeira fica sempre na tabela do lado N. Quando o lado N tem participação mínima 1 (por exemplo, cada atendimento tem um cliente), a coluna é `NOT NULL`. Quando o mínimo é 0 (por exemplo, uma compra pode não ter venda de origem), a coluna aceita `NULL`.
 
 **1:1 (5 relacionamentos e 2 especializações).** A chave estrangeira recebe `UNIQUE` para impedir que dois registros apontem para o mesmo.
 - ORIGINA e RESULTA EM, (0,1)–(1,1): a FK fica na tabela de participação obrigatória (receita e venda). Um atendimento sem receita ou sem venda continua válido.
-- QUITA, (0,1)–(0,1): as duas pontas são opcionais. A FK ficou em `PAGAMENTO` e aceita `NULL`, porque a maioria dos pagamentos não quita parcela; o `UNIQUE` garante que uma parcela seja quitada por no máximo um pagamento (RN-28).
+- QUITA, (0,1)–(0,1): as duas pontas são opcionais. A FK composta em `PAGAMENTO` associa a parcela quitada à mesma venda; `ID_PARCELA_QUITADA` aceita `NULL` e é `UNIQUE` (RN-28).
 - GERA e POSSUI, (1,1)–(1,1): as duas pontas são obrigatórias. A FK ficou na **nota fiscal**, que é o documento que depende do pagamento ou da compra. O banco garante que cada nota tem um pagamento ou uma compra e que não há duas notas para o mesmo. O contrário, "todo pagamento tem nota" e "toda compra tem nota", não pode ser declarado só com chaves, porque o pagamento é gravado antes da nota. Essa regra (RN-22 e RN-35) fica na transação da aplicação e na consulta de auditoria correspondente (seção 3).
 
 **N:N (CONTÉM).** Virou a tabela `CONTEM`, com chave primária composta por venda e número da linha, e não por venda e produto: a mesma armação pode aparecer em duas linhas com preços diferentes (RN-29). Quantidade, preço unitário e observação são atributos da linha.
@@ -642,13 +645,12 @@ PRODUTO é especializado em LENTE e ARMACAO (total e disjunta, RN-14). A estrat�
 - **Disjunção garantida pelo banco:** `PRODUTO.CD_TIPO` aceita só `LENTE` ou `ARMACAO`. `LENTE` e `ARMACAO` repetem `CD_TIPO` (valor fixo) e têm uma **chave estrangeira composta** (`ID_PRODUTO`, `CD_TIPO`) para `PRODUTO`, que por isso tem um `UNIQUE (ID_PRODUTO, CD_TIPO)`. Assim, um produto do tipo LENTE só pode ter linha em `LENTE`, nunca em `ARMACAO`.
 - **Totalidade:** que todo produto tenha a sua especialização não pode ser declarado só com chaves. Fica a cargo da gravação em uma transação (produto e especialização juntos) e de uma consulta de auditoria (seção 3).
 
-### Consequências da conversão (limitações herdadas do DER)
+### Consequências da conversão (limitações ainda existentes)
 
-O DER revisado não traz alguns relacionamentos que existiam na versão anterior. A conversão **respeita o DER** e não acrescenta chaves que ele não tem; as consequências ficam declaradas:
+Nesta revisão, o DER passou a relacionar VENDA e PARCELA, preservando o QUITA opcional. As demais limitações abaixo continuam sem solução estrutural por não terem sido confirmadas com o grupo e a ótica:
 
 | Lacuna no DER | Consequência no modelo lógico | Como é tratada |
 | --- | --- | --- |
-| PARCELA não se liga a VENDA nem ao sinal. | Uma parcela ainda não quitada não aponta para nenhuma venda; só depois de quitada ela chega à venda (`PAGAMENTO.ID_PARCELA_QUITADA`). | O saldo devedor da venda é o total calculado (view `vw_venda_total`) menos a soma dos pagamentos, sem as parcelas. Consultas sobre parcelas em aberto mostram vencimento e valor, sem cliente. |
 | ORCAMENTO não se liga a VENDA nem a PRODUTO. | Não há como saber qual orçamento originou a venda, nem os produtos orçados. | A conversão em venda é medida por atendimento: atendimentos com orçamento e com venda (P4). |
 | TROCA_DEVOLUCAO liga-se só à nota fiscal de saída. | A venda é obtida por nota → pagamento → venda, mas o produto devolvido não é identificado. | A garantia é calculada por produto vendido (venda → `CONTEM` → `PRODUTO`), e a ocorrência é tratada no nível da venda. |
 | ESTOQUE liga-se só a PRODUTO e (nas entradas) a COMPRA. | Saídas por venda e movimentos de troca não apontam para a venda ou a ocorrência. | O motivo do movimento (`CD_MOTIVO`) distingue a origem; o saldo por produto e condição não depende do vínculo (RN-12). |
@@ -698,16 +700,17 @@ Todas as chaves estrangeiras usam `ON DELETE RESTRICT` e `ON UPDATE RESTRICT`, p
 | 7 | `CONTEM` | `ID_VENDA` | `VENDA` | CONTÉM | Sim (parte da PK) | Não |
 | 8 | `CONTEM` | `ID_PRODUTO` | `PRODUTO` | CONTÉM | Sim | Não |
 | 9 | `PAGAMENTO` | `ID_VENDA` | `VENDA` | RECEBE | Sim | Não |
-| 10 | `PAGAMENTO` | `ID_PARCELA_QUITADA` | `PARCELA` | QUITA | Não | Sim |
-| 11 | `NOTA_FISCAL_SAIDA` | `ID_PAGAMENTO` | `PAGAMENTO` | GERA | Sim | Sim |
-| 12 | `TROCA_DEVOLUCAO` | `ID_NOTA_SAIDA` | `NOTA_FISCAL_SAIDA` | REFERE-SE A | Sim | Não |
-| 13 | `COMPRA` | `ID_FORNECEDOR` | `FORNECEDOR` | FORNECE | Sim | Não |
-| 14 | `COMPRA` | `ID_VENDA` | `VENDA` | DEMANDA | Não | Não |
-| 15 | `NOTA_FISCAL_ENTRADA` | `ID_COMPRA` | `COMPRA` | POSSUI | Sim | Sim |
-| 16 | `ESTOQUE` | `ID_PRODUTO` | `PRODUTO` | É MOVIMENTADO EM | Sim | Não |
-| 17 | `ESTOQUE` | `ID_COMPRA` | `COMPRA` | GERA ENTRADA | Não | Não |
-| 18 | `LENTE` | `ID_PRODUTO + CD_TIPO` | `PRODUTO (ID_PRODUTO, CD_TIPO)` | ESPECIALIZA-SE EM | Sim (PK) | Sim |
-| 19 | `ARMACAO` | `ID_PRODUTO + CD_TIPO` | `PRODUTO (ID_PRODUTO, CD_TIPO)` | ESPECIALIZA-SE EM | Sim (PK) | Sim |
+| 10 | `PARCELA` | `ID_VENDA` | `VENDA` | PARCELA SALDO EM | Sim | Não |
+| 12 | `PAGAMENTO` | `ID_PARCELA_QUITADA + ID_VENDA` | `PARCELA (ID_PARCELA, ID_VENDA)` | QUITA | Não (parcela); venda obrigatória | Sim (ID_PARCELA_QUITADA) |
+| 12 | `NOTA_FISCAL_SAIDA` | `ID_PAGAMENTO` | `PAGAMENTO` | GERA | Sim | Sim |
+| 13 | `TROCA_DEVOLUCAO` | `ID_NOTA_SAIDA` | `NOTA_FISCAL_SAIDA` | REFERE-SE A | Sim | Não |
+| 14 | `COMPRA` | `ID_FORNECEDOR` | `FORNECEDOR` | FORNECE | Sim | Não |
+| 15 | `COMPRA` | `ID_VENDA` | `VENDA` | DEMANDA | Não | Não |
+| 16 | `NOTA_FISCAL_ENTRADA` | `ID_COMPRA` | `COMPRA` | POSSUI | Sim | Sim |
+| 17 | `ESTOQUE` | `ID_PRODUTO` | `PRODUTO` | É MOVIMENTADO EM | Sim | Não |
+| 18 | `ESTOQUE` | `ID_COMPRA` | `COMPRA` | GERA ENTRADA | Não | Não |
+| 19 | `LENTE` | `ID_PRODUTO + CD_TIPO` | `PRODUTO (ID_PRODUTO, CD_TIPO)` | ESPECIALIZA-SE EM | Sim (PK) | Sim |
+| 20 | `ARMACAO` | `ID_PRODUTO + CD_TIPO` | `PRODUTO (ID_PRODUTO, CD_TIPO)` | ESPECIALIZA-SE EM | Sim (PK) | Sim |
 
 ### Chaves alternativas e restrições de unicidade
 
@@ -719,10 +722,12 @@ Todas as chaves estrangeiras usam `ON DELETE RESTRICT` e `ON UPDATE RESTRICT`, p
 | `RECEITA` | `UNIQUE (ID_ATENDIMENTO)` | ORIGINA: no máximo uma receita por atendimento. |
 | `VENDA` | `UNIQUE (ID_ATENDIMENTO)` | RESULTA EM: no máximo uma venda por atendimento (RN-01). |
 | `PAGAMENTO` | `UNIQUE (ID_PARCELA_QUITADA)` | QUITA: uma parcela é quitada por no máximo um pagamento (RN-28). |
+| `PARCELA` | `UNIQUE (ID_PARCELA, ID_VENDA)` | Suporte à FK composta, que garante quitação da mesma venda. |
+| `PARCELA` | `UNIQUE (ID_VENDA, NR_PARCELA)` | Impede repetir o número da parcela na mesma venda (RN-17). |
 | `NOTA_FISCAL_SAIDA` | `UNIQUE (ID_PAGAMENTO)` | GERA: uma nota por pagamento (RN-22). |
 | `NOTA_FISCAL_ENTRADA` | `UNIQUE (ID_COMPRA)` | POSSUI: uma nota por compra (RN-35). |
 
-Os números de nota (`NR_NOTA`) não são únicos no banco: a numeração depende do emissor fiscal e dos fornecedores, o que não foi validado com a ótica. Ficam com índice e com consulta de auditoria.
+Os números de nota (`NR_NOTA`) não recebem `UNIQUE`: a numeração depende do emissor e da série fiscal, ainda sem validação junto à ótica. O SQL inclui índices não exclusivos para consulta; verificações exploratórias de números repetidos (saída e entrada por fornecedor) estão em `docs/testes_regressao_integridade.sql`. Um número repetido exige conferência, não implica automaticamente erro fiscal.
 
 ## 1.4 Processo de Normalização (1FN, 2FN e 3FN)
 
@@ -906,7 +911,7 @@ Estas são as restrições que o script SQL (seção 3) cria. Os valores permiti
 | `ORCAMENTO.DH_APROVACAO` | `CHECK` obrigatória quando o status é APROVADO | RN-23 | A venda só é feita com aprovação dentro da validade. |
 | `VENDA.CD_STATUS` | `CHECK IN` (ABERTO, AGUARDANDO_PRODUTO, EM_MONTAGEM, PRONTO, RETIRADO, CANCELADO) | RN-24 | Acompanha o ciclo da encomenda. |
 | `VENDA.DT_LIBERACAO_ENCOMENDA` | `CHECK`: exige `DT_PREVISTA_CONCLUSAO` | RN-18 | A encomenda só é liberada com previsão de conclusão. |
-| `VENDA.DT_RETIRADA` | `CHECK`: exige `IN_CANHOTO_CONFERIDO` verdadeiro | RN-21 | A entrega é feita ao portador do canhoto. |
+| `VENDA.DT_RETIRADA`, `CD_STATUS` | `CHECK`: retirada exige canhoto verdadeiro, inclusive quando a coluna booleana seria `NULL`; status RETIRADO exige data preenchida | RN-21 | Evita que uma confirmação desconhecida (`NULL`) passe pelo `CHECK` do MySQL. |
 | `CONTEM.QT_PRODUTO` | `CHECK` maior que 0 | RN-04 | Linha sem quantidade não tem sentido. |
 | `CONTEM.VL_PRECO_UNITARIO` | `NOT NULL`, `CHECK` maior ou igual a 0 | RN-04 | O preço praticado fica gravado na linha, e dele vem o total da venda. |
 | `PRODUTO.CD_TIPO` | `CHECK IN` (LENTE, ARMACAO) | RN-14 | Base da especialização. |
@@ -922,7 +927,7 @@ Estas são as restrições que o script SQL (seção 3) cria. Os valores permiti
 | `PARCELA.VL_PARCELA` | `CHECK` maior ou igual a 50 | RN-17 | Parcela mínima de R$ 50,00. |
 | `NOTA_FISCAL_SAIDA.NR_NOTA`, `DT_EMISSAO`, `VL_TOTAL` | `NOT NULL`; `VL_TOTAL` maior ou igual a 0 | RN-22 | Dados mínimos da nota que a ótica registra. |
 | `COMPRA.CD_STATUS` | `CHECK IN` (SOLICITADA, RECEBIDA, CANCELADA) | RN-06 | Situação da compra. |
-| `COMPRA.DT_CHEGADA` | `CHECK`: não anterior a `DT_PEDIDO` | RN-06 | Datas coerentes. |
+| `COMPRA.DT_CHEGADA`, `CD_STATUS` | `CHECK`: não anterior a `DT_PEDIDO`; compra RECEBIDA exige data de chegada | RN-06 | Impede registrar recebimento sem data efetiva. |
 | `TROCA_DEVOLUCAO.TP_OCORRENCIA`, `CD_STATUS` | `CHECK IN` (TROCA, DEVOLUCAO) e (ABERTA, EM_AVALIACAO, APROVADA, RECUSADA, CONCLUIDA) | RN-25 | Ciclo de avaliação. |
 | `TROCA_DEVOLUCAO.QT_AFETADA` | `CHECK` maior que 0 | RN-25 | Há pelo menos uma peça afetada. |
 | `TROCA_DEVOLUCAO.DS_PARECER_AVALIACAO`, `DT_AVALIACAO` | `CHECK`: obrigatórios quando o status é APROVADA ou RECUSADA | RN-25 | Parecer e data são exigidos na decisão. |
@@ -990,7 +995,7 @@ Cada KPI tem fórmula, período e meta. A coluna **Origem da meta** diz de onde 
 | K6 | Giro de estoque | Saídas por venda no período ÷ saldo médio disponível, por tipo de produto | Ano | 3 a 5 voltas por ano, no caso de armações | Referência |
 | K7 | Prazo médio de entrega | Média de `DT_CHEGADA` menos `DT_PEDIDO`, por fornecedor | Trimestre | Acompanhar por fornecedor | Sem meta numérica |
 | K8 | Garantias a vencer | Produtos cuja garantia vence nos próximos 30 dias | Semana | Acompanhar | Regra da ótica (RN-07) |
-| K9 | Taxa de trocas e devoluções | Ocorrências (contadas no mês da venda de origem) ÷ vendas do mês | Mês | Abaixo de 10% | Referência (taxa de refazer pedidos) |
+| K9 | Taxa de trocas e devoluções | Ocorrências ÷ vendas do mês; G09 também mostra vendas distintas afetadas ÷ vendas do mês, separando repetição de ocorrências na mesma venda | Mês | Abaixo de 10% (referência para ocorrências/venda) | Referência (taxa de refazer pedidos) |
 | K10 | Conversão de atendimentos | Vendas ÷ atendimentos | Semana | Cerca de 80% | Informado (≈ 80 vendas para ≈ 100 atendimentos por semana) |
 | K11 | Aprovação de orçamentos | Orçamentos aprovados ÷ orçamentos emitidos | Mês | Acompanhar a tendência | Sem meta numérica |
 | K12 | Conversão por consultor | Vendas ÷ atendimentos comerciais conduzidos, por funcionário | Mês | Acompanhar | Sem meta numérica |
@@ -1015,7 +1020,7 @@ São propostas, não funcionalidades implementadas. Com o volume de uma ótica p
 | Previsão de demanda por produto | Saídas de `ESTOQUE` por mês e tipo de produto | Antecipar a reposição de lentes e armações (P2) |
 | Lembrete de renovação de receita | `RECEITA.DT_RECEITA`, `ATENDIMENTO`, `CLIENTE` | A ótica relatou aceitar receita de até um ano (RN-03); o cliente com receita perto de vencer pode ser contatado |
 | Recomendação de lente e armação | `RECEITA_MEDIDA`, `CONTEM`, `PRODUTO`, `LENTE`, `ARMACAO` | Sugerir o produto mais vendido para faixas parecidas de grau e índice |
-| Risco de atraso em parcelas | `PARCELA`, `PAGAMENTO` (forma e valor) | Priorizar o contato com clientes de maior risco (P1) |
+| Risco de atraso em parcelas | `PARCELA` → `VENDA` → `ATENDIMENTO` → `CLIENTE`, com pagamentos de quitação | Possível análise futura de atrasos por venda e cliente; depende de histórico e governança (P1) |
 | Alerta de anomalias no estoque | `ESTOQUE` (motivo, condição, quantidade) | Detectar saída maior que o saldo ou descarte fora do padrão |
 
 **Cuidado com os dados de saúde (P5):** receitas e medidas são dados pessoais sensíveis. Qualquer uso em IA deve ser feito com dados anonimizados, sem nome, CPF ou contato, e a ótica precisa confirmar a base legal e o prazo de guarda (pendência registrada no dicionário).
@@ -1033,7 +1038,7 @@ As consultas gerenciais **G01 a G14** são criadas no script SQL (seção 3), co
 | P5 — Proteção dos dados de saúde e receita obrigatória | `RECEITA`, `RECEITA_MEDIDA`, `ATENDIMENTO`, `VENDA`, `CONTEM`, `LENTE` | G13 (e auditoria A05) |
 | K1 — Receita recebida | `PAGAMENTO` | G01 |
 | K2 — Saldo a receber | `VENDA`, `CONTEM`, `PAGAMENTO` | G02 |
-| K3 — Parcelas atrasadas | `PARCELA`, `PAGAMENTO` | G03 |
+| K3 — Parcelas atrasadas | `PARCELA`, `VENDA`, `PAGAMENTO` | G03 e J07 |
 | K4 — Ticket médio | `VENDA`, `CONTEM` | G04 |
 | K5 — Itens abaixo do mínimo | `PRODUTO`, `ESTOQUE` | G05 |
 | K6 — Giro de estoque | `ESTOQUE`, `PRODUTO` | G06 |
@@ -1075,9 +1080,9 @@ O diagrama está em [`docs/modelo_logico.png`](docs/modelo_logico.png), com uma 
 
 ![Modelo lógico relacional da Ótica Kadosh, com 19 tabelas, colunas e tipos, chaves primárias (PK), chaves estrangeiras (FK) e cardinalidades (mín, máx) em cada ponta de ligação](./docs/modelo_logico.png)
 
-**Descrição em texto.** O diagrama tem 19 tabelas em quatro grupos: atendimento (`CLIENTE`, `FUNCIONARIO`, `ATENDIMENTO`, `RECEITA`, `RECEITA_MEDIDA`, `ORCAMENTO`, `VENDA`), itens e produtos (`CONTEM`, `PRODUTO`, `LENTE`, `ARMACAO`), pagamentos (`PAGAMENTO`, `PARCELA`, `NOTA_FISCAL_SAIDA`, `TROCA_DEVOLUCAO`) e compras e estoque (`FORNECEDOR`, `COMPRA`, `NOTA_FISCAL_ENTRADA`, `ESTOQUE`). As 19 ligações são as chaves estrangeiras da seção 1.3, uma a uma.
+**Descrição em texto.** O diagrama tem 19 tabelas em quatro grupos: atendimento (`CLIENTE`, `FUNCIONARIO`, `ATENDIMENTO`, `RECEITA`, `RECEITA_MEDIDA`, `ORCAMENTO`, `VENDA`), itens e produtos (`CONTEM`, `PRODUTO`, `LENTE`, `ARMACAO`), pagamentos (`PAGAMENTO`, `PARCELA`, `NOTA_FISCAL_SAIDA`, `TROCA_DEVOLUCAO`) e compras e estoque (`FORNECEDOR`, `COMPRA`, `NOTA_FISCAL_ENTRADA`, `ESTOQUE`). As 20 ligações são as chaves estrangeiras da seção 1.3, uma a uma.
 
-**Software.** O diagrama foi gerado com o **Graphviz** (comando `dot`) pelo programa [`docs/gerar_diagrama_logico.py`](docs/gerar_diagrama_logico.py), que lê o próprio `docs/script.sql`. Cada tabela, tipo, chave primária e chave estrangeira do desenho vem do script, então desenho e banco não se separam. O programa para com erro se o script deixar de ter 19 tabelas e 19 chaves estrangeiras. As cardinalidades (mín, máx) não existem no script; elas vêm do DER e estão copiadas, ligação por ligação, da tabela “Relacionamentos → chaves” da seção 1.2. O grupo consultou o professor, que aceitou o diagrama gerado com o Graphviz em lugar do brModelo.
+**Software.** O diagrama foi gerado com o **Graphviz** (comando `dot`) pelo programa [`docs/gerar_diagrama_logico.py`](docs/gerar_diagrama_logico.py), que lê o próprio `docs/script.sql`. Cada tabela, tipo, chave primária e chave estrangeira do desenho vem do script, então desenho e banco não se separam. O programa para com erro se o script deixar de ter 19 tabelas e 20 chaves estrangeiras. As cardinalidades (mín, máx) não existem no script; elas vêm do DER e estão copiadas, ligação por ligação, da tabela “Relacionamentos → chaves” da seção 1.2. O grupo consultou o professor, que aceitou o diagrama gerado com o Graphviz em lugar do brModelo.
 
 ### Notação
 
@@ -1122,7 +1127,9 @@ O script está em [`docs/script.sql`](docs/script.sql) e roda em **MySQL 8.0**. 
 
 **Como executar.** `mysql -u root -p < docs/script.sql`, ou abrir o arquivo no MySQL Workbench e executar tudo. As consultas gerenciais usam a data de referência `@hoje = '2026-10-30'` (a da carga), para o resultado ser sempre o mesmo; em produção, troca-se por `CURDATE()`.
 
-**Teste do zero.** O script foi executado em banco vazio, duas vezes seguidas, no MySQL 8.0.46: nenhum erro, nenhum aviso e saídas idênticas. Também foi executado com o modo seguro de `UPDATE` e `DELETE` ligado, que é o padrão do MySQL Workbench.
+**Teste do zero (versão anterior ao PR #2).** O grupo registrou execução anterior do script em banco vazio, duas vezes no MySQL 8.0.46, sem erro ou aviso, inclusive com modo seguro para `UPDATE` e `DELETE`. As alterações posteriores nas restrições e na G09 ainda precisam ser reexecutadas no MySQL 8 para uma nova confirmação. O arquivo [`docs/testes_regressao_integridade.sql`](docs/testes_regressao_integridade.sql) contém consultas somente de leitura para essa conferência.
+
+**Validação automatizada proposta.** O workflow [`.github/workflows/validar-sql.yml`](.github/workflows/validar-sql.yml) inicia MySQL 8, executa o script completo e verifica as restrições RN-06/RN-21 e os índices fiscais. A execução depende do GitHub Actions estar habilitado; consultar o resultado do workflow antes de considerar a nova versão validada.
 
 **Conferências extras.** Em `docs/` há três verificações feitas fora do MySQL e um arquivo de diagnóstico: a [auditoria de consistência](./docs/auditoria_consistencia.md) confirma que 18 entidades geram 19 tabelas (a 19ª é `CONTEM`, vinda do relacionamento N:N); a [checagem das 12 auditorias](./docs/verificacao_12_auditorias.md) recalcula A01 a A12 sobre os dados do script e chega às mesmas 21 ocorrências; o [verificador](./docs/verificar_consistencia.py) compara o inventário do README, do dicionário e do script; as [consultas de diagnóstico](./docs/consultas_diagnostico_pr1.sql) repetem, só com `SELECT`, as condições de A04 e A11.
 
@@ -1130,7 +1137,7 @@ O script está em [`docs/script.sql`](docs/script.sql) e roda em **MySQL 8.0**. 
 | --- | --- |
 | 1. `CREATE DATABASE` | Banco `otica_kadosh`, `utf8mb4`. |
 | 2. `CREATE TABLE` | As 19 tabelas, com colunas, tipos, `PRIMARY KEY`, `NOT NULL`, `DEFAULT` e `AUTO_INCREMENT`. |
-| 3. Constraints | 8 `UNIQUE`, 19 `FOREIGN KEY` (todas `RESTRICT`) e 40 `CHECK`, cada uma com a regra `RN-xx` em comentário; 5 índices de apoio; as 3 visões `vw_venda_total`, `vw_parcela_situacao` e `vw_produto_unidade` (seção 1.4). |
+| 3. Constraints | 10 `UNIQUE`, 20 `FOREIGN KEY` (todas `RESTRICT`) e 40 `CHECK`, cada uma com a regra `RN-xx` em comentário; 7 índices de apoio (incluindo os 2 índices não únicos de notas fiscais); as 3 visões `vw_venda_total`, `vw_parcela_situacao` e `vw_produto_unidade` (seção 1.4). |
 | 4. `INSERT INTO` | Massa fictícia de ≈ 12,5 mil linhas (explicada abaixo). |
 | 5. `SELECT` com `JOIN` | J01 a J06: histórico de clientes, linhas de venda com o subtipo do produto, vendas retiradas, receita e medidas, pagamentos com nota e parcela, compras com fornecedor e nota. |
 | 6. `UPDATE` | U01 a U03: registrar a retirada (exige o canhoto, RN-21), corrigir telefone, reprogramar a previsão de uma encomenda. |
@@ -1152,12 +1159,14 @@ Cada uma tem no script o cabeçalho `-- G## — pergunta` e `-- Atende: ...`. A 
 | G06 | Qual o giro de estoque do período, por tipo? | P2, K6 | Armações: 4,5 voltas por ano (referência de 3 a 5). Lentes: 24,1. |
 | G07 | Qual o prazo médio de entrega de cada fornecedor? | P2, K7 | De 3,5 a 11,3 dias, conforme o fornecedor. |
 | G08 | Quais garantias vencem nos próximos 30 dias? | P3, K8 | 24 linhas de vendas antigas (armação: 1 ano; lente: 6 meses, desde a montagem). |
-| G09 | Qual a taxa de trocas e devoluções sobre as vendas de cada mês? | P3, K9 | 6,1% das vendas de setembro e 2,8% das de outubro. |
+| G09 | Qual a taxa de ocorrências e de vendas distintas afetadas por trocas/devoluções? | P3, K9 | 6,1% de ocorrências/venda em setembro e 2,8% em outubro; a consulta diferencia eventos de vendas afetadas. |
 | G10 | Quantos atendimentos viram venda em cada semana? | P4, K10 | De 67,3% a 88,8% por semana; 79,8% no período (referência de 80%). |
 | G11 | Qual a taxa de aprovação dos orçamentos por mês? | P4, K11 | 87,1% em setembro e 83,7% em outubro. |
 | G12 | Qual a conversão de cada funcionário nos atendimentos comerciais? | P4, K12 | De 81,4% a 94,3%. |
 | G13 | Que proporção das vendas de lente de grau tem receita? | P5, K13 | 100% em setembro e 99,2% em outubro (2 vendas sem receita). |
 | G14 | Que proporção das vendas tem armação e lente? | K14 | 78,6% em setembro e 79,9% em outubro (referência de 75%). |
+
+**J07 (revisão de integridade):** lista as parcelas abertas e atrasadas com venda, cliente, vencimento e valor. As 850 parcelas agora identificam sua venda mesmo quando não há pagamento; a FK composta impede quitação de parcela de outra venda.
 
 ### Consultas de auditoria
 
@@ -1198,7 +1207,7 @@ O período é de **01/09/2026 a 30/10/2026**: 8,6 semanas e 51 dias de funcionam
 | `ORCAMENTO` | 862 | 831 no período (≈ 97 por semana; a estimativa era ≈ 90). Toda venda tem orçamento aprovado (738 aprovados no total); há 98 recusados, 22 emitidos sem decisão e 4 cancelados. |
 | `VENDA` | 740 | 712 no período, das quais 28 canceladas (≈ 4%). As 684 efetivas dão 79,5 por semana, perto das 80 informadas. Mais 28 da amostra antiga. |
 | `CONTEM` | 1.402 | Média de 1,9 linhas por venda: cerca de 79% das vendas levam armação e lente (G14), e as demais só armação (óculos de sol) ou só lente. |
-| `PRODUTO`, `LENTE`, `ARMACAO` | 352, 120 e 231 (351, 120 e 230 depois da D02) | 351 produtos com subtipo (231 armações e 120 lentes), mais 1 produto sem subtipo proposital (caso da A06). A D02 apaga 1 armação de teste, e a base fica com 350 produtos com subtipo (230 armações e 120 lentes) mais o produto da A06. A projeção inicial era ≈ 350 produtos; 16 lentes são sem grau. |
+| `PRODUTO`, `LENTE`, `ARMACAO` | 351, 120 e 230 | A massa inicial contém 351 produtos: 120 lentes, 230 armações e 1 produto propositalmente sem subtipo (A06). A D02 insere e exclui a armação de teste ID 9001; portanto, após a execução completa, os totais permanecem 351, 120 e 230. A projeção inicial era ≈ 350 produtos; 16 lentes são sem grau. |
 | `RECEITA`, `RECEITA_MEDIDA` | 625 e 1.569 | Uma receita para cada venda de lente de grau, mais laudos de avaliação e de orçamentos sem venda. Média de 2,5 medidas por receita (de 1 a 4, RN-10). |
 | `PAGAMENTO` | 846 | 705 sinais e pagamentos integrais (≈ 345 por mês, como na seção 1.1), 42 parciais e 99 quitações de parcela. Os 374 pagamentos de setembro e os 444 de outubro ficam abaixo dos ≈ 800 por mês da seção 1.1 porque a carga começa em setembro e não inclui as parcelas das vendas de agosto. |
 | `PARCELA` | 850 | 232 vendas parceladas (34% das efetivas; a estimativa era 35%), com 2 a 6 parcelas cada. Situação em 30/10: 99 pagas, 27 atrasadas e 724 abertas, com vencimento até abril de 2027. |
@@ -1554,7 +1563,7 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | **Motivação** | O esqueleto pede o modelo lógico em diagrama, com tabelas, tipos, PK, FK e cardinalidades (mín, máx) em cada ponta. Um integrante propôs usar o conversor do próprio brModelo. |
 | **Prompt(s) utilizados** | “Pelo brmodelo tem a opção de transformar em modelo logico pelo software mesmo, quer dar uma olhada lá?”; “Vamos pelo 1 então, me de o caminho de qual ferramenta baixar e logar, apos isso vc assume e faz o modelo logico por lá”. |
 | **Resposta recebida** | Três tentativas, nesta ordem: a conversão do brModelo, a importação do script no Workbench (primeiro a versão 26, que não tem modelagem, depois a 8.0.47) e o diagrama final em Graphviz, lido do script. |
-| **Fontes consultadas e verificadas** | A página de versões antigas do MySQL Workbench (dev.mysql.com), para achar a 8.0.47. A verificação foi por conferência: o programa falha se o script não tiver 19 tabelas e 19 chaves estrangeiras, e a importação no Workbench leu as 19 tabelas e as 3 visões. |
+| **Fontes consultadas e verificadas** | A página de versões antigas do MySQL Workbench (dev.mysql.com), para achar a 8.0.47. A verificação foi por conferência: o programa falha se o script não tiver 19 tabelas e 20 chaves estrangeiras, e a importação no Workbench leu as 19 tabelas e as 3 visões. |
 | **Trechos rejeitados ou corrigidos** | O resultado do conversor do brModelo foi rejeitado: chaves estrangeiras no lado errado, três tabelas sem chave estrangeira, sem a chave composta e tudo como `INT`. O desenho automático do Workbench também foi rejeitado, por ligações que cruzam as tabelas e por não mostrar o (mín, máx). No Graphviz, a IA ajustou a posição de alguns rótulos de cardinalidade que se sobrepunham. |
 | **Justificativa da escolha final** | O diagrama é gerado do próprio script, então não diverge do banco, e mostra a cardinalidade nas duas pontas, como o esqueleto exige. |
 | **Reflexão crítica** | As cardinalidades (mín, máx) não estão no script: foram copiadas do DER para o programa e precisam ser atualizadas à mão se o DER mudar. O Graphviz não é uma ferramenta de modelagem de dados; se o professor exigir uma, o diagrama deve ser refeito no brModelo ou no Workbench. |
@@ -1583,7 +1592,7 @@ Os slides estão em [`docs/apresentacao_final.pptx`](./docs/apresentacao_final.p
 | Abertura | 1 | 0:20 | Título e integrantes. |
 | 1. Contextualização do problema | 2 | 1:00 | Porte da ótica (≈100 atendimentos e ≈80 vendas por semana, ≈1.800 clientes) e os problemas P1 a P5. |
 | 2. Solução proposta | 3 | 1:00 | Fluxo atendimento → receita → orçamento → venda → pagamento e nota → estoque; 12 processos, 33 regras, 19 tabelas. |
-| 3. Modelo lógico | 4 | 1:00 | Diagrama (`docs/modelo_logico.png`); 19 tabelas, 19 chaves estrangeiras, 40 `CHECK`. |
+| 3. Modelo lógico | 4 | 1:00 | Slide produzido antes da revisão; o esquema atualizado tem 19 tabelas, 20 FKs e 40 `CHECK`. Atualizar o slide antes da entrega. |
 | 4. Demonstração da implementação | 5 | 1:00 | Etapas do script e linhas por tabela; **demonstração ao vivo** no MySQL Workbench. |
 | 5. Demonstração de consultas (gerenciais) | 6 | 1:00 | G10 (conversão semanal contra a meta de 80%), G05 (lentes em 86 de 100 pares) e G02 (R$ 96.211,94 a receber). |
 | 5. Demonstração de consultas (auditoria) | 7 | 0:50 | A01 a A12: 21 ocorrências plantadas na massa e achadas pelas consultas. |
