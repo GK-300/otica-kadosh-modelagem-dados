@@ -1077,7 +1077,7 @@ O diagrama está em [`docs/modelo_logico.png`](docs/modelo_logico.png), com uma 
 
 **Descrição em texto.** O diagrama tem 19 tabelas em quatro grupos: atendimento (`CLIENTE`, `FUNCIONARIO`, `ATENDIMENTO`, `RECEITA`, `RECEITA_MEDIDA`, `ORCAMENTO`, `VENDA`), itens e produtos (`CONTEM`, `PRODUTO`, `LENTE`, `ARMACAO`), pagamentos (`PAGAMENTO`, `PARCELA`, `NOTA_FISCAL_SAIDA`, `TROCA_DEVOLUCAO`) e compras e estoque (`FORNECEDOR`, `COMPRA`, `NOTA_FISCAL_ENTRADA`, `ESTOQUE`). As 19 ligações são as chaves estrangeiras da seção 1.3, uma a uma.
 
-**Software.** O diagrama foi gerado com o **Graphviz** (comando `dot`) pelo programa [`docs/gerar_diagrama_logico.py`](docs/gerar_diagrama_logico.py), que lê o próprio `docs/script.sql`. Cada tabela, tipo, chave primária e chave estrangeira do desenho vem do script, então desenho e banco não se separam. O programa para com erro se o script deixar de ter 19 tabelas e 19 chaves estrangeiras. As cardinalidades (mín, máx) não existem no script; elas vêm do DER e estão copiadas, ligação por ligação, da tabela “Relacionamentos → chaves” da seção 1.2.
+**Software.** O diagrama foi gerado com o **Graphviz** (comando `dot`) pelo programa [`docs/gerar_diagrama_logico.py`](docs/gerar_diagrama_logico.py), que lê o próprio `docs/script.sql`. Cada tabela, tipo, chave primária e chave estrangeira do desenho vem do script, então desenho e banco não se separam. O programa para com erro se o script deixar de ter 19 tabelas e 19 chaves estrangeiras. As cardinalidades (mín, máx) não existem no script; elas vêm do DER e estão copiadas, ligação por ligação, da tabela “Relacionamentos → chaves” da seção 1.2. O grupo consultou o professor, que aceitou o diagrama gerado com o Graphviz em lugar do brModelo.
 
 ### Notação
 
@@ -1198,7 +1198,7 @@ O período é de **01/09/2026 a 30/10/2026**: 8,6 semanas e 51 dias de funcionam
 | `ORCAMENTO` | 862 | 831 no período (≈ 97 por semana; a estimativa era ≈ 90). Toda venda tem orçamento aprovado (738 aprovados no total); há 98 recusados, 22 emitidos sem decisão e 4 cancelados. |
 | `VENDA` | 740 | 712 no período, das quais 28 canceladas (≈ 4%). As 684 efetivas dão 79,5 por semana, perto das 80 informadas. Mais 28 da amostra antiga. |
 | `CONTEM` | 1.402 | Média de 1,9 linhas por venda: cerca de 79% das vendas levam armação e lente (G14), e as demais só armação (óculos de sol) ou só lente. |
-| `PRODUTO`, `LENTE`, `ARMACAO` | 352, 120 e 231 | 351 produtos com subtipo (231 armações e 120 lentes), mais 1 produto sem subtipo proposital (caso da A06). A projeção inicial era ≈ 350 produtos; 16 lentes são sem grau. |
+| `PRODUTO`, `LENTE`, `ARMACAO` | 352, 120 e 231 (351, 120 e 230 depois da D02) | 351 produtos com subtipo (231 armações e 120 lentes), mais 1 produto sem subtipo proposital (caso da A06). A D02 apaga 1 armação de teste, e a base fica com 350 produtos com subtipo (230 armações e 120 lentes) mais o produto da A06. A projeção inicial era ≈ 350 produtos; 16 lentes são sem grau. |
 | `RECEITA`, `RECEITA_MEDIDA` | 625 e 1.569 | Uma receita para cada venda de lente de grau, mais laudos de avaliação e de orçamentos sem venda. Média de 2,5 medidas por receita (de 1 a 4, RN-10). |
 | `PAGAMENTO` | 846 | 705 sinais e pagamentos integrais (≈ 345 por mês, como na seção 1.1), 42 parciais e 99 quitações de parcela. Os 374 pagamentos de setembro e os 444 de outubro ficam abaixo dos ≈ 800 por mês da seção 1.1 porque a carga começa em setembro e não inclui as parcelas das vendas de agosto. |
 | `PARCELA` | 850 | 232 vendas parceladas (34% das efetivas; a estimativa era 35%), com 2 a 6 parcelas cada. Situação em 30/10: 99 pagas, 27 atrasadas e 724 abertas, com vencimento até abril de 2027. |
@@ -1236,22 +1236,21 @@ A massa cobre não só o caso comum, mas as situações que as consultas precisa
 
 ---
 
-## Andamento da Entrega 2
+## 5. Repositório GitHub
 
-| Seção | Situação |
+Tudo o que a Entrega 2 pede está na branch `main`:
+
+| Item do esqueleto | Onde está |
 | --- | --- |
-| 1.1 Revisão do Modelo Conceitual | Pronta (acima) |
-| 1.2 Conversão do modelo conceitual para o lógico | Pronta (acima) |
-| 1.3 Chaves primárias e estrangeiras | Pronta (acima) |
-| 1.4 Normalização (1FN, 2FN e 3FN) | Pronta (acima) |
-| 1.5 Justificativas técnicas | Pronta (acima) |
-| 1.6 Arquitetura analítica para BI e IA (com rastreabilidade) | Pronta (acima) |
-| 2. Modelo lógico relacional (diagrama) | Pronta (acima); imagens (`.png` e `.svg`) e gerador em `docs/` |
-| 3. Script SQL completo (`docs/script.sql`) | Pronta (abaixo); arquivo no repositório, testado do zero no MySQL 8.0 |
-| 4. Massa de dados | Pronta (abaixo); dentro do `docs/script.sql`, com o gerador em `docs/gerar_massa.py` |
-| 5. Repositório | Pronta: README, dicionário, levantamento, DER, modelo lógico, script, slides e conferências (`docs/`) na branch `main`; o histórico de commits está no GitHub |
-| 6. Uso de inteligência artificial | Pronta (abaixo): Usos 1 a 23 |
-| 7. Apresentação corporativa final | Pronta (abaixo): slides em `docs/apresentacao_final.pptx` |
+| Relatório técnico | Este `README.md` |
+| Dicionário de dados (HTML, com as restrições de cada coluna) | [`Dicionario_de_Dados_Otica_Kadosh.html`](./Dicionario_de_Dados_Otica_Kadosh.html) |
+| DER revisado | [`DER_OticaKadosh.png`](./DER_OticaKadosh.png) (seção 1.1) |
+| Modelo lógico | [`docs/modelo_logico.png`](./docs/modelo_logico.png), com a versão [`.svg`](./docs/modelo_logico.svg) e o gerador [`docs/gerar_diagrama_logico.py`](./docs/gerar_diagrama_logico.py) (seção 2) |
+| Levantamento e evidências da organização | [`levantamento/levantamento.md`](./levantamento/levantamento.md) e a foto da visita [`Otica kadoshi.jpeg`](./Otica%20kadoshi.jpeg) |
+| Script SQL e massa de dados | [`docs/script.sql`](./docs/script.sql) e o gerador da massa [`docs/gerar_massa.py`](./docs/gerar_massa.py) (seções 3 e 4) |
+| Slides da apresentação | [`docs/apresentacao_final.pptx`](./docs/apresentacao_final.pptx) (seção 7) |
+| Conferências de consistência | [Auditoria](./docs/auditoria_consistencia.md), [checagem das 12 auditorias](./docs/verificacao_12_auditorias.md), [verificador](./docs/verificar_consistencia.py) e [consultas de diagnóstico](./docs/consultas_diagnostico_pr1.sql) |
+| Histórico de commits | Aba Commits do GitHub: o trabalho foi feito ao longo de outubro e novembro de 2026, com commits de vários integrantes |
 
 ---
 
@@ -1564,8 +1563,8 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 
 | Item | Registro |
 | --- | --- |
-| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): comparação do README com o esqueleto da Entrega 2, atualização do índice de artefatos e da tabela de andamento, e montagem dos slides da seção 7 (`docs/apresentacao_final.pptx`). |
-| **Motivação** | Faltavam a seção 7 e os slides, a tabela de andamento estava desatualizada e os arquivos de conferência de `docs/` não tinham link no README. |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): comparação do README com o esqueleto da Entrega 2, atualização do índice de artefatos, troca da tabela de andamento pela seção 5 (repositório) e montagem dos slides da seção 7 (`docs/apresentacao_final.pptx`). |
+| **Motivação** | Faltavam a seção 7 e os slides, a tabela de andamento estava desatualizada (e foi trocada depois pela seção 5) e os arquivos de conferência de `docs/` não tinham link no README. |
 | **Prompt(s) utilizados** | “Quero agora que revise tudo do README e compare com o esqueleto da entrega 2 e veja se contém todas as seções e nada está faltando”; “Pode corrigir itens 1, 2 e 3 e fazer os slides”. |
 | **Resposta recebida** | Um relatório de conformidade seção a seção e, depois, as correções do README e um arquivo de 10 slides, com notas do orador e a divisão dos 8 minutos. |
 | **Fontes consultadas e verificadas** | Os números dos slides (conversão semanal, estoque, saldo a receber, 21 ocorrências de auditoria, linhas por tabela) vêm da execução do `docs/script.sql` em MySQL 8.0.46, refeita para esta etapa; os números da ótica (≈100 atendimentos e ≈80 vendas por semana, ≈1.800 clientes, metas) vêm das seções 1.1 e 1.6 do README. |
