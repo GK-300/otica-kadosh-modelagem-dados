@@ -1,0 +1,51 @@
+name: Validar diagramas DER e modelo logico
+
+on:
+  push:
+    paths:
+      - "docs/script.sql"
+      - "docs/gerar_diagrama_logico.py"
+      - "docs/gerar_der_conceitual.py"
+      - "DER_OticaKadosh.png"
+      - "DER_OticaKadosh.svg"
+      - "docs/modelo_logico.png"
+      - "docs/modelo_logico.svg"
+      - ".github/workflows/validar-diagramas.yml"
+  pull_request:
+    paths:
+      - "docs/script.sql"
+      - "docs/gerar_diagrama_logico.py"
+      - "docs/gerar_der_conceitual.py"
+      - "DER_OticaKadosh.png"
+      - "DER_OticaKadosh.svg"
+      - "docs/modelo_logico.png"
+      - "docs/modelo_logico.svg"
+      - ".github/workflows/validar-diagramas.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagramas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter arquivos
+        uses: actions/checkout@v4
+
+      - name: Instalar Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz
+
+      - name: Regenerar diagramas e conferir relacionamento
+        run: |
+          python3 docs/gerar_der_conceitual.py docs/script.sql DER_OticaKadosh
+          python3 docs/gerar_diagrama_logico.py docs/script.sql docs/modelo_logico
+          test -s DER_OticaKadosh.png
+          test -s DER_OticaKadosh.svg
+          test -s docs/modelo_logico.png
+          test -s docs/modelo_logico.svg
+          grep -q "PARCELA SALDO EM" DER_OticaKadosh.svg
+          grep -q "20 chaves estrangeiras" docs/modelo_logico.svg
+          git diff --exit-code -- DER_OticaKadosh.png DER_OticaKadosh.svg docs/modelo_logico.png docs/modelo_logico.svg

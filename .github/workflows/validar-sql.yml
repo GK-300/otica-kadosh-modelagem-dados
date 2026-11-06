@@ -1,0 +1,130 @@
+name: Validar SQL no MySQL 8
+
+on:
+  push:
+    paths:
+      - "docs/script.sql"
+      - "docs/testes_regressao_integridade.sql"
+      - "docs/testes_vinculo_parcelas.sql"
+      - ".github/workflows/validar-sql.yml"
+  pull_request:
+    paths:
+      - "docs/script.sql"
+      - "docs/testes_regressao_integridade.sql"
+      - "docs/testes_vinculo_parcelas.sql"
+      - ".github/workflows/validar-sql.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mysql8:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: senha_temporaria_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+
+    steps:
+      - name: Obter projeto
+        uses: actions/checkout@v4
+
+      - name: Instalar cliente MySQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+      - name: Executar DDL, massa de dados, consultas e demonstrações
+        env:
+          MYSQL_PWD: senha_temporaria_ci
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root --show-warnings < docs/script.sql
+
+      - name: Executar diagnósticos somente leitura
+        env:
+          MYSQL_PWD: senha_temporaria_ci
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root < docs/testes_regressao_integridade.sql
+
+      - name: Validar vínculo entre venda e parcelas
+        env:
+          MYSQL_PWD: senha_temporaria_ci
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root < docs/testes_vinculo_parcelas.sql
+          MYSQL="mysql --host=127.0.0.1 --port=3306 --user=root --batch --skip-column-names --silent otica_kadosh"
+          total=$($MYSQL -e "SELECT COUNT(*) FROM PARCELA;")
+          vendas=$($MYSQL -e "SELECT COUNT(DISTINCT ID_VENDA) FROM PARCELA;")
+          divergencias=$($MYSQL -e "SELECT COUNT(*) FROM PAGAMENTO g JOIN PARCELA p ON p.ID_PARCELA=g.ID_PARCELA_QUITADA WHERE g.ID_VENDA<>p.ID_VENDA;")
+          chaves=$($MYSQL -e "SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA='otica_kadosh';")
+          echo "Parcelas=$total, vendas parceladas=$vendas, quitacoes cruzadas=$divergencias, FKs=$chaves"
+          test "$total" = "850"
+          test "$vendas" = "232"
+          test "$divergencias" = "0"
+          test "$chaves" = "20"
+          # MySQL precisa rejeitar quitação de parcela de outra venda, mesmo
+          # quando ID_PARCELA_QUITADA ainda não foi usado.
+          if $MYSQL -e "
+            INSERT INTO PAGAMENTO (VL_PAGAMENTO, DT_PAGAMENTO, TP_FORMA, TP_FINALIDADE, ID_VENDA, ID_PARCELA_QUITADA)
+            SELECT 50.00, '2026-10-30', 'PIX', 'QUITACAO_PARCELA', v.ID_VENDA, p.ID_PARCELA
+              FROM PARCELA p
+              JOIN VENDA v ON v.ID_VENDA <> p.ID_VENDA
+             WHERE NOT EXISTS (SELECT 1 FROM PAGAMENTO g WHERE g.ID_PARCELA_QUITADA=p.ID_PARCELA)
+             ORDER BY p.ID_PARCELA, v.ID_VENDA LIMIT 1;" 2>/dev/null; then
+            echo "ERRO: banco aceitou quitação cruzada"
+            exit 1
+          fi
+          echo "FK composta rejeitou a quitação cruzada como esperado."
+
+      - name: Reproduzir massa a partir do gerador determinístico
+        run: |
+          python3 docs/gerar_massa.py /tmp/massa_regenerada.sql
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          committed = Path("docs/script.sql").read_text(encoding="utf-8")
+          regenerated = Path("/tmp/massa_regenerada.sql").read_text(encoding="utf-8")
+          start = committed.index("-- FUNCIONARIO: ")
+          end = committed.index("-- 5. SELECT", start)
+          section = committed[start:end]
+          if not section.rstrip().startswith(regenerated[:100]):
+              raise SystemExit("O inicio da massa diverge da gerada")
+          # Cada INSERT de PARCELA deve estar idêntico, inclusive ID_VENDA.
+          regex = re.compile(r"INSERT INTO PARCELA \([^)]*\) VALUES\s*.*?;", re.S)
+          in_committed = regex.findall(section)
+          in_regenerated = regex.findall(regenerated)
+          assert in_committed == in_regenerated, "Massa PARCELA divergente do gerador"
+          print("850 parcelas conferidas com o gerador original revisado.")
+          PY
+
+      - name: Conferir restrições e índices adicionados
+        env:
+          MYSQL_PWD: senha_temporaria_ci
+        run: |
+          MYSQL="mysql --host=127.0.0.1 --port=3306 --user=root --batch --skip-column-names --silent otica_kadosh"
+          saidas_sem_canhoto=$($MYSQL -e "
+            SELECT COUNT(*) FROM VENDA
+             WHERE (DT_RETIRADA IS NOT NULL AND COALESCE(IN_CANHOTO_CONFERIDO, FALSE) <> TRUE)
+                OR (CD_STATUS = 'RETIRADO'
+                    AND (DT_RETIRADA IS NULL OR COALESCE(IN_CANHOTO_CONFERIDO, FALSE) <> TRUE));")
+          compras_sem_chegada=$($MYSQL -e "
+            SELECT COUNT(*) FROM COMPRA
+             WHERE CD_STATUS = 'RECEBIDA' AND DT_CHEGADA IS NULL;")
+          indices_notas=$($MYSQL -e "
+            SELECT COUNT(*) FROM information_schema.STATISTICS
+             WHERE TABLE_SCHEMA = 'otica_kadosh'
+               AND INDEX_NAME IN ('idx_nfs_numero', 'idx_nfe_numero');")
+          echo "Retiradas inconsistentes: $saidas_sem_canhoto"
+          echo "Compras recebidas sem chegada: $compras_sem_chegada"
+          echo "Indices de notas fiscais: $indices_notas"
+          test "$saidas_sem_canhoto" = "0"
+          test "$compras_sem_chegada" = "0"
+          test "$indices_notas" = "2"
