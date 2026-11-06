@@ -14,7 +14,9 @@
 | João Victor Gobi Romero | 48114642 | [joaovromero](https://github.com/joaovromero) |
 | Guilherme Araujo de Oliveira | 47116862 | [GK-300](https://github.com/GK-300) |
 
-**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_OticaKadosh.png) · [Modelo lógico](./docs/modelo_logico.png) · [Script SQL com a massa de dados](./docs/script.sql) · [Gerador da massa](./docs/gerar_massa.py) · [Gerador do diagrama lógico](./docs/gerar_diagrama_logico.py).
+**Artefatos do repositório:** [Dicionário de dados (HTML)](./Dicionario_de_Dados_Otica_Kadosh.html) · [Levantamento](./levantamento/levantamento.md) · [DER revisado](./DER_OticaKadosh.png) · [Modelo lógico](./docs/modelo_logico.png) · [Script SQL com a massa de dados](./docs/script.sql) · [Gerador da massa](./docs/gerar_massa.py) · [Gerador do diagrama lógico](./docs/gerar_diagrama_logico.py) · [Slides da apresentação final](./docs/apresentacao_final.pptx) (seção 7).
+
+**Conferências de consistência (docs/):** [Auditoria de consistência](./docs/auditoria_consistencia.md) (README × dicionário × script) · [Checagem das 12 auditorias](./docs/verificacao_12_auditorias.md) (recálculo independente de A01 a A12) · [Verificador do inventário](./docs/verificar_consistencia.py) (`python docs/verificar_consistencia.py`) · [Consultas de diagnóstico](./docs/consultas_diagnostico_pr1.sql) (somente `SELECT`, para A04 e A11).
 
 ---
 
@@ -1122,6 +1124,8 @@ O script está em [`docs/script.sql`](docs/script.sql) e roda em **MySQL 8.0**. 
 
 **Teste do zero.** O script foi executado em banco vazio, duas vezes seguidas, no MySQL 8.0.46: nenhum erro, nenhum aviso e saídas idênticas. Também foi executado com o modo seguro de `UPDATE` e `DELETE` ligado, que é o padrão do MySQL Workbench.
 
+**Conferências extras.** Em `docs/` há três verificações feitas fora do MySQL e um arquivo de diagnóstico: a [auditoria de consistência](./docs/auditoria_consistencia.md) confirma que 18 entidades geram 19 tabelas (a 19ª é `CONTEM`, vinda do relacionamento N:N); a [checagem das 12 auditorias](./docs/verificacao_12_auditorias.md) recalcula A01 a A12 sobre os dados do script e chega às mesmas 21 ocorrências; o [verificador](./docs/verificar_consistencia.py) compara o inventário do README, do dicionário e do script; as [consultas de diagnóstico](./docs/consultas_diagnostico_pr1.sql) repetem, só com `SELECT`, as condições de A04 e A11.
+
 | Parte do script | O que contém |
 | --- | --- |
 | 1. `CREATE DATABASE` | Banco `otica_kadosh`, `utf8mb4`. |
@@ -1242,18 +1246,18 @@ A massa cobre não só o caso comum, mas as situações que as consultas precisa
 | 1.4 Normalização (1FN, 2FN e 3FN) | Pronta (acima) |
 | 1.5 Justificativas técnicas | Pronta (acima) |
 | 1.6 Arquitetura analítica para BI e IA (com rastreabilidade) | Pronta (acima) |
-| 2. Modelo lógico relacional (diagrama) | Pronta (acima); as imagens e o gerador entram no repositório em `docs/` |
-| 3. Script SQL completo (`docs/script.sql`) | Pronta (abaixo); o arquivo entra no repositório junto com este texto |
-| 4. Massa de dados | Pronta (abaixo) |
-| 5. Repositório | Em andamento (histórico de commits, dicionário, levantamento e DER já no repositório) |
-| 6. Uso de inteligência artificial | Em andamento (abaixo; atualizado a cada parte) |
-| 7. Apresentação corporativa final | A entregar na parte 6 |
+| 2. Modelo lógico relacional (diagrama) | Pronta (acima); imagens (`.png` e `.svg`) e gerador em `docs/` |
+| 3. Script SQL completo (`docs/script.sql`) | Pronta (abaixo); arquivo no repositório, testado do zero no MySQL 8.0 |
+| 4. Massa de dados | Pronta (abaixo); dentro do `docs/script.sql`, com o gerador em `docs/gerar_massa.py` |
+| 5. Repositório | Pronta: README, dicionário, levantamento, DER, modelo lógico, script, slides e conferências (`docs/`) na branch `main`; o histórico de commits está no GitHub |
+| 6. Uso de inteligência artificial | Pronta (abaixo): Usos 1 a 23 |
+| 7. Apresentação corporativa final | Pronta (abaixo): slides em `docs/apresentacao_final.pptx` |
 
 ---
 
 ## 6. Uso de Inteligência Artificial
 
-O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As decisões de modelagem e o levantamento de campo são do grupo. Os Usos 1 a 15 documentam a Entrega 1; os Usos 16 a 22 documentam a revisão e a Entrega 2.
+O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As decisões de modelagem e o levantamento de campo são do grupo. Os Usos 1 a 15 documentam a Entrega 1; os Usos 16 a 23 documentam a revisão e a Entrega 2.
 
 ### Uso 1 — análise do material inicial
 
@@ -1555,3 +1559,37 @@ O grupo usou ferramentas de IA em várias etapas e registra cada uso abaixo. As 
 | **Trechos rejeitados ou corrigidos** | O resultado do conversor do brModelo foi rejeitado: chaves estrangeiras no lado errado, três tabelas sem chave estrangeira, sem a chave composta e tudo como `INT`. O desenho automático do Workbench também foi rejeitado, por ligações que cruzam as tabelas e por não mostrar o (mín, máx). No Graphviz, a IA ajustou a posição de alguns rótulos de cardinalidade que se sobrepunham. |
 | **Justificativa da escolha final** | O diagrama é gerado do próprio script, então não diverge do banco, e mostra a cardinalidade nas duas pontas, como o esqueleto exige. |
 | **Reflexão crítica** | As cardinalidades (mín, máx) não estão no script: foram copiadas do DER para o programa e precisam ser atualizadas à mão se o DER mudar. O Graphviz não é uma ferramenta de modelagem de dados; se o professor exigir uma, o diagrama deve ser refeito no brModelo ou no Workbench. |
+
+### Uso 23 — slides da apresentação final e conferência do README contra o esqueleto (04/11/2026)
+
+| Item | Registro |
+| --- | --- |
+| **Ferramenta e etapa** | Claude (Anthropic, modelo Claude Sonnet 5.5): comparação do README com o esqueleto da Entrega 2, atualização do índice de artefatos e da tabela de andamento, e montagem dos slides da seção 7 (`docs/apresentacao_final.pptx`). |
+| **Motivação** | Faltavam a seção 7 e os slides, a tabela de andamento estava desatualizada e os arquivos de conferência de `docs/` não tinham link no README. |
+| **Prompt(s) utilizados** | “Quero agora que revise tudo do README e compare com o esqueleto da entrega 2 e veja se contém todas as seções e nada está faltando”; “Pode corrigir itens 1, 2 e 3 e fazer os slides”. |
+| **Resposta recebida** | Um relatório de conformidade seção a seção e, depois, as correções do README e um arquivo de 10 slides, com notas do orador e a divisão dos 8 minutos. |
+| **Fontes consultadas e verificadas** | Os números dos slides (conversão semanal, estoque, saldo a receber, 21 ocorrências de auditoria, linhas por tabela) vêm da execução do `docs/script.sql` em MySQL 8.0.46, refeita para esta etapa; os números da ótica (≈100 atendimentos e ≈80 vendas por semana, ≈1.800 clientes, metas) vêm das seções 1.1 e 1.6 do README. |
+| **Trechos rejeitados ou corrigidos** | Um dos números do cartão de MySQL estourava a caixa na primeira versão dos slides e foi reduzido. A afirmação de que as 21 ocorrências são “achadas” foi mantida só com a ressalva de que elas foram plantadas na massa fictícia. |
+| **Justificativa da escolha final** | Os slides têm pouco texto, como o esqueleto exige, e cada número pode ser conferido no script; as notas do orador servem de roteiro de ensaio. |
+| **Reflexão crítica** | Os resultados são da massa fictícia, e não da ótica real. A divisão do tempo por slide é uma estimativa e precisa de ensaio com cronômetro. Quem fala em cada bloco e a demonstração ao vivo no MySQL Workbench são decisão do grupo e não foram feitas pela IA. |
+
+---
+
+## 7. Apresentação Corporativa Final
+
+Os slides estão em [`docs/apresentacao_final.pptx`](./docs/apresentacao_final.pptx): 10 slides de estética minimalista, com as notas do orador e a divisão dos 8 minutos no campo de notas de cada slide. Os números dos gráficos são resultados reais do `docs/script.sql`, executado sobre a massa fictícia.
+
+| Ordem do esqueleto | Slide | Tempo | O que aparece |
+| --- | --- | --- | --- |
+| Abertura | 1 | 0:20 | Título e integrantes. |
+| 1. Contextualização do problema | 2 | 1:00 | Porte da ótica (≈100 atendimentos e ≈80 vendas por semana, ≈1.800 clientes) e os problemas P1 a P5. |
+| 2. Solução proposta | 3 | 1:00 | Fluxo atendimento → receita → orçamento → venda → pagamento e nota → estoque; 12 processos, 33 regras, 19 tabelas. |
+| 3. Modelo lógico | 4 | 1:00 | Diagrama (`docs/modelo_logico.png`); 19 tabelas, 19 chaves estrangeiras, 40 `CHECK`. |
+| 4. Demonstração da implementação | 5 | 1:00 | Etapas do script e linhas por tabela; **demonstração ao vivo** no MySQL Workbench. |
+| 5. Demonstração de consultas (gerenciais) | 6 | 1:00 | G10 (conversão semanal contra a meta de 80%), G05 (lentes em 86 de 100 pares) e G02 (R$ 96.211,94 a receber). |
+| 5. Demonstração de consultas (auditoria) | 7 | 0:50 | A01 a A12: 21 ocorrências plantadas na massa e achadas pelas consultas. |
+| 6. Potencial para BI e IA | 8 | 0:50 | Quatro painéis e 14 KPIs; quatro propostas de IA, com os dados de saúde anonimizados. |
+| 7. Benefícios para a decisão | 9 | 0:40 | Repor lentes, cobrar o saldo aberto, corrigir a conversão e garantir a receita nas vendas de lente de grau. |
+| Encerramento | 10 | 0:20 | Perguntas e defesa do modelo lógico. |
+
+A defesa do modelo lógico vem logo depois do pitch, fora do tempo cronometrado.
