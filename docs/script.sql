@@ -312,7 +312,9 @@ ALTER TABLE VENDA ADD CONSTRAINT ck_venda_status
 ALTER TABLE VENDA ADD CONSTRAINT ck_venda_liberacao
   CHECK (DT_LIBERACAO_ENCOMENDA IS NULL OR DT_PREVISTA_CONCLUSAO IS NOT NULL);                                  -- RN-18
 ALTER TABLE VENDA ADD CONSTRAINT ck_venda_retirada
-  CHECK (DT_RETIRADA IS NULL OR IN_CANHOTO_CONFERIDO = TRUE);                                                   -- RN-21
+  CHECK ((DT_RETIRADA IS NULL OR COALESCE(IN_CANHOTO_CONFERIDO, FALSE) = TRUE)
+         AND (CD_STATUS <> 'RETIRADO' OR
+              (DT_RETIRADA IS NOT NULL AND COALESCE(IN_CANHOTO_CONFERIDO, FALSE) = TRUE)));                       -- RN-21: NULL não pode validar uma retirada
 
 ALTER TABLE CONTEM ADD CONSTRAINT ck_contem_qt     CHECK (QT_PRODUTO > 0);                                      -- RN-04
 ALTER TABLE CONTEM ADD CONSTRAINT ck_contem_preco  CHECK (VL_PRECO_UNITARIO >= 0);                             -- RN-04
@@ -336,7 +338,9 @@ ALTER TABLE NOTA_FISCAL_SAIDA   ADD CONSTRAINT ck_nfs_total CHECK (VL_TOTAL >= 0
 ALTER TABLE NOTA_FISCAL_ENTRADA ADD CONSTRAINT ck_nfe_total CHECK (VL_TOTAL >= 0);                              -- RN-35
 
 ALTER TABLE COMPRA ADD CONSTRAINT ck_compra_status  CHECK (CD_STATUS IN ('SOLICITADA','RECEBIDA','CANCELADA')); -- RN-06
-ALTER TABLE COMPRA ADD CONSTRAINT ck_compra_chegada CHECK (DT_CHEGADA IS NULL OR DT_CHEGADA >= DT_PEDIDO);      -- RN-06
+ALTER TABLE COMPRA ADD CONSTRAINT ck_compra_chegada
+  CHECK ((DT_CHEGADA IS NULL OR DT_CHEGADA >= DT_PEDIDO)
+         AND (CD_STATUS <> 'RECEBIDA' OR DT_CHEGADA IS NOT NULL));                                               -- RN-06: recebimento exige data
 
 ALTER TABLE TROCA_DEVOLUCAO ADD CONSTRAINT ck_troca_tipo   CHECK (TP_OCORRENCIA IN ('TROCA','DEVOLUCAO'));       -- RN-25
 ALTER TABLE TROCA_DEVOLUCAO ADD CONSTRAINT ck_troca_status
@@ -369,6 +373,8 @@ CREATE INDEX idx_venda_data      ON VENDA (DH_COMPRA);
 CREATE INDEX idx_pag_venda_data  ON PAGAMENTO (ID_VENDA, DT_PAGAMENTO);
 CREATE INDEX idx_estoque_prod    ON ESTOQUE (ID_PRODUTO, DT_MOVIMENTO);
 CREATE INDEX idx_parcela_venc    ON PARCELA (DT_VENCIMENTO);
+CREATE INDEX idx_nfs_numero      ON NOTA_FISCAL_SAIDA (NR_NOTA);
+CREATE INDEX idx_nfe_numero      ON NOTA_FISCAL_ENTRADA (NR_NOTA);
 
 -- 3.5 Visões dos valores calculáveis (seção 1.4 do README) -----------
 -- O total da venda, a situação da parcela e a unidade do produto não
@@ -13337,20 +13343,26 @@ SELECT v.ID_VENDA, c.NM_CLIENTE, COALESCE(c.NR_TELEFONE_CELULAR, c.NR_TELEFONE_F
        BETWEEN @hoje AND DATE_ADD(@hoje, INTERVAL 30 DAY)
  ORDER BY fim_garantia, v.ID_VENDA;
 
--- G09 — Qual a taxa de trocas e devoluções sobre as vendas de cada mês (pela nota da venda de origem)?
--- Atende: P3 (pós-venda); K9 (taxa de trocas e devoluções)
+-- G09 — Quantas ocorrências e quantas vendas distintas foram afetadas no mês da compra?
+-- Atende: P3 (pós-venda); K9 (ocorrências/venda e percentual de vendas afetadas)
+-- Eventos e vendas afetadas são métricas diferentes: a mesma venda pode ter várias ocorrências.
 SELECT vm.mes, vm.vendas,
        COALESCE(oc.trocas, 0) AS trocas, COALESCE(oc.devolucoes, 0) AS devolucoes,
+       COALESCE(oc.vendas_afetadas, 0) AS vendas_afetadas,
+       ROUND(100 * COALESCE(oc.vendas_afetadas, 0) / vm.vendas, 1) AS pct_vendas_afetadas,
        ROUND(100 * (COALESCE(oc.trocas, 0) + COALESCE(oc.devolucoes, 0)) / vm.vendas, 1) AS pct_ocorrencias
   FROM (SELECT DATE_FORMAT(DH_COMPRA, '%Y-%m') AS mes, COUNT(*) AS vendas
           FROM VENDA WHERE CD_STATUS <> 'CANCELADO' AND DH_COMPRA >= @ini
          GROUP BY DATE_FORMAT(DH_COMPRA, '%Y-%m')) vm
   LEFT JOIN (SELECT DATE_FORMAT(v.DH_COMPRA, '%Y-%m') AS mes,
-                    SUM(t.TP_OCORRENCIA = 'TROCA') AS trocas, SUM(t.TP_OCORRENCIA = 'DEVOLUCAO') AS devolucoes
+                    COUNT(DISTINCT v.ID_VENDA) AS vendas_afetadas,
+                    SUM(t.TP_OCORRENCIA = 'TROCA') AS trocas,
+                    SUM(t.TP_OCORRENCIA = 'DEVOLUCAO') AS devolucoes
                FROM TROCA_DEVOLUCAO t
                JOIN NOTA_FISCAL_SAIDA n ON n.ID_NOTA_SAIDA = t.ID_NOTA_SAIDA
                JOIN PAGAMENTO p         ON p.ID_PAGAMENTO = n.ID_PAGAMENTO
                JOIN VENDA v             ON v.ID_VENDA = p.ID_VENDA
+              WHERE v.CD_STATUS <> 'CANCELADO' AND v.DH_COMPRA >= @ini
               GROUP BY DATE_FORMAT(v.DH_COMPRA, '%Y-%m')) oc ON oc.mes = vm.mes
  ORDER BY vm.mes;
 

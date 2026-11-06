@@ -722,7 +722,7 @@ Todas as chaves estrangeiras usam `ON DELETE RESTRICT` e `ON UPDATE RESTRICT`, p
 | `NOTA_FISCAL_SAIDA` | `UNIQUE (ID_PAGAMENTO)` | GERA: uma nota por pagamento (RN-22). |
 | `NOTA_FISCAL_ENTRADA` | `UNIQUE (ID_COMPRA)` | POSSUI: uma nota por compra (RN-35). |
 
-Os números de nota (`NR_NOTA`) não são únicos no banco: a numeração depende do emissor fiscal e dos fornecedores, o que não foi validado com a ótica. Ficam com índice e com consulta de auditoria.
+Os números de nota (`NR_NOTA`) não recebem `UNIQUE`: a numeração depende do emissor e da série fiscal, ainda sem validação junto à ótica. O SQL inclui índices não exclusivos para consulta; verificações exploratórias de números repetidos (saída e entrada por fornecedor) estão em `docs/testes_regressao_integridade.sql`. Um número repetido exige conferência, não implica automaticamente erro fiscal.
 
 ## 1.4 Processo de Normalização (1FN, 2FN e 3FN)
 
@@ -906,7 +906,7 @@ Estas são as restrições que o script SQL (seção 3) cria. Os valores permiti
 | `ORCAMENTO.DH_APROVACAO` | `CHECK` obrigatória quando o status é APROVADO | RN-23 | A venda só é feita com aprovação dentro da validade. |
 | `VENDA.CD_STATUS` | `CHECK IN` (ABERTO, AGUARDANDO_PRODUTO, EM_MONTAGEM, PRONTO, RETIRADO, CANCELADO) | RN-24 | Acompanha o ciclo da encomenda. |
 | `VENDA.DT_LIBERACAO_ENCOMENDA` | `CHECK`: exige `DT_PREVISTA_CONCLUSAO` | RN-18 | A encomenda só é liberada com previsão de conclusão. |
-| `VENDA.DT_RETIRADA` | `CHECK`: exige `IN_CANHOTO_CONFERIDO` verdadeiro | RN-21 | A entrega é feita ao portador do canhoto. |
+| `VENDA.DT_RETIRADA`, `CD_STATUS` | `CHECK`: retirada exige canhoto verdadeiro, inclusive quando a coluna booleana seria `NULL`; status RETIRADO exige data preenchida | RN-21 | Evita que uma confirmação desconhecida (`NULL`) passe pelo `CHECK` do MySQL. |
 | `CONTEM.QT_PRODUTO` | `CHECK` maior que 0 | RN-04 | Linha sem quantidade não tem sentido. |
 | `CONTEM.VL_PRECO_UNITARIO` | `NOT NULL`, `CHECK` maior ou igual a 0 | RN-04 | O preço praticado fica gravado na linha, e dele vem o total da venda. |
 | `PRODUTO.CD_TIPO` | `CHECK IN` (LENTE, ARMACAO) | RN-14 | Base da especialização. |
@@ -922,7 +922,7 @@ Estas são as restrições que o script SQL (seção 3) cria. Os valores permiti
 | `PARCELA.VL_PARCELA` | `CHECK` maior ou igual a 50 | RN-17 | Parcela mínima de R$ 50,00. |
 | `NOTA_FISCAL_SAIDA.NR_NOTA`, `DT_EMISSAO`, `VL_TOTAL` | `NOT NULL`; `VL_TOTAL` maior ou igual a 0 | RN-22 | Dados mínimos da nota que a ótica registra. |
 | `COMPRA.CD_STATUS` | `CHECK IN` (SOLICITADA, RECEBIDA, CANCELADA) | RN-06 | Situação da compra. |
-| `COMPRA.DT_CHEGADA` | `CHECK`: não anterior a `DT_PEDIDO` | RN-06 | Datas coerentes. |
+| `COMPRA.DT_CHEGADA`, `CD_STATUS` | `CHECK`: não anterior a `DT_PEDIDO`; compra RECEBIDA exige data de chegada | RN-06 | Impede registrar recebimento sem data efetiva. |
 | `TROCA_DEVOLUCAO.TP_OCORRENCIA`, `CD_STATUS` | `CHECK IN` (TROCA, DEVOLUCAO) e (ABERTA, EM_AVALIACAO, APROVADA, RECUSADA, CONCLUIDA) | RN-25 | Ciclo de avaliação. |
 | `TROCA_DEVOLUCAO.QT_AFETADA` | `CHECK` maior que 0 | RN-25 | Há pelo menos uma peça afetada. |
 | `TROCA_DEVOLUCAO.DS_PARECER_AVALIACAO`, `DT_AVALIACAO` | `CHECK`: obrigatórios quando o status é APROVADA ou RECUSADA | RN-25 | Parecer e data são exigidos na decisão. |
@@ -990,7 +990,7 @@ Cada KPI tem fórmula, período e meta. A coluna **Origem da meta** diz de onde 
 | K6 | Giro de estoque | Saídas por venda no período ÷ saldo médio disponível, por tipo de produto | Ano | 3 a 5 voltas por ano, no caso de armações | Referência |
 | K7 | Prazo médio de entrega | Média de `DT_CHEGADA` menos `DT_PEDIDO`, por fornecedor | Trimestre | Acompanhar por fornecedor | Sem meta numérica |
 | K8 | Garantias a vencer | Produtos cuja garantia vence nos próximos 30 dias | Semana | Acompanhar | Regra da ótica (RN-07) |
-| K9 | Taxa de trocas e devoluções | Ocorrências (contadas no mês da venda de origem) ÷ vendas do mês | Mês | Abaixo de 10% | Referência (taxa de refazer pedidos) |
+| K9 | Taxa de trocas e devoluções | Ocorrências ÷ vendas do mês; G09 também mostra vendas distintas afetadas ÷ vendas do mês, separando repetição de ocorrências na mesma venda | Mês | Abaixo de 10% (referência para ocorrências/venda) | Referência (taxa de refazer pedidos) |
 | K10 | Conversão de atendimentos | Vendas ÷ atendimentos | Semana | Cerca de 80% | Informado (≈ 80 vendas para ≈ 100 atendimentos por semana) |
 | K11 | Aprovação de orçamentos | Orçamentos aprovados ÷ orçamentos emitidos | Mês | Acompanhar a tendência | Sem meta numérica |
 | K12 | Conversão por consultor | Vendas ÷ atendimentos comerciais conduzidos, por funcionário | Mês | Acompanhar | Sem meta numérica |
@@ -1122,7 +1122,9 @@ O script está em [`docs/script.sql`](docs/script.sql) e roda em **MySQL 8.0**. 
 
 **Como executar.** `mysql -u root -p < docs/script.sql`, ou abrir o arquivo no MySQL Workbench e executar tudo. As consultas gerenciais usam a data de referência `@hoje = '2026-10-30'` (a da carga), para o resultado ser sempre o mesmo; em produção, troca-se por `CURDATE()`.
 
-**Teste do zero.** O script foi executado em banco vazio, duas vezes seguidas, no MySQL 8.0.46: nenhum erro, nenhum aviso e saídas idênticas. Também foi executado com o modo seguro de `UPDATE` e `DELETE` ligado, que é o padrão do MySQL Workbench.
+**Teste do zero (versão anterior ao PR #2).** O grupo registrou execução anterior do script em banco vazio, duas vezes no MySQL 8.0.46, sem erro ou aviso, inclusive com modo seguro para `UPDATE` e `DELETE`. As alterações posteriores nas restrições e na G09 ainda precisam ser reexecutadas no MySQL 8 para uma nova confirmação. O arquivo [`docs/testes_regressao_integridade.sql`](docs/testes_regressao_integridade.sql) contém consultas somente de leitura para essa conferência.
+
+**Validação automatizada proposta.** O workflow [`.github/workflows/validar-sql.yml`](.github/workflows/validar-sql.yml) inicia MySQL 8, executa o script completo e verifica as restrições RN-06/RN-21 e os índices fiscais. A execução depende do GitHub Actions estar habilitado; consultar o resultado do workflow antes de considerar a nova versão validada.
 
 **Conferências extras.** Em `docs/` há três verificações feitas fora do MySQL e um arquivo de diagnóstico: a [auditoria de consistência](./docs/auditoria_consistencia.md) confirma que 18 entidades geram 19 tabelas (a 19ª é `CONTEM`, vinda do relacionamento N:N); a [checagem das 12 auditorias](./docs/verificacao_12_auditorias.md) recalcula A01 a A12 sobre os dados do script e chega às mesmas 21 ocorrências; o [verificador](./docs/verificar_consistencia.py) compara o inventário do README, do dicionário e do script; as [consultas de diagnóstico](./docs/consultas_diagnostico_pr1.sql) repetem, só com `SELECT`, as condições de A04 e A11.
 
@@ -1130,7 +1132,7 @@ O script está em [`docs/script.sql`](docs/script.sql) e roda em **MySQL 8.0**. 
 | --- | --- |
 | 1. `CREATE DATABASE` | Banco `otica_kadosh`, `utf8mb4`. |
 | 2. `CREATE TABLE` | As 19 tabelas, com colunas, tipos, `PRIMARY KEY`, `NOT NULL`, `DEFAULT` e `AUTO_INCREMENT`. |
-| 3. Constraints | 8 `UNIQUE`, 19 `FOREIGN KEY` (todas `RESTRICT`) e 40 `CHECK`, cada uma com a regra `RN-xx` em comentário; 5 índices de apoio; as 3 visões `vw_venda_total`, `vw_parcela_situacao` e `vw_produto_unidade` (seção 1.4). |
+| 3. Constraints | 8 `UNIQUE`, 19 `FOREIGN KEY` (todas `RESTRICT`) e 40 `CHECK`, cada uma com a regra `RN-xx` em comentário; 7 índices de apoio (incluindo os 2 índices não únicos de notas fiscais); as 3 visões `vw_venda_total`, `vw_parcela_situacao` e `vw_produto_unidade` (seção 1.4). |
 | 4. `INSERT INTO` | Massa fictícia de ≈ 12,5 mil linhas (explicada abaixo). |
 | 5. `SELECT` com `JOIN` | J01 a J06: histórico de clientes, linhas de venda com o subtipo do produto, vendas retiradas, receita e medidas, pagamentos com nota e parcela, compras com fornecedor e nota. |
 | 6. `UPDATE` | U01 a U03: registrar a retirada (exige o canhoto, RN-21), corrigir telefone, reprogramar a previsão de uma encomenda. |
@@ -1152,7 +1154,7 @@ Cada uma tem no script o cabeçalho `-- G## — pergunta` e `-- Atende: ...`. A 
 | G06 | Qual o giro de estoque do período, por tipo? | P2, K6 | Armações: 4,5 voltas por ano (referência de 3 a 5). Lentes: 24,1. |
 | G07 | Qual o prazo médio de entrega de cada fornecedor? | P2, K7 | De 3,5 a 11,3 dias, conforme o fornecedor. |
 | G08 | Quais garantias vencem nos próximos 30 dias? | P3, K8 | 24 linhas de vendas antigas (armação: 1 ano; lente: 6 meses, desde a montagem). |
-| G09 | Qual a taxa de trocas e devoluções sobre as vendas de cada mês? | P3, K9 | 6,1% das vendas de setembro e 2,8% das de outubro. |
+| G09 | Qual a taxa de ocorrências e de vendas distintas afetadas por trocas/devoluções? | P3, K9 | 6,1% de ocorrências/venda em setembro e 2,8% em outubro; a consulta diferencia eventos de vendas afetadas. |
 | G10 | Quantos atendimentos viram venda em cada semana? | P4, K10 | De 67,3% a 88,8% por semana; 79,8% no período (referência de 80%). |
 | G11 | Qual a taxa de aprovação dos orçamentos por mês? | P4, K11 | 87,1% em setembro e 83,7% em outubro. |
 | G12 | Qual a conversão de cada funcionário nos atendimentos comerciais? | P4, K12 | De 81,4% a 94,3%. |
@@ -1198,7 +1200,7 @@ O período é de **01/09/2026 a 30/10/2026**: 8,6 semanas e 51 dias de funcionam
 | `ORCAMENTO` | 862 | 831 no período (≈ 97 por semana; a estimativa era ≈ 90). Toda venda tem orçamento aprovado (738 aprovados no total); há 98 recusados, 22 emitidos sem decisão e 4 cancelados. |
 | `VENDA` | 740 | 712 no período, das quais 28 canceladas (≈ 4%). As 684 efetivas dão 79,5 por semana, perto das 80 informadas. Mais 28 da amostra antiga. |
 | `CONTEM` | 1.402 | Média de 1,9 linhas por venda: cerca de 79% das vendas levam armação e lente (G14), e as demais só armação (óculos de sol) ou só lente. |
-| `PRODUTO`, `LENTE`, `ARMACAO` | 352, 120 e 231 (351, 120 e 230 depois da D02) | 351 produtos com subtipo (231 armações e 120 lentes), mais 1 produto sem subtipo proposital (caso da A06). A D02 apaga 1 armação de teste, e a base fica com 350 produtos com subtipo (230 armações e 120 lentes) mais o produto da A06. A projeção inicial era ≈ 350 produtos; 16 lentes são sem grau. |
+| `PRODUTO`, `LENTE`, `ARMACAO` | 351, 120 e 230 | A massa inicial contém 351 produtos: 120 lentes, 230 armações e 1 produto propositalmente sem subtipo (A06). A D02 insere e exclui a armação de teste ID 9001; portanto, após a execução completa, os totais permanecem 351, 120 e 230. A projeção inicial era ≈ 350 produtos; 16 lentes são sem grau. |
 | `RECEITA`, `RECEITA_MEDIDA` | 625 e 1.569 | Uma receita para cada venda de lente de grau, mais laudos de avaliação e de orçamentos sem venda. Média de 2,5 medidas por receita (de 1 a 4, RN-10). |
 | `PAGAMENTO` | 846 | 705 sinais e pagamentos integrais (≈ 345 por mês, como na seção 1.1), 42 parciais e 99 quitações de parcela. Os 374 pagamentos de setembro e os 444 de outubro ficam abaixo dos ≈ 800 por mês da seção 1.1 porque a carga começa em setembro e não inclui as parcelas das vendas de agosto. |
 | `PARCELA` | 850 | 232 vendas parceladas (34% das efetivas; a estimativa era 35%), com 2 a 6 parcelas cada. Situação em 30/10: 99 pagas, 27 atrasadas e 724 abertas, com vencimento até abril de 2027. |
