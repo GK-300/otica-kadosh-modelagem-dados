@@ -1,0 +1,50 @@
+name: Atualizar diagramas da revisao de parcelas (PR3)
+
+on:
+  push:
+    branches:
+      - fix/pr3-vinculo-parcelas-venda
+    paths:
+      - "docs/script.sql"
+      - "docs/gerar_diagrama_logico.py"
+      - "docs/gerar_der_conceitual.py"
+      - ".github/workflows/atualizar-diagramas-pr3.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  graficos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Instalar Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz
+
+      - name: Gerar DER conceitual e modelo logico
+        run: |
+          python3 docs/gerar_der_conceitual.py docs/script.sql DER_OticaKadosh
+          python3 docs/gerar_diagrama_logico.py docs/script.sql docs/modelo_logico
+          test -s DER_OticaKadosh.png
+          test -s DER_OticaKadosh.svg
+          test -s docs/modelo_logico.png
+          test -s docs/modelo_logico.svg
+          grep -q "PARCELA SALDO EM" DER_OticaKadosh.svg
+          grep -q "20 chaves estrangeiras" docs/modelo_logico.svg
+
+      - name: Registrar diagramas revistos na branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add DER_OticaKadosh.png DER_OticaKadosh.svg docs/modelo_logico.png docs/modelo_logico.svg
+          if ! git diff --cached --quiet; then
+            git commit -m "docs(diagramas): refletir vinculo entre venda e parcelas"
+            git push origin HEAD:fix/pr3-vinculo-parcelas-venda
+          fi

@@ -41,7 +41,7 @@ for m in re.finditer(r'ALTER TABLE (\w+)\s+ADD CONSTRAINT (\w+)\s+FOREIGN KEY \(
                      r'REFERENCES (\w+) \(([^)]*)\)', ddl):
     t, _, c, p, pc = m.groups()
     fks.append((t, [x.strip() for x in c.split(',')], p, [x.strip() for x in pc.split(',')]))
-assert len(tables) == 19 and len(fks) == 19, (len(tables), len(fks))
+assert len(tables) == 19 and len(fks) == 20, (len(tables), len(fks))
 
 # (tabela filha, 1ª coluna da FK) -> (relacionamento, cardinalidade da tabela referenciada, da tabela filha)
 REL = {
@@ -53,6 +53,7 @@ REL = {
  ('VENDA', 'ID_ATENDIMENTO'): ('RESULTA EM', '(0,1)', '(1,1)'),
  ('CONTEM', 'ID_VENDA'): ('CONTÉM', '(1,n)', '(1,1)'),
  ('CONTEM', 'ID_PRODUTO'): ('CONTÉM', '(0,n)', '(1,1)'),
+ ('PARCELA', 'ID_VENDA'): ('DIVIDE SALDO EM', '(0,n)', '(1,1)'),
  ('PAGAMENTO', 'ID_VENDA'): ('RECEBE', '(0,n)', '(1,1)'),
  ('PAGAMENTO', 'ID_PARCELA_QUITADA'): ('QUITA', '(0,1)', '(0,1)'),
  ('NOTA_FISCAL_SAIDA', 'ID_PAGAMENTO'): ('GERA', '(1,1)', '(1,1)'),
@@ -76,7 +77,7 @@ def esc(s):
 o = ['digraph G {',
      'graph [rankdir=LR, bgcolor="white", nodesep=0.55, ranksep=1.5, splines=true, pad=0.4, '
      'fontname="Helvetica", labelloc=t, fontsize=26, label=<<B>Modelo lógico — Ótica Kadosh</B><BR/>'
-     '<FONT POINT-SIZE="15">19 tabelas · 19 chaves estrangeiras · cardinalidades (mín,máx) em cada ponta '
+     '<FONT POINT-SIZE="15">19 tabelas · 20 chaves estrangeiras · cardinalidades (mín,máx) em cada ponta '
      '· PK = chave primária, FK = chave estrangeira</FONT>>];',
      'node [shape=plain, fontname="Helvetica", fontsize=12];',
      'edge [fontname="Helvetica", fontsize=10, arrowhead=none, color="#44546a", fontcolor="#222222", '
