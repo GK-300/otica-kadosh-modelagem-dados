@@ -1,0 +1,78 @@
+name: Validar SQL no MySQL 8
+
+on:
+  push:
+    paths:
+      - "docs/script.sql"
+      - "docs/testes_regressao_integridade.sql"
+      - ".github/workflows/validar-sql.yml"
+  pull_request:
+    paths:
+      - "docs/script.sql"
+      - "docs/testes_regressao_integridade.sql"
+      - ".github/workflows/validar-sql.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mysql8:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: senha_temporaria_ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+
+    steps:
+      - name: Obter projeto
+        uses: actions/checkout@v4
+
+      - name: Instalar cliente MySQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+      - name: Executar DDL, massa de dados, consultas e demonstrações
+        env:
+          MYSQL_PWD: senha_temporaria_ci
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root --show-warnings < docs/script.sql
+
+      - name: Executar diagnósticos somente leitura
+        env:
+          MYSQL_PWD: senha_temporaria_ci
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root < docs/testes_regressao_integridade.sql
+
+      - name: Conferir restrições e índices adicionados
+        env:
+          MYSQL_PWD: senha_temporaria_ci
+        run: |
+          MYSQL="mysql --host=127.0.0.1 --port=3306 --user=root --batch --skip-column-names --silent otica_kadosh"
+          saidas_sem_canhoto=$($MYSQL -e "
+            SELECT COUNT(*) FROM VENDA
+             WHERE (DT_RETIRADA IS NOT NULL AND COALESCE(IN_CANHOTO_CONFERIDO, FALSE) <> TRUE)
+                OR (CD_STATUS = 'RETIRADO'
+                    AND (DT_RETIRADA IS NULL OR COALESCE(IN_CANHOTO_CONFERIDO, FALSE) <> TRUE));")
+          compras_sem_chegada=$($MYSQL -e "
+            SELECT COUNT(*) FROM COMPRA
+             WHERE CD_STATUS = 'RECEBIDA' AND DT_CHEGADA IS NULL;")
+          indices_notas=$($MYSQL -e "
+            SELECT COUNT(*) FROM information_schema.STATISTICS
+             WHERE TABLE_SCHEMA = 'otica_kadosh'
+               AND INDEX_NAME IN ('idx_nfs_numero', 'idx_nfe_numero');")
+          echo "Retiradas inconsistentes: $saidas_sem_canhoto"
+          echo "Compras recebidas sem chegada: $compras_sem_chegada"
+          echo "Indices de notas fiscais: $indices_notas"
+          test "$saidas_sem_canhoto" = "0"
+          test "$compras_sem_chegada" = "0"
+          test "$indices_notas" = "2"
